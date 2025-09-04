@@ -1,0 +1,151 @@
+﻿Bridge It Together!
+Characters Spec Doc Document
+
+
+Índice
+Índice        1
+Descripción General:        2
+Resumen de componentes mecánicos/del sistema:        2
+Diagrama de Flujo:        4
+Flujo de construcción de cuadrantes:        4
+Componentes:        6
+Arte        7
+Arte 2D        7
+Arte 3D        7
+Feedback a considerar:        8
+Objetivos:        8
+Criterios de éxito:        8
+Pasos para Implementación:        9
+Desarrollo:        9
+Game Design:        9
+Arte:        9
+Sonido:        9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Descripción General:
+Los puentes son el objeto a construir en cada nivel. Se crean utilizando una grilla invisible por cuadrantes, lo que permite un diseño modular y dinámico. Cada cuadrante se construye por capas, usando diferentes materiales según un orden predefinido, y su funcionalidad depende de que estén completamente construidos. Solo los cuadrantes completos tienen colisión activa, lo que permite el paso seguro de vehículos y personajes.
+El diseño está centrado en una lógica de construcción progresiva, con feedback visual y mecánico para indicar el estado de cada cuadrante. Además, los cuadrantes incompletos pueden colapsar si un vehículo cae en ellos, obstaculizando el progreso de la construcción del puente. La última capa de cada cuadrante tiene un sistema de daño por estados, que permite reparaciones de la misma en medio del gameplay. La manera en la que dicha capa se rompe varía según la época.
+Todos los cuadrantes están gestionados mediante ScriptableObjects, lo que permite una implementación eficiente y flexible de las mecánicas de construcción, destrucción y colisión sin necesidad de instanciar físicamente todos los materiales.
+
+
+Resumen de componentes mecánicos/del sistema:
+Los puentes van a tener las siguientes características:
+* El puente está dividido en una grilla invisible configurable, donde cada cuadrante es independiente.
+* Cada cuadrante se construye por capas en orden, con 4 capas obligatorias y materiales específicos.
+* El cuadrante no tiene colisión hasta completar las 4 capas.
+* Cada cuadrante es gestionado por un ScriptableObject (SO).
+* El SO mantiene el estado de cada capa.
+* El SO dibuja la textura sin instanciar objetos físicos.
+* El SO activa o desactiva la colisión del cuadrante.
+* El SO maneja el estado dañado y destruido de la última capa.
+* El SO responde a triggers de colapso, daño y reparación.
+* Si un vehículo cae en un cuadrante incompleto, se activa un trigger de destrucción. El SO limpia las capas, elimina la colisión y muestra un efecto visual de colapso.
+* La última capa puede estar en estado completo o dañado.
+* Si la última capa en estado dañado recibe otro golpe, se destruye completamente el bloque.
+* La última capa dañada puede ser reparada si se coloca el mismo material encima.
+* La forma en la que se rompe la capa del último bloque varía según la época.
+Diagrama de Flujo:
+Flujo de construcción de cuadrantes:  
+Flujo de sistema de destrucción y reparación de objetos:
+  
+
+
+
+Componentes:
+* Grilla de construcción: Estructura lógica del puente dividida en cuadrantes. Cada cuadrante contiene múltiples capas (por ejemplo: base, soporte, superficie).
+La grilla no tiene representación visual, pero define la posición y estado de cada cuadrante en el mundo.
+Permite ubicar rápidamente qué cuadrantes están completos, cuáles faltan por construir y si la última capa de un cuadrante está dañada o no.
+Tiene 3 parámetros: Tamaño de la grilla (ancho y largo), cantidad de capas por cuadrante y referencia al ScriptableObject que maneja las reglas de construcción.
+Para ver una referencia visual ir a Diagrama de flujo y a Wireframe.
+
+* ScriptableObject del cuadrante: Encargado de manejar el estado interno de cada cuadrante del puente.
+Define cuántas capas requiere ese cuadrante, en qué orden deben colocarse y si están completas o no. También administra la visualización (activación de modelos o sprites por capa) y la colisión, que solo se activa cuando todas las capas están colocadas.
+En caso de que una capa sea destruida por un vehículo, actualiza el estado visual y desactiva la colisión.
+También contiene información sobre el estado de la última capa (si está en estado Completo o Dañado).
+Tiene 4 parámetros principales: Lista de capas requeridas, estado de la última capa, referencias visuales por capa y condiciones para habilitar colisión.
+Para ver una referencia visual ir a Diagrama de flujo.
+A su vez, la última capa tiene sus propios parámetros que varían según la época:
+   * Prehistoria y época medieval: Desgaste por uso. La capa tiene un límite de usos, al llegar a la mitad de usos, cambia a estado Dañado.
+   * Época industrial: Temperatura. La capa requiere de calor para mantenerse estable. Si deja de recibir calor, baja de temperatura, si llega a la mitad de temperatura, pasa a estado dañado. El calor no le aumenta la temperatura si no que le mantiene la temperatura actual, es decir que si del 100% la temperatura baja al 80%, al recibir calor nuevamente no sube a 100%, se queda en 80% hasta que pierda calor de nuevo.
+   * Época contemporánea: Sistema de cargas de daño probabilístico. Si la capa recibe un golpe (por parte de los vehículos) pasa a estado dañado, si vuelve a recibir daño, se rompe la capa (las capas de abajo se mantienen sanas). Si la última capa se repara, vuelve a estado completo.
+   * Época futurista: Sistema de baterías. La última capa se mantiene con el uso de baterías. Si la batería baja del 50%, entra en estado dañado. Si el jugador le pone a la capa una batería nueva, duración de la capa se reinicia.
+   * Modelo 3D: Cada capa tiene un determinado modelo 3D que se muestra cuando dicha capa es construida, no es un GameObject, solo un sprite.
+   * Shader: Cuando el cuadrante se destruye, tendrá un shader de destrucción que variará según la época histórica.
+
+
+
+
+
+
+Arte
+   * Modelo 3D.
+   * Shader de destrucción.
+   * Decorador de aspecto destruido para la última capa.
+
+
+Arte 2D
+
+Arte 3D
+Modelos: Ir poniendo el aspecto del puente por época.
+
+
+Shader de destrucción:
+Es un shader que se ejecutará al ser destruido el bloque completo, la apariencia del shader varía según el puente de cada época:
+Ir poniendo el aspecto del shader por época.
+Referencia:
+
+
+Shader de destrucción:
+Este aspecto denotará que la última capa está a punto de destruirse. Varía en cada época.
+Ir poniendo el aspecto por época.
+Referencia:
+
+
+Feedback a considerar:
+   * Ruido de destrucción: Se ejecuta al destruirse el bloque o la última capa. Varía en cada época.
+Referencia: https://pixabay.com/es/sound-effects/cartoon-scream-1-6835/
+
+
+Objetivos:
+      * La construcción y reparación debe ser fácil de aprender. La dificultad recae principalmente en el diseño de niveles, y no tanto en este sistema.
+      * Los aspectos de la última capa en estado Dañado deben notarse a simple vista para ayudar a los jugadores.
+      * El tamaño del puente aumentará progresivamente, pero no debe ser tan grande como para que los jugadores lleguen a construirlo con el tiempo justo (si es que se coordinaron correctamente, caso contrario pueden incluso no terminarlo, pero no por culpa del puente en sí).
+
+
+Criterios de éxito:
+Al utilizar métricas para evaluar el éxito del sistema, prestaremos mucha atención a lo siguiente:
+      * Playtest para saber qué tan rápido construyen el puente en su totalidad.
+      * Playtest para saber cuántas estrategias individuales y cuantas en equipo se toman para construir un bloque y luego todo el puente.
+      * Playtest para saber si los jugadores sienten justo el sistema de destrucción.
+      * Playtest para saber si los jugadores no se frustran con la construcción.
+      * Playtest para saber si los jugadores aprovechan el sistema de reparación.
+Pasos para Implementación:
+Desarrollo:
+      * Crear un puente con una grilla personalizable y SO.
+      * Crear los SO personalizables.
+Game Design:
+      * Definir el ancho y largo del puente según el nivel. Luego balancear en cada nivel.
+      * Definir si un puente empieza con alguna capa construida o no, de llegar a pasar, definir cuántas capas empiezan construidas.
+Arte:
+      * Hacer modelos 3D
+      * Hacer shaders para cada época.
+
+
+Sonido:
+      * Buscar sonidos de destrucción.
+      * Buscar sonidos de construcción (los de reparación serán los mismos).
+      * Todos los sonidos deben ser 3D.

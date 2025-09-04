@@ -1,0 +1,288 @@
+﻿Bridge It Together!
+Materials and Interactable Objects Specification Document
+
+
+Índice
+Índice        1
+Descripción General:        1
+Resumen de componentes mecánicos/del sistema:        2
+Diagrama de Flujo:        4
+Componentes:        4
+Arte        8
+Arte 2D        8
+Arte 3D        8
+Feedback a considerar:        11
+Referencias:        11
+Referencia visual        11
+Wireframe:        12
+Objetivos:        13
+Criterios de éxito:        14
+Pasos para Implementación:        15
+Desarrollo:        15
+Game Design:        15
+Arte:        15
+Sonido:        16
+
+
+
+
+
+
+
+
+
+
+________________
+Descripción General:
+Los objetos interactuables del mundo son el corazón de las mecánicas de recolección y transformación de materiales en el juego. Se dividen en dos grandes grupos: objetos genéricos, presentes en todas las épocas, y objetos únicos, específicos de cada época histórica.
+Los objetos genéricos permiten recolectar o fabricar los materiales necesarios para construir las capas 1, 3 y 4 del puente, utilizando siempre el mismo procedimiento.
+En cambio, la capa 2 del puente requiere una máquina única por época, lo que introduce variaciones mecánicas y obliga a los jugadores a adaptar sus estrategias.
+Además, cada época incluye dos máquinas especiales adicionales, que aportan mecánicas exclusivas y fomentan distintos tipos de interacción y cooperación.
+Los materiales, aunque cambian visualmente en cada época, tienen funciones compartidas: pueden usarse para construir el puente, como insumos en máquinas únicas, o para fabricar otros materiales intermedios.
+Esta dualidad potencia la toma de decisiones y el juego en equipo, ya que obliga a los jugadores a gestionar recursos y planificar su uso en función del contexto del nivel y la época.
+
+
+Resumen de componentes mecánicos/del sistema:
+Los objetos y materiales interactuables tienen las siguientes características:
+* Se dividen en materiales genéricos, presentes en todas las épocas y usados para construir las capas 1, 3 y 4 del puente, y materiales únicos, que cambian según la época y permiten obtener la capa 2 o introducen mecánicas secundarias.
+* Los materiales pueden ser transportados por los jugadores, usados en el puente o como insumos para otras máquinas.
+* Cada objeto tiene una funcionalidad específica, como recolectar, transformar o consumir materiales.
+* Las máquinas únicas pueden requerir múltiples insumos o pasos secuenciales.
+* Los jugadores interactúan mediante un botón contextual dentro de un radio de detección.
+* Si hay múltiples objetos cerca, se prioriza automáticamente el más relevante.
+* Algunas máquinas únicas requieren de coordinación por parte de los jugadores.
+________________
+Diagrama de Flujo:
+Flujo uso de los materiales interactuables:
+  
+
+
+
+
+
+
+
+Componentes:
+   * Zona segura: La zona segura es la parte del mapa donde aparecen los jugadores y donde aparecen los materiales y los objetos interactuables. El mapa contendrá 4 de estas zonas, 2 de cada lado del puente, estando 2 en arriba de la carretera y 2 debajo de esta. Cada zona debe estar separada en cuadrantes de 1x1 (en metros). Mientras un cuadrante sea zona segura, los materiales y personajes podrán caer sobre él. Si un cuadrante deja de ser zona segura (es decir, pasa a ser zona NO segura), entonces ya no se tiene en cuenta en los cálculos de lanzamiento (o sea que si un auto arroja a un player, no tendrá en cuenta al cuadrante no seguro como posible punto de caída).
+   * Componentes comunes de todos los objetos y materiales: Tienen un modelo 3D, una layer interactuable, y un rango de prioridad (muy bajo, bajo, medio, alto, muy alto). El rango de prioridad sirve para decidir cuál objeto se selecciona cuando hay varios dentro del radio de interacción. Además, tanto los materiales como los objetos interactuables convierten el cuadrante en el que están posicionados en no seguro (por ejemplo, si un player suelta un material, este debe caer en un cuadrante, al colisionar con el material con el cuadrante, este último se vuelve no seguro).
+   * Materiales:
+   * Todos los materiales tienen un tipo, que va del 1 al 4.
+   * El tipo determina en qué capa del puente se puede usar el material (tipo 1 → capa 1, tipo 2 → capa 2, etc.).
+   * Los tipos también definen combinaciones posibles, como tipo 1 + tipo 2 = tipo 3.
+   * Objetos genéricos:
+   * Objeto genérico 1: Permite obtener el material tipo 1 al presionar el botón de interacción.
+   * Objeto genérico 2 (mezcladora): Cada mezcladora tiene dos slots internos, uno para cada tipo de material. Al colocar un material tipo 1, si su slot está vacío, el objeto desaparece y el slot se marca como ocupado. Lo mismo ocurre al colocar un material tipo 2. Como feedback visual, cada slot tiene una representación visual correspondiente que se activa al llenarse, como por ejemplo un objeto decorativo que simula que ese material está en uso. Una vez ambos materiales están cargados, la mezcladora inicia el proceso de creación del material tipo 3, cuyo comportamiento y velocidad de creación varía según la época en la que se encuentre. Al terminar el proceso, las visuales de ambos materiales se desactivan:
+   * Prehistoria: Su material tipo 1 es un palo de madera y su material tipo 2 es resina. Al colocar ambos materiales, la fogata inicia automáticamente el proceso de mezcla. El proceso dura 1.5 segundos y la fogata funciona constantemente durante todo el nivel.
+   * Época medieval: La mezcladora requiere que un jugador mantenga presionado el botón de interacción durante 1.5 segundos para que se fabrique el nuevo material. Funciona de forma similar a las otras mezcladoras, con la diferencia de que el proceso es manual y requiere la participación activa del jugador para iniciarse.
+   * Época industrial: La mezcladora necesita carbón para funcionar. Al colocar carbón, se activa por un tiempo determinado. Si el tiempo de vida se agota, la mezcladora se apaga y requiere más carbón para volver a funcionar. Si se le coloca más carbón antes de que se apague, el tiempo de vida se reinicia.
+   * Época contemporánea: La mezcladora funciona de forma automática una vez que se colocan los materiales, de manera similar a la fogata de la época prehistórica. No requiere interacción adicional ni recursos extra para operar.
+   * Época futurista: En la época futurista, la mezcladora funciona de manera parecida a la industrial, pero en lugar de utilizar carbón, requiere baterías como fuente de energía. El proceso de mezcla es mucho más rápido, tardando solo 0.5 segundos en generar el material tipo 3 una vez que ambos materiales han sido cargados. 
+   * Objeto genérico 3: Entrega el material tipo 4 al mantener presionado el botón de interacción durante 1 segundo.
+   * Objetos y materiales únicos por época:
+   * Prehistoria: Solo tiene un objeto único fácil de entender y que no requiere precisión ni mucha coordinación dado que sirve como objeto de tutorial:
+   * Corteza resistente: Corteza de árbol que no puede ser recogida por los jugadores a no ser que cuenten con un palo ignífugo. Al usar el palo, la corteza deja caer resina al suelo (es el material tipo 2).
+   * Resina de árbol: Es el material que suelta la corteza resistente, puede ser recogido por un Player y se usa para cocinar el material tipo 3 y para construir la capa 2 del puente.
+   * Palo ignífugo: Un palo que al acercarse a una fogata se enciende, si el jugador se acerca con un palo ignífugo encendido a la zona de obtención del material tipo 2, entonces al interactuar se caerá al suelo el material tipo 2 y el palo se romperá. La fuente de palos ignífugos es infinita.
+   * Época medieval: El objetivo es fomentar la cooperación a distancia, desde lados opuestos del puente:
+   * Bloque de adoquín: Bloque que puede ser recogido por los jugadores, cuando es golpeado por una flecha de ballista, se rompe y se crea un material tipo 2.
+   * Catapulta: Permite lanzar materiales en parábola. Se coloca el material sobre la plataforma y se activa con el botón de interacción, el lanzamiento tarda 1 segundo en realizarse. Se recarga en 3 segundos. Cuando lanza el material, la catapulta rota hacia adelante, luego del lanzamiento, rota hacia abajo hasta volver a su posición original, el tiempo de rotación hacia abajo es el mismo que el tiempo de recarga.
+   * Ballista: Dispara en línea recta al presionar el botón de interacción, dispara luego de 0.5 segundos. Tiene una recarga de 3 segundos. Al disparar, la soga en tensión se mueve rápidamente hacia al centro, luego de ejecutado el lanzamiento, la soga vuelve progresivamente a su posición original, el tiempo para que la soga vuelva a su posición original es igual al tiempo de recarga.
+   * Flecha: Es lanzada por la ballista. Al colisionar con un material, se destruye. Si colisiona con un player, lo empuja 1 cuadrante de zona segura para atrás. En caso de que no pueda irse para atrás (porque está en el límite del mapa o porque hay materiales u objetos interactuables bloqueando el espacio), entonces saldrá volando y caerá en el mismo cuadrante en el que estaba. 
+   * Época industrial: La estrategia a fomentar es el aprovechamiento eficiente del carbón para que las partes del puente no se deterioren tan rápido.
+   * Carbón: Material esencial para que los objetos de la época funcionen. El jugador puede recogerlo y llevarlo a otro lugar. Cuando el jugador interactúa con una máquina que requiera carbón teniendo uno en la mano, dicho carbón desaparece y carga al máximo el tiempo de vida de la máquina.
+   * Vagón a carbón: Se mueve por un riel de un lado al otro cuando un jugador activa el horno con carbón. Sirve para transportar materiales.
+   * Horno común: Son 2 hornos que se colocan uno en cada costado del puente, su rango de calor ocupa la mitad del puente, es decir que para calentar todo el puente se necesitan ambos hornos encendidos, para funcionar, los jugadores deben meter una cantidad determinada de carbones para que prendan. Tienen una vida útil, cuando se les acaba el tiempo de vida, el calor del horno se apaga. Los jugadores pueden reiniciar el tiempo de vida en cualquier momento al poner un nuevo carbón.
+   * Gran horno: Requiere el doble de carbón que un horno normal. Al llenarse, calienta todo el puente por un tiempo. Los bloques construidos durante ese tiempo también mantienen su temperatura.
+   * Época contemporánea: La estrategia a promover es que se pasen materiales de un lado del mapa a otro mediante las máquinas automáticas y se junten para construir, aprovechando así la automatización de la época:
+   * Cintas transportadoras: Mueven materiales de un lado al otro. Si se acumulan, los materiales se apilan y bloquean el flujo.
+   * Máquina de cemento: Se carga al lanzar mezclas. Al llegar al 100%, ambos jugadores deben mantener presionado cada uno un botón de cada lado durante 1 segundo para activarla. Al activarse, construye automáticamente la capa 4 en bloques que estén completos hasta la capa 3 o solo estén en estado Dañado. No afecta bloques incompletos que tengan menos de 3 capas.
+   * Época futurista: La estrategia a promover es el uso de la teletransportación para ir más rápido de un punto a otro y aprovechar los múltiples usos de las baterías:
+   * Teletransportadores: Mueven materiales y jugadores, requieren baterías como los bloques del puente.
+   * Generador de energía: Al llenarse y ser activado por ambos jugadores, carga todos los bloques activos del puente. Durante 30 segundos, los bloques activos no pierden batería. No afecta a bloques destruidos o los activados después de encender el generador.
+
+
+Arte
+   * Modelo 3D
+   * Animaciones de cada máquina.
+   * Shader si le corresponde a la máquina.
+
+
+Arte 2D
+Bocetos:
+Prehistoria:
+Material tipo 1: Palo de madera
+  
+
+
+
+Material tipo 2: Resina
+  
+
+Material tipo 3: Resina cocinada
+  
+
+Material tipo 4: Adoquín
+  
+
+
+Interactuable para conseguir el material tipo 1:  
+Interactuable para conseguir el material tipo 2:
+  
+
+Interactuable para conseguir el material tipo 4:
+  
+
+
+
+________________
+
+
+Fogata (mezcladora):
+  
+
+Palo ignífugo:
+  
+
+Mapa:
+  
+  
+
+
+Arte 3D
+Modelos: Ir poniendo el aspecto del personaje por época.
+Animación de caminar:
+Durante la animación de caminar, los brazos del personaje deben ir casi pegados a su cuerpo, su recorrido sería de adelante hacia atrás con un movimiento curvo.
+Referencia:
+  
+
+
+
+Animación de interactuar:
+El personaje levantará ambos brazos rápidamente en dirección al objeto interactuable.
+
+
+Animación de construir:
+El personaje arrojará con fuerza hacia abajo el material, como si quisiera que el material se colocará directamente con la velocidad.
+Referencia:
+  
+  
+
+El movimiento sería similar al primero gif pero con la velocidad e intensidad del segundo.
+Animación de sostener materiales:
+El personaje sostendrá con ambas manos el material que recoja.
+Referencia:
+  
+
+
+
+Animación de salir volando:
+El personaje se sacudirá de manera exagerada mientras está en el aire.
+Referencia:
+  
+
+Animación de soltar objetos:
+El personaje soltará el objeto que tenga en la mano como si lo arrojara suavemente.
+Referencia:
+  
+
+
+
+
+
+Feedback a considerar:
+   * Grito de susto: Cuando un personaje es atropellado por un vehículo y sale volando. Debe ser corto y agudo.
+Referencia: https://pixabay.com/es/sound-effects/cartoon-scream-1-6835/ (algo así pero más agudo).
+
+
+Referencias:
+Referencia visual
+Los materiales tendrán un estilo visual caricaturesco, con siluetas simples y colores planos, en línea con el diseño de los personajes. Tendrán proporciones claras y reconocibles que permitan distinguir fácilmente el tipo de material (tipo 1, tipo 2, etc.) con solo mirarlo. Sus texturas serán suaves, con detalles mínimos como bordes resaltados y sombreados sutiles para aportar volumen sin perder la estética amigable y clara.
+Las herramientas (como mezcladoras, hornos pequeños, etc.) compartirán el mismo estilo general pero con un poco más de detalle que los materiales, reflejando su mayor tamaño y complejidad funcional. Mantendrán formas fácilmente reconocibles, con partes móviles o destacadas que refuercen visualmente su función (por ejemplo, la tapa de una mezcladora o el compartimiento de carga de un horno). Se utilizarán colores distintivos por época o función, y patrones simples para enfatizar interactividad y estado (como luces encendidas/apagadas o cambios de color al activarse).
+Los objetos más grandes, como maquinaria industrial o estructuras futuristas, tendrán un nivel de detalle similar al de los puentes. Incluirán más subdivisiones en su modelado, elementos decorativos adicionales (tubos, luces, indicadores), pero seguirán evitando texturas complejas o hiperrealistas. Se priorizará siempre la legibilidad visual en el contexto del juego cooperativo y el estilo caricaturesco general.
+  
+  
+  
+
+Wireframe:
+  
+
+
+
+Objetivos:
+      * Todos los materiales deben ser fácilmente reconocibles a simple vista, incluso a distancia o en medio del caos del gameplay. Su forma, color y tamaño deben indicar claramente su tipo y uso.
+
+      * El diseño de los materiales debe ser coherente con su utilidad. Por ejemplo, los materiales de mayor nivel deben verse más complejos o refinados, sin perder la simplicidad general del estilo artístico.
+
+      * Todos los materiales deben poder ser sostenidos con ambas manos, para no limitar el movimiento del jugador. Visualmente deben encajar con esta idea, sin parecer demasiado grandes o pesados.
+
+      * Las máquinas y objetos interactuables deben comunicar su funcionalidad sin necesidad de tutoriales extensos. Esto se puede lograr con animaciones simples, luces o iconografía intuitiva.
+
+      * El feedback visual al interactuar con un objeto (como el brillo intermitente) debe ser claro pero no molesto. Debe ser perceptible sin distraer al jugador de otras tareas.
+
+      * Los objetos interactuables deben responder al mismo sistema de prioridades, lo cual permite una detección coherente en entornos con múltiples elementos cerca.
+
+      * Las animaciones de interacción (como mezclar, presionar o activar) deben tener tiempos breves y estar optimizadas para el ritmo rápido del juego.
+
+      * Las máquinas deben tener tiempos de espera o recarga que generen decisiones cooperativas y fomenten la coordinación entre jugadores.
+
+      * Las proporciones de las máquinas deben respetar su funcionalidad: deben verse robustas pero no deben tapar al jugador ni dificultar la navegación alrededor de ellas.
+
+      * Todos los objetos deben integrarse visualmente con el entorno, sin camuflarse ni destacarse en exceso. Deben ser claramente parte del mundo del juego.
+
+
+
+
+Criterios de éxito:
+         * Playtests para comprobar si los jugadores pueden identificar rápidamente el tipo y función de cada material sin explicaciones externas.
+
+         * Playtests para observar si los jugadores entienden intuitivamente cómo usar cada objeto interactuable y si logran activarlos sin frustración.
+
+         * Playtests para analizar si la interacción entre jugadores alrededor de los objetos fomenta la cooperación y no genera bloqueos innecesarios.
+
+         * Métricas invisibles para medir el tiempo que tarda un jugador en recoger un material desde que aparece hasta que se coloca en el puente (útil para balancear dificultad y ritmo).
+
+         * Métricas invisibles para registrar cuántas veces se usan los objetos interactuables y con qué éxito (por ejemplo, cuántas mezclas fallan o cuántas veces la catapulta no atina).
+
+         * Playtests para evaluar si el feedback visual de los objetos es claro (por ejemplo, si saben cuándo un horno está encendido o una mezcladora está lista).
+
+         * Playtests para determinar si los jugadores encuentran satisfactorio el uso de los objetos especiales de cada era.
+
+         * Playtests para ver si la presencia de materiales y máquinas genera variedad en las estrategias que los jugadores desarrollan en diferentes niveles.
+Pasos para Implementación:
+Desarrollo:
+            * Crear un sistema base de materiales con tipo, modelo 3D, layer y prioridad.
+            * Crear un sistema de mezcla de materiales, con entradas y salidas definidas por tipo.
+            * Programar la lógica de cada objeto interactuable genérico (generador simple, mezcladora, generador con retardo).
+            * Programar la lógica de los objetos únicos de cada era, respetando sus reglas y tiempos específicos.
+            * Crear el sistema de interacción, permitiendo el uso con botón único o mantener presionado según el objeto.
+            * Definir los triggers y eventos necesarios para detectar entrada y salida de materiales en cada máquina.
+Game Design:
+            * Balancear los tiempos de interacción para cada objeto (mezcla, espera, recarga, etc.).
+            * Determinar las combinaciones de materiales válidas y sus resultados.
+            * Establecer los rangos de prioridad para los objetos y cómo afectan a la selección de interacción.
+            * Diseñar los flujos de interacción por época, asegurando que cada sistema sea comprensible y cooperativo.
+            * Validar que el uso de cada objeto tenga sentido en el flujo de gameplay y no genere cuellos de botella innecesarios.
+Arte:
+            * Hacer modelos 3D de todos los materiales (tipo 1 a 4) con estilo coherente al resto del juego.
+
+            * Hacer modelos 3D para los objetos interactuables genéricos y únicos de cada época.
+
+            * Buscar o crear:
+
+               * Animaciones de interacción genérica para los objetos.
+
+               * Animaciones de mezcla o activación para cada máquina.
+
+               * Feedback visual claro para estados como "listo", "cargando", "en uso", etc.
+
+               * Efectos visuales simples para procesos como mezcla o teletransportación.
+
+
+Sonido:
+                  * Sonido de interacción genérica.
+
+                  * Sonidos específicos por tipo de objeto (mezcladora, catapulta, horno, etc.).
+
+                  * Sonidos de confirmación cuando una acción se completa con éxito (mezcla realizada, horno encendido, etc.).
+
+                  * Todos los sonidos deben ser 3D para integrarse con la posición del objeto en la escena.

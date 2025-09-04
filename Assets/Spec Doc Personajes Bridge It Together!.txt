@@ -1,0 +1,299 @@
+﻿Bridge It Together!
+Characters Specification Document
+
+
+Índice
+Índice        1
+Descripción General:        2
+Resumen de componentes mecánicos/del sistema:        2
+Controles:        3
+Diagrama de Flujo:        4
+Componentes:        5
+Arte        7
+Arte 2D        7
+Arte 3D        7
+Feedback a considerar:        11
+Referencias:        11
+Referencia Funcional        11
+Referencia visual        12
+Wireframe:        13
+Objetivos:        13
+Criterios de éxito:        14
+Pasos para Implementación:        14
+Desarrollo:        14
+Game Design:        15
+Arte:        15
+Sonido:        15
+
+
+
+
+
+
+
+
+
+
+Descripción General:
+Los personajes son los avatares controlados por los jugadores. Son los encargados de construir y reparar los puentes a lo largo de las distintas épocas históricas del juego. Su diseño está orientado a una experiencia cooperativa y caótica en un entorno multijugador local. Cuentan con una estética caricaturesca: con siluetas simples, colores planos, proporciones y animaciones exageradas, y físicas no realistas, similares a juegos como Overcooked o Unrailed. Su desplazamiento es constante, sin aceleración ni desaceleración, y responden de forma inmediata a los comandos del jugador. Los controles son sencillos y fáciles de entender, pensados para que cualquier jugador pueda participar sin necesidad de experiencia previa en videojuegos. Los personajes pueden interactuar con objetos del entorno, operar máquinas y transportar materiales para construir el puente.
+
+
+Resumen de componentes mecánicos/del sistema:
+Los jugadores van a tener las siguientes características:
+* Se mueven en un plano 3D con los inputs dados por el jugador (ej. teclado o joystick).
+* El movimiento es directo y constante, sin aceleración ni desaceleración. Tampoco usan inercia.
+* Giran automática e inmediatamente en la dirección en la que se están moviendo.
+* No pueden caer fuera del mapa: se utiliza OverlapSphereNonAlloc para detectar si están saliendo del área de movimiento. Si se detecta una posición fuera del límite, el personaje es suavemente reposicionado hacia el interior del área válida.
+* Pueden moverse solo por superficies caminables. La superficie se expande a medida que el puente es construido.
+* Detectan objetos interactuables mediante una OverlapSphereNonAlloc invisible posicionada en el frente del personaje.
+* Cuando un interactuable entra en el radio de detección, empieza a emitir un brillo intermitente para indicar que puede ser usado.
+* Los jugadores tendrán un área esférica invisible a su alrededor que convertirá los cuadrantes seguros en No Seguros para evitar colisiones no deseadas.
+* Si hay múltiples interactuables, se prioriza automáticamente el más importante según un sistema de prioridades.
+* Al presionar el botón de interacción cerca de un objeto, el personaje ejecuta la acción correspondiente.
+* Pueden usar máquinas del entorno para combinar materiales y obtener recursos más avanzados.
+* Pueden recoger materiales y llevarlos en las manos.
+* Si tienen un material en mano, pueden:
+   * Usarlo para construir una parte del puente (solo si la sección está vacía y la capa actual lo permite).
+   * Soltarlo manualmente mediante un input (este caerá en un cuadrante calificado como zona segura).
+   * Ponerlo dentro de alguna máquina u objeto.
+* Si un vehículo golpea a un personaje, éste saldrá volando como reacción cómica. Al ser golpeado, saldrá volando. Si el personaje tenía algún material en la mano, lo soltará.
+
+
+Controles:
+Acción
+	Jugador 1
+	Jugador 2
+	Movimiento (Y+)
+	W
+	⬆
+	Movimiento (Y-)
+	S
+	⬇
+	Movimiento (X+)
+	D
+	⮕
+	Movimiento (X-)
+	A
+	⬅
+	Interactuar
+	F
+	1
+	Soltar Objetos
+	G
+	2
+	Pausar
+	ESC
+	ENTER
+	
+
+Diagrama de Flujo:
+Flujo de detección de interactuables:
+  
+
+Flujo de detección del terreno caminable:
+  
+
+
+
+Componentes:
+* Esfera de detección de interactuables: Radio de detección de objetos interactuables en el mundo (se usa OverlapSphereNonAlloc). Tiene 3 parámetros: posición, radio de distancia y layer a detectar. Es invisible, al detectar a un objeto interactuable, lo hace brillar automáticamente. En caso de detectar más de un objeto a la vez, elige al de mayor prioridad, si los objetos tienen la misma prioridad, elige uno aleatoriamente.
+  
+Para ver una referencia visual ir a Diagrama de flujo y a Wireframe.
+* Esfera de detección de terreno caminable: Radio de detección de terreno caminable (se usa OverlapSphereNonAlloc). Tiene 3 parámetros: posición, radio de distancia y layer a detectar. Es invisible. Cuando deja de detectar terreno caminable, reposiciona sutilmente al jugador en una posición anterior para que no se caiga.
+Para ver una referencia visual ir a Diagrama de flujo y a Wireframe.
+* Velocidad de movimiento: Velocidad de movimiento de los personajes. El movimiento carece de aceleración, desaceleración e inercia.
+  
+* Distancia para soltar objeto: Al presionar el input, el personaje soltará lo que tenga en la mano, si es que tiene algo. El objeto caerá en el cuadrante desocupado más cercano frente al personaje en un área de 2 de largo por 3 de ancho, si toda el área está ocupada, entonces el player no podrá soltar el material. Parámetro: cuadrantes de distancia.
+* Modelo: Modelo en 3D de los personajes. Varían según la época.
+* Burbuja de pensamiento: Los personajes tendrán una imagen de ellos mismos en las esquinas superiores de la pantalla, en la izquierda el Player 1 y en la derecha el Player 2. En cada dibujo habrá una burbuja de pensamiento, dentro de la burbuja estará el material que el personaje tenga en la mano, en caso de no tener nada, la burbuja queda vacía.
+* Área perimetral: Los jugadores tendrán un área esférica invisible de 1 metro (se puede usar OverlapSphereNonAlloc) . Los cuadrantes de la zona segura que estén dentro de la esfera se considerarán Zona no segura. De esta manera se evita que caigan sobre el player los materiales o el otro player.
+
+
+Arte
+   * Modelo 3D
+   * Animación de caminar.
+   * Animación de interactuar.
+   * Animación de construir.
+   * Animación de sostener materiales.
+   * Animación de salir volando.
+   * Animación de soltar objetos.
+
+
+Arte 2D
+Bocetos:
+
+
+Prehistoria:
+  
+
+
+Arte 3D
+Modelos: Ir poniendo el aspecto del personaje por época.
+
+
+Animación idle:
+El personaje se sacudirá un poco mientras mira para los costados.
+
+
+Animación final:
+  
+
+
+
+________________
+
+
+Animación de correr:
+Durante la animación de correr, el personaje deberá correr con los brazos doblados hacia adelante mientras los mueve en círculos.
+
+
+Animación final:
+  
+
+________________
+
+
+Animación de interactuar:
+El personaje levantará ambos brazos rápidamente en dirección al objeto interactuable.
+
+
+Animación final:
+  
+
+________________
+
+
+Animación de construir:
+El personaje arrojará con fuerza hacia abajo el material, como si quisiera que el material se colocará directamente con la velocidad.
+Referencia:
+  
+  
+
+El movimiento sería similar al primero gif pero con la velocidad e intensidad del segundo.
+
+
+Animación final:
+  
+
+
+
+________________
+
+
+Animación de sostener materiales:
+El personaje sostendrá con ambas manos el material que recoja. Mientras lo tenga en la mano, moverá levemente su espalda de atrás hacia adelante, como que se está esforzando. 
+Referencia:
+  
+
+
+
+Animación final:
+  
+
+________________
+Animación de salir volando:
+El personaje se sacudirá de manera exagerada mientras está en el aire.
+Referencia:
+  
+
+
+
+Animación final:
+  
+________________
+
+Animación de soltar objetos:
+El personaje soltará el objeto que tenga en la mano como si lo arrojara suavemente.
+Referencia:
+  
+
+
+
+Animación final:
+  
+________________
+
+Animación de Victoria:
+El personaje dará pequeños saltos con los brazos levantados mientras mira hacia arriba.
+Referencia:
+  
+
+
+
+Animación final:
+  
+
+________________
+
+
+Animación de Derrota:
+El personaje dará una suave patada al suelo como si estuviera tirando polvo mientras tiene la cabeza baja.
+Referencia:
+  
+
+
+
+Animación final:
+  
+
+
+
+________________
+Feedback a considerar:
+   * Grito de susto: Cuando un personaje es atropellado por un vehículo y sale volando. Debe ser corto y agudo.
+Referencia: https://pixabay.com/es/sound-effects/cartoon-scream-1-6835/ (algo así pero más agudo).
+
+
+Referencias:
+Referencia Funcional
+El sistema de personajes será similar al de la franquicia Overcooked!. Los controles son fáciles de comprender. La velocidad de movimiento es constante, no cambia en ningún momento. Tiene un sistema de interacción posicionado al frente de los personajes.
+  
+  
+
+
+
+Referencia visual
+Los personajes tendrán un aspecto similar a los del juego Gang Beasts.
+Su aspecto visual será caricaturesco: con siluetas simples, colores planos, y proporciones y animaciones exageradas.
+Link con varias skins de Gang Beasts: https://www.artstation.com/artwork/dmN1w
+  
+
+Wireframe:
+   
+
+
+Objetivos:
+      * Los controles deben ser fáciles de aprender y dominar. También deben ser cómodos para un multiplayer local ya que los jugadores pueden estar compartiendo un mismo teclado, por ejemplo.
+      * La estética de los personajes debe dar tintes de ridiculez. Sus movimientos deben ser exagerados.
+      * La esfera de detección de interactuables debe tener un radio aproximado al tamaño del jugador. Es un tamaño generoso para el jugador pero que no le da demasiada ventaja.
+      * La esfera de detección del terreno caminable debe tener un radio aproximado al tamaño de los pies del jugador. Ese tamaño debe alcanzar para que el jugador no se caiga y no se note el reposicionamiento a la hora de jugar.
+
+
+Criterios de éxito:
+Al utilizar métricas para evaluar el éxito del sistema, prestaremos mucha atención a lo siguiente:
+      * Playtest para saber qué tanto trabajan en equipo los jugadores.
+      * Playtest para saber cuántas estrategias individuales y cuantas en equipo se toman.
+      * Playtest para saber si los jugadores sienten el frenetismo de los niveles.
+      * Playtest para saber si el rango de alcance de ambas esferas de detección se sienten justas o injustas.
+      * Playtest para saber si los jugadores sienten satisfacción al superar un nivel, y para saber si lo quieren rejugar,
+      * Usar algún evento invisible para ver cuánto tardan los jugadores en perder una partida y ver cuál es la causa principal de fracaso (sirve para balanceo).
+Pasos para Implementación:
+Desarrollo:
+      * Crear personajes con estadísticas de movimiento.
+      * Crear ambas esferas de detección con los parámetros de posición, radio y layer de detección.
+Game Design:
+      * Definir la velocidad de los personajes.
+      * Definir y balancear los parámetros de las esferas de detección.
+Arte:
+      * Hacer modelos 3D
+      * Buscar:
+      * Animación de caminar.
+      * Animación de salir volando.
+      * Animación de interacción genérica.
+      * Animación genérica de soltar algo.
+      * Animación genérica de construcción.
+
+
+Sonido:
+      * Sonido de grito exagerado al salir volando.
+      * Todos los sonidos deben ser 3D.

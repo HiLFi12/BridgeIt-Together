@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8982840b44f663240a2ed9271433f8cc, type: 3}
+  m_Name: MedievalBridgeQuadrants
+  m_EditorClassIdentifier: 
+  era: 1
+  requiredLayers:
+  - layerName: 0
+    visualPrefab: {fileID: 187256071978650319, guid: 98affd2f1cb09fc4da3685f27bb98530, type: 3}
+    material: {fileID: 2100000, guid: f2ba779d124f85948bd1a58524537299, type: 2}
+    isCompleted: 0
+  - layerName: 1
+    visualPrefab: {fileID: 6669498875483708022, guid: d9f0dd36a03c5464cae7e9bd246c4779, type: 3}
+    material: {fileID: 2100000, guid: f926dc8502ba14945bbae59dc4e161cb, type: 2}
+    isCompleted: 0
+  - layerName: 2
+    visualPrefab: {fileID: 4570496333377251059, guid: 19bd1f804aaa014438c60407183442ff, type: 3}
+    material: {fileID: 0}
+    isCompleted: 0
+  - layerName: 3
+    visualPrefab: {fileID: 8709062679644081020, guid: e8148da00c1055542a5462a5b04d4968, type: 3}
+    material: {fileID: 2100000, guid: 55d92973624a35940b63c5638fcb85fc, type: 2}
+    isCompleted: 0
+  hasCollision: 1
+  lastLayerState: 0
+  maxUsesBeforeDamage: 1
+  currentUses: 0
+  maxTemperature: 100
+  currentTemperature: 100
+  temperatureDecayRate: 5
+  damageChance: 0.3
+  batteryLife: 100
+  batteryDrainRate: 5
+  damagedMaterial: {fileID: 2100000, guid: 25a76c028a5fca048800dd297963835a, type: 2}
+  destroyedMaterial: {fileID: 2100000, guid: 31746a195f76e364f801898c80305451, type: 2}
+  destructionEffectPrefab: {fileID: 0}
+  constructionSound: {fileID: 0}
+  damageSound: {fileID: 0}
+  destructionSound: {fileID: 0}
+  repairSound: {fileID: 0}

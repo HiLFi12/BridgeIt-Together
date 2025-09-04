@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &764718891593655724
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8917701861384250346}
+  - component: {fileID: 2362986081783338978}
+  m_Layer: 0
+  m_Name: RoundController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8917701861384250346
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764718891593655724}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2362986081783338978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764718891593655724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c87e39e563c0f0e4195fdd6caaeb3f56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  usarSistemaRondas: 1
+  tiempoEsperaEntreRondas: 3
+  configuracionRondas:
+  - nombreRonda: 
+    cantidadAutos: 3
+    tiempoEntreAutos: 10
+    sobrescribirTipoCarril: 1
+    tipoCarrilRonda: 2
+    posicionesCarrilPorAuto: 000000000100000000000000
+    tiposVehiculoPorAuto: 000000000000000000000000
+  - nombreRonda: 
+    cantidadAutos: 3
+    tiempoEntreAutos: 5
+    sobrescribirTipoCarril: 0
+    tipoCarrilRonda: 1
+    posicionesCarrilPorAuto: 000000000000000000000000
+    tiposVehiculoPorAuto: 000000000000000000000000
+  - nombreRonda: 
+    cantidadAutos: 0
+    tiempoEntreAutos: 0
+    sobrescribirTipoCarril: 0
+    tipoCarrilRonda: 0
+    posicionesCarrilPorAuto: 
+    tiposVehiculoPorAuto: 
+  loopearRondas: 0
+  mostrarDebugInfo: 0
+  spawner: {fileID: 0}

@@ -1,0 +1,232 @@
+﻿Bridge It Together!
+Power Ups Specification Document
+
+
+Índice
+Índice        1
+Descripción General:        2
+Resumen de componentes mecánicos/del sistema:        2
+Diagrama de Flujo:        3
+Componentes:        7
+Arte        9
+Arte 2D        9
+Arte 3D        9
+Feedback a considerar:        12
+Referencias:        12
+Referencia visual        12
+Wireframe:        13
+Objetivos:        13
+Criterios de éxito:        14
+Pasos para Implementación:        15
+Desarrollo:        15
+Game Design:        16
+Arte:        16
+Sonido:        16
+
+
+
+
+
+
+
+
+
+
+________________
+Descripción General:
+Los Power Ups son objetos especiales que aparecen aleatoriamente durante el desarrollo de los niveles, ofreciendo ventajas temporales a los jugadores que logren activarlos antes de que desaparezcan. Cada Power Up tiene una duración limitada y se mantiene en el escenario solo por un breve periodo de tiempo. Si el jugador interactúa con el Power Up, recibe una mejora temporal que puede afectar aspectos del juego. Los Power Ups varían en cada época del juego, tanto en su apariencia como en su forma de activación.
+
+
+
+
+Resumen de componentes mecánicos/del sistema:
+Los Power Ups van a tener las siguientes características:
+* Los Power Ups aparecen en el nivel de forma aleatoria tanto en ubicación como en tiempo.
+* Permanecen disponibles por un periodo corto antes de desaparecer automáticamente.
+* Los jugadores pueden interactuar con ellos si se encuentran dentro del área de activación.
+* La forma de activarlos depende de la época: puede ser al tocarlos, al presionar un botón o al llevar un objeto, entre otros.
+* Al activarse, el Power Up otorga una ventaja temporal que afecta positivamente al jugador o al equipo.
+* El tipo de ventaja y su efecto están relacionados con la época en curso y no se repiten entre eras.
+* Los Power Ups se eliminan del escenario una vez activados o al agotarse su tiempo de permanencia.
+* Una vez que el power up se haya activado o se haya ido del mapa, no podrá volver hasta pasado un tiempo.
+
+Diagrama de Flujo:
+Flujo de "Ritual del Gran Fuego":
+  
+
+________________
+
+
+Flujo de "Motivación de la Estatua":
+  
+
+Flujo de “Calor Humano”:
+  
+
+
+
+________________
+
+
+Flujo de  “Sobrecarga de Fábrica”:
+  
+
+
+
+________________
+
+
+Flujo de “Constructor Holográfico":
+  
+
+
+
+Componentes:
+   * Los power ups son elementos con los que los jugadores pueden interactuar para obtener ventajas temporales. Cada power up aparece en un momento aleatorio del nivel y permanece activo por un tiempo limitado antes de desaparecer si no fue activado.
+Los componentes generales de todos los power ups incluyen:
+      * Un sistema de temporizador que se inicia cuando el power up aparece y lo elimina si no es activado a tiempo.
+      * Una mecánica de activación, que varía según la época del nivel.
+      * Una acción que se ejecuta al activarse correctamente.
+      * Cada época histórica cuenta con una forma de activación completamente diferente, adaptada a su contexto temático y jugabilidad:
+      * Época Prehistórica – "Ritual del Gran Fuego": Un tótem ritual aparece detrás del puente, en la zona inicial del mapa, donde no hay terreno caminable. Este tótem cuenta con dos antorchas, una a cada lado, que los jugadores deben encender casi simultáneamente. Para encender cada antorcha, los jugadores deben interactuar con ella utilizando una antorcha encendida, al interactuar, la antorcha del totem se enciende y la del jugador se destruye. Cada antorcha permanece encendida durante un segundo, funcionando como margen de error. Si ambas antorchas se encuentran encendidas al mismo tiempo dentro de ese margen, se activa el power up. Su efecto construye automáticamente todos los cuadrantes del puente hasta la capa 3, siempre que estos no estén ya completos o no hayan alcanzado dicha capa.
+      * Época Medieval – "Motivación de la Estatua": Una estatua aparece en una de las zonas seguras del mapa, en un punto aleatorio. Un jugador debe transportarla manualmente hasta el lado opuesto del puente, respecto de donde se encuentra la ballesta. Al disparar la ballesta y golpear la estatua, esta se rompe y activa el power up. El efecto motiva a los personajes durante 20 segundos, permitiéndoles construir una hilera completa del ancho del puente con un solo material, correspondiente a la capa que estén usando en ese momento. Solo se construyen materiales válidos según el estado del cuadrante: si un cuadrante ya tiene esa capa o no cumple los requisitos (como tener la capa anterior construida), no se ve afectado por el efecto.
+      * Época Industrial – “Calor Humano”: Una tubería industrial oxidada aparece en el mapa con una barra de carga que requiere tres carbones para completarse. Una vez cargada, ambos jugadores deben mantener presionado un botón de activación simultáneamente en dos puntos distintos. Al activarse el power up, los personajes comienzan a generar calor durante 20 segundos. Mientras dura el efecto, todas las máquinas apagadas dentro del rango de calor se encienden como si hubieran recibido carbón, y aquellas que ya estaban encendidas reinician su tiempo de funcionamiento.
+      * Época Contemporánea – “Sobrecarga de Fábrica”: Una plataforma de construcción desciende desde el cielo con una batería y activa dos botones en el suelo, ubicados a cada lado del puente. Cada jugador debe situarse sobre un botón y mantenerse en esa posición durante cinco segundos. Si ambos jugadores lo hacen al mismo tiempo, el power up se activa. Su efecto acelera temporalmente la velocidad de las cintas transportadoras del mapa.
+      * Época Futurista – “Constructor Holográfico": Una máquina voladora desciende en una zona segura aleatoria del mapa, equipada con dos botones, uno a cada lado. Cada botón debe recibir una batería para poder ser activado. Los jugadores deben insertar una batería en cada lado y luego presionar ambos botones al mismo tiempo. Cada batería tiene una vida útil de cinco segundos una vez colocada, y los botones permanecen presionados durante un segundo, permitiendo una leve descoordinación. Si se logra la activación dentro de ese margen, se desencadena el efecto del power up, correspondiente a la mejora tecnológica de la época futurista.
+
+
+Arte
+      * Modelo 3D
+      * Animaciones de movimiento
+      * Animaciones de activación
+
+
+________________
+Arte 2D
+Bocetos:
+Prehistoria:
+  
+
+
+Arte 3D
+Modelos: Ir poniendo el aspecto del personaje por época.
+Animación de caminar:
+Durante la animación de caminar, los brazos del personaje deben ir casi pegados a su cuerpo, su recorrido sería de adelante hacia atrás con un movimiento curvo.
+Referencia:
+  
+
+
+
+Animación de interactuar:
+El personaje levantará ambos brazos rápidamente en dirección al objeto interactuable.
+
+
+Animación de construir:
+El personaje arrojará con fuerza hacia abajo el material, como si quisiera que el material se colocará directamente con la velocidad.
+Referencia:
+  
+  
+
+El movimiento sería similar al primero gif pero con la velocidad e intensidad del segundo.
+Animación de sostener materiales:
+El personaje sostendrá con ambas manos el material que recoja.
+Referencia:
+  
+
+
+
+Animación de salir volando:
+El personaje se sacudirá de manera exagerada mientras está en el aire.
+Referencia:
+  
+
+Animación de soltar objetos:
+El personaje soltará el objeto que tenga en la mano como si lo arrojara suavemente.
+Referencia:
+  
+
+
+
+
+
+Feedback a considerar:
+      * Grito de susto: Cuando un personaje es atropellado por un vehículo y sale volando. Debe ser corto y agudo.
+Referencia: https://pixabay.com/es/sound-effects/cartoon-scream-1-6835/ (algo así pero más agudo).
+
+
+Referencias:
+Referencia visual
+Los personajes tendrán un aspecto similar a los del juego Gang Beasts.
+Su aspecto visual será caricaturesco: con siluetas simples, colores planos, y proporciones y animaciones exageradas.
+  
+
+Wireframe:
+   
+
+
+Objetivos:
+         * Los power ups deben incentivar la cooperación entre los jugadores, exigiendo coordinación, comunicación y toma de decisiones conjuntas para ser activados.
+
+         * La activación de cada power up debe ser lo suficientemente distinta como para sentirse única, representando mecánicamente la época a la que pertenece.
+
+         * El desafío de activación debe sentirse justo, con márgenes de error pequeños pero razonables, que generen tensión sin frustrar.
+
+         * Los efectos deben ser poderosos y tener un impacto claro en la jugabilidad, permitiendo una ventaja temporal significativa si se activan correctamente.
+
+         * El diseño visual y sonoro debe comunicar claramente cuándo un power up está disponible, en proceso de activación o activado, evitando confusiones.
+
+         * Los jugadores deben entender intuitivamente qué deben hacer al ver un power up, incluso si es la primera vez que lo encuentran.
+
+
+Criterios de éxito:
+Al utilizar métricas para evaluar el éxito del sistema, prestaremos mucha atención a lo siguiente:
+            * Playtests para evaluar si los jugadores entienden rápidamente cómo activar cada power up y qué efecto tiene.
+
+            * Playtests para observar si los power ups se usan estratégicamente y en momentos relevantes, o si se ignoran o activan sin planificación.
+
+            * Playtests para medir el nivel de comunicación entre jugadores en el proceso de activación: si se genera caos, si se asignan roles, si se dividen tareas.
+
+            * Playtests para comprobar si los efectos de los power ups son percibidos como valiosos, justos y satisfactorios.
+
+            * Recolección de datos invisibles sobre cuántos power ups fueron activados por nivel y qué impacto tuvieron en la victoria o derrota.
+
+            * Playtests para observar si cada época se siente diferente gracias a los distintos tipos de activaciones y efectos.
+
+            * Observación de si hay power ups que nunca se usan o que siempre se usan de inmediato, para ajustar su balance y relevancia en el ritmo de juego.
+            * Pasos para Implementación:
+Desarrollo:
+               * Crear un sistema base de power up con componentes generales: activación, temporizador, y efecto.
+
+               * Implementar un sistema de sincronización para inputs simultáneos (botones, antorchas, interacciones duales).
+
+               * Programar lógica específica de activación y efecto para cada época.
+
+               * Integrar detección de condiciones específicas (por ejemplo, ubicación de jugadores, materiales requeridos, inserción de baterías, etc).
+
+               * Añadir feedback visual y sonoro en las distintas etapas: aparición, activación en proceso, activación completa.
+
+               * Conectar efectos con los sistemas afectados (máquinas, construcción automática, velocidad de cintas, etc.).
+Game Design:
+                  * Definir y balancear las condiciones de activación de cada power up (requerimientos, tiempos, márgenes de error).
+
+                  * Definir la duración e impacto de cada efecto.
+
+                  * Balancear la aparición y frecuencia de uso para que tengan un impacto importante pero no obligatorio.
+
+                  * Asegurar que todos los power ups fomenten cooperación sin volverse repetitivos o forzados.
+Arte:
+                     * Modelar elementos visuales para cada power up (tótem, estatua, tubería, plataforma, máquina voladora, botones, baterías, etc.).
+                     * Buscar:
+                     * Animación de caminar.
+                     * Animación de salir volando.
+                     * Animación de interacción genérica.
+                     * Animación genérica de soltar algo.
+                     * Animación genérica de construcción.
+
+
+Sonido:
+                     * Sonido de aparición de cada power up (único por época si es posible).
+                     * Sonidos de interacción: prender antorcha, cargar carbón, insertar batería, presionar botón.
+                     * Sonido distintivo de activación exitosa de cada power up.
+                     * Sonido de fondo o loop que dure mientras el efecto esté activo (por ejemplo: ruido mecánico en industrial, energía en contemporáneo).
+                     * Todos los sonidos deben ser 3D, con volumen y dirección espacial claros para facilitar la orientación del jugador.
