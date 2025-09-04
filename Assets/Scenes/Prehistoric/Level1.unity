@@ -256,9 +256,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 985317586}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
+      propertyPath: modoContinuo
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: roundController
       value: 
       objectReference: {fileID: 453853949}
+    - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
+      propertyPath: 'autoPrefabs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2948579226618137670, guid: 1f4ef2c2afff5e643bad7bfe75c55c2f, type: 3}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: returnTriggers.Array.size
       value: 9
@@ -2957,6 +2965,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1399994230}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: tiempoEsperaEntreRondas
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[0].nombreRonda
       value: Ronda 1
       objectReference: {fileID: 0}
@@ -2967,6 +2979,62 @@ PrefabInstance:
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[2].nombreRonda
       value: Ronda 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[0].cantidadAutos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[1].cantidadAutos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[2].cantidadAutos
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[1].tipoCarrilRonda
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[2].tipoCarrilRonda
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[2].sobrescribirTipoCarril
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[0].tiposVehiculoPorAuto.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[1].tiposVehiculoPorAuto.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[2].tiposVehiculoPorAuto.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[0].posicionesCarrilPorAuto.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[1].posicionesCarrilPorAuto.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[2].posicionesCarrilPorAuto.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: 'configuracionRondas.Array.data[0].posicionesCarrilPorAuto.Array.data[0]'
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: 'configuracionRondas.Array.data[2].posicionesCarrilPorAuto.Array.data[0]'
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8917701861384250346, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: m_LocalPosition.x

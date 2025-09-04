@@ -115,7 +115,7 @@ public class PowerUpSpawner : MonoBehaviour
         int pointIndex = Random.Range(0, spawnPoints.Count);
         
         Debug.Log($"Spawneando PowerUp: {powerUpPrefabs[prefabIndex].name} en {spawnPoints[pointIndex].name}");
-        GameObject newPowerUp = Instantiate(powerUpPrefabs[prefabIndex], spawnPoints[pointIndex].position, Quaternion.identity);
+        GameObject newPowerUp = Instantiate(powerUpPrefabs[prefabIndex], spawnPoints[pointIndex].position, powerUpPrefabs[prefabIndex].transform.rotation);
         
         // Añadir a la lista de power-ups activos
         activePowerUps.Add(newPowerUp);
