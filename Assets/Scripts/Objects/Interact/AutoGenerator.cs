@@ -27,9 +27,12 @@ public enum PosicionCarril
 /// </summary>
 public enum TipoVehiculo
 {
-    Normal,     // Vehículo normal (autoPrefab)
-    AutoDoble,  // Vehículo doble (AutoDoble.prefab)
-    Random      // Selección aleatoria entre Normal y AutoDoble
+    Auto1,     // Vehículo Auto1
+    Auto2,     // Vehículo Auto2
+    Auto3,     // Vehículo Auto3
+    Auto4,     // Vehículo Auto4
+    Auto5,     // Vehículo Auto5
+    Random      // Selección aleatoria entre Auto1 y Auto5
 }
 
 /// <summary>
@@ -52,32 +55,30 @@ public class RondaConfig
     public PosicionCarril[] posicionesCarrilPorAuto = new PosicionCarril[0]; // Posición de carril para cada auto individual
     
     [Header("Configuración Individual de Vehículos")]
-    [Tooltip("Define el tipo de vehículo (Normal/AutoDoble/Random) para cada auto en esta ronda.")]
+    [Tooltip("Define el tipo de vehículo (Auto1/Auto2/Auto3/Auto4/Auto5/Random) para cada auto en esta ronda.")]
     public TipoVehiculo[] tiposVehiculoPorAuto = new TipoVehiculo[0]; // Tipo de vehículo para cada auto individual
     
     /// <summary>
     /// Obtiene el tipo de vehículo para un auto específico. Si no hay configuración individual, usa el vehículo normal por defecto.
     /// Si la configuración es Random, selecciona aleatoriamente entre Normal y AutoDoble.
     /// </summary>
-    public TipoVehiculo ObtenerTipoVehiculoParaAuto(int indiceAuto)
-    {
-        TipoVehiculo tipoConfigurado = TipoVehiculo.Normal; // Por defecto
-        
-        if (tiposVehiculoPorAuto != null && indiceAuto < tiposVehiculoPorAuto.Length)
+        public TipoVehiculo ObtenerTipoVehiculoParaAuto(int indiceAuto)
         {
-            tipoConfigurado = tiposVehiculoPorAuto[indiceAuto];
-        }
-        
-        // Si la configuración es Random, elegir aleatoriamente
-        if (tipoConfigurado == TipoVehiculo.Random)
-        {
-            return (Random.Range(0, 2) == 0) ? TipoVehiculo.Normal : TipoVehiculo.AutoDoble;
-        }
-        
-        return tipoConfigurado;
-    }
-    
-    /// <summary>
+            TipoVehiculo tipoConfigurado = TipoVehiculo.Auto1; // Por defecto
+            
+            if (tiposVehiculoPorAuto != null && indiceAuto < tiposVehiculoPorAuto.Length)
+            {
+                tipoConfigurado = tiposVehiculoPorAuto[indiceAuto];
+            }
+            
+            // Si la configuración es Random, elegir aleatoriamente
+            if (tipoConfigurado == TipoVehiculo.Random)
+            {
+                return (TipoVehiculo)Random.Range(0, 5); // Auto1 to Auto5
+            }
+            
+            return tipoConfigurado;
+        }    /// <summary>
     /// Obtiene la posición de carril para un auto específico. Si no hay configuración individual, usa el carril inferior por defecto.
     /// Si la configuración es Random, selecciona el carril opuesto al último usado para evitar colisiones.
     /// </summary>
@@ -152,9 +153,12 @@ public class RondaConfig
             // Llenar el resto con valores por defecto (alternando entre Normal, AutoDoble y Random)
             for (int i = (tiposVehiculoPorAuto?.Length ?? 0); i < cantidadAutos; i++)
             {
-                int resto = i % 3;
-                nuevosConfigs[i] = resto == 0 ? TipoVehiculo.Normal : 
-                                  resto == 1 ? TipoVehiculo.AutoDoble : 
+                int resto = i % 6;
+                nuevosConfigs[i] = resto == 0 ? TipoVehiculo.Auto1 : 
+                                  resto == 1 ? TipoVehiculo.Auto2 : 
+                                  resto == 2 ? TipoVehiculo.Auto3 :
+                                  resto == 3 ? TipoVehiculo.Auto4 :
+                                  resto == 4 ? TipoVehiculo.Auto5 :
                                               TipoVehiculo.Random;
             }
             
@@ -170,11 +174,9 @@ public class RondaConfig
 public class AutoGenerator : MonoBehaviour
 {
     [Header("Configuración")]
-    [SerializeField] private GameObject autoPrefab; // Prefab del auto normal a generar
-    [SerializeField] private GameObject autoDoblePrefab; // Prefab del auto doble a generar
+    [SerializeField] private GameObject[] prefabsAutos = new GameObject[5]; // Prefabs de autos Auto1 a Auto5
     [SerializeField] private float tiempoEntreAutos = 10f; // Tiempo entre cada auto generado
-    [SerializeField] private float velocidadAutoNormal = 5f; // Velocidad de movimiento del auto normal
-    [SerializeField] private float velocidadAutoDoble = 7f; // Velocidad de movimiento del auto doble
+    [SerializeField] private float[] velocidadesAutos = new float[5] { 5f, 6f, 7f, 8f, 9f }; // Velocidades para Auto1 a Auto5
     [SerializeField] private BridgeConstructionGrid bridgeGrid; // Referencia al grid del puente
     
     [Header("Configuración de Spawn")]
@@ -192,15 +194,15 @@ public class AutoGenerator : MonoBehaviour
     [SerializeField] private RondaConfig[] configuracionRondas = new RondaConfig[]
     {
         new RondaConfig { 
-            nombreRonda = "Ronda 1 - Fácil (Solo Normales)", 
+            nombreRonda = "Ronda 1 - Fácil (Solo Auto1)", 
             cantidadAutos = 3, 
             tiempoEntreAutos = 8f,
             tiposVehiculoPorAuto = new TipoVehiculo[] { 
-                TipoVehiculo.Normal, TipoVehiculo.Normal, TipoVehiculo.Normal 
+                TipoVehiculo.Auto1, TipoVehiculo.Auto1, TipoVehiculo.Auto1 
             }
         },
         new RondaConfig { 
-            nombreRonda = "Ronda 2 - Mixta (Normal + AutoDoble)", 
+            nombreRonda = "Ronda 2 - Mixta (Auto1 + Auto2)", 
             cantidadAutos = 5, 
             tiempoEntreAutos = 6f, 
             sobrescribirTipoCarril = true, 
@@ -210,8 +212,8 @@ public class AutoGenerator : MonoBehaviour
                 PosicionCarril.Superior, PosicionCarril.Inferior 
             },
             tiposVehiculoPorAuto = new TipoVehiculo[] { 
-                TipoVehiculo.Normal, TipoVehiculo.AutoDoble, TipoVehiculo.Normal, 
-                TipoVehiculo.AutoDoble, TipoVehiculo.Normal 
+                TipoVehiculo.Auto1, TipoVehiculo.Auto2, TipoVehiculo.Auto1, 
+                TipoVehiculo.Auto2, TipoVehiculo.Auto1 
             }
         },
         new RondaConfig { 
@@ -226,8 +228,8 @@ public class AutoGenerator : MonoBehaviour
                 PosicionCarril.Random
             },
             tiposVehiculoPorAuto = new TipoVehiculo[] { 
-                TipoVehiculo.Random, TipoVehiculo.AutoDoble, 
-                TipoVehiculo.Random, TipoVehiculo.Normal,
+                TipoVehiculo.Random, TipoVehiculo.Auto3, 
+                TipoVehiculo.Random, TipoVehiculo.Auto4,
                 TipoVehiculo.Random
             }
         }
@@ -330,15 +332,10 @@ public class AutoGenerator : MonoBehaviour
     /// </summary>
     private void InitializeVehiclePool()
     {
-        if (autoPrefab == null)
+        if (prefabsAutos == null || prefabsAutos.Length == 0 || prefabsAutos[0] == null)
         {
-            Debug.LogError("No se ha asignado un prefab de auto normal al generador");
+            Debug.LogError("No se ha asignado el prefab de auto Auto1 al generador");
             return;
-        }
-        
-        if (autoDoblePrefab == null)
-        {
-            Debug.LogWarning("No se ha asignado un prefab de auto doble al generador. Solo se podrán usar vehículos normales.");
         }
         
         // Obtener o crear el componente VehiclePool
@@ -349,7 +346,7 @@ public class AutoGenerator : MonoBehaviour
         }
         
         // Inicializar el pool con las configuraciones del generador
-        vehiclePool.Initialize(autoPrefab, poolSize, poolExpandible, bridgeGrid);
+        vehiclePool.Initialize(prefabsAutos[0], poolSize, poolExpandible, bridgeGrid);
     }
     
     /// <summary>
@@ -462,7 +459,7 @@ public class AutoGenerator : MonoBehaviour
             Vector3 direccion = spawnDesdeIzquierda ? Vector3.left : Vector3.right;
             
             movimiento.SetDireccionMovimiento(direccion);
-            movimiento.SetVelocidad(velocidadAutoNormal);
+            movimiento.SetVelocidad(velocidadesAutos.Length > 0 ? velocidadesAutos[0] : 5f);
             // Aplicar corrección automática de rotación del modelo
             movimiento.AplicarCorreccionAutomatica();
             movimiento.enabled = true;
@@ -472,7 +469,7 @@ public class AutoGenerator : MonoBehaviour
                 Debug.Log($"[AutoGenerator] DEBUG ConfigurarMovimientoAuto:");
                 Debug.Log($"  - Vehículo: {auto.name}");
                 Debug.Log($"  - Dirección: {direccion}");
-                Debug.Log($"  - Velocidad: {velocidadAutoNormal}");
+                Debug.Log($"  - Velocidad: {(velocidadesAutos.Length > 0 ? velocidadesAutos[0] : 5f)}");
                 Debug.Log($"  - AutoMovement.enabled: {movimiento.enabled}");
                 Debug.Log($"  - Posición inicial: {auto.transform.position}");
                 Debug.Log($"  - Rotación inicial: {auto.transform.rotation.eulerAngles}");
@@ -1404,18 +1401,18 @@ public class AutoGenerator : MonoBehaviour
     }
     
     /// <summary>
-    /// Crea una configuración donde los tipos de vehículo se alternan entre Normal y AutoDoble
+    /// Crea una configuración donde los tipos de vehículo se alternan entre Auto1 y Auto2
     /// </summary>
     /// <param name="cantidadAutos">Número de autos para los que generar la configuración</param>
-    /// <param name="iniciarConAutoDoble">Si empezar con AutoDoble en lugar de Normal</param>
+    /// <param name="iniciarConAuto2">Si empezar con Auto2 en lugar de Auto1</param>
     /// <returns>Array de tipos de vehículo alternados</returns>
-    public static TipoVehiculo[] GenerarConfiguracionVehiculoAlternada(int cantidadAutos, bool iniciarConAutoDoble = false)
+    public static TipoVehiculo[] GenerarConfiguracionVehiculoAlternada(int cantidadAutos, bool iniciarConAuto2 = false)
     {
         TipoVehiculo[] configuracion = new TipoVehiculo[cantidadAutos];
         for (int i = 0; i < cantidadAutos; i++)
         {
             bool esPar = (i % 2 == 0);
-            configuracion[i] = (esPar != iniciarConAutoDoble) ? TipoVehiculo.Normal : TipoVehiculo.AutoDoble;
+            configuracion[i] = (esPar != iniciarConAuto2) ? TipoVehiculo.Auto1 : TipoVehiculo.Auto2;
         }
         return configuracion;
     }
@@ -1499,18 +1496,21 @@ public class AutoGenerator : MonoBehaviour
     {
         switch (tipo)
         {
-            case TipoVehiculo.Normal:
-                return autoPrefab;
-            case TipoVehiculo.AutoDoble:
-                if (autoDoblePrefab == null)
-                {
-                    Debug.LogWarning($"[AutoGenerator] AutoDoble prefab no está asignado. Usando vehículo normal.");
-                    return autoPrefab;
-                }
-                return autoDoblePrefab;
+            case TipoVehiculo.Auto1:
+                return prefabsAutos.Length > 0 && prefabsAutos[0] != null ? prefabsAutos[0] : null;
+            case TipoVehiculo.Auto2:
+                return prefabsAutos.Length > 1 && prefabsAutos[1] != null ? prefabsAutos[1] : prefabsAutos[0];
+            case TipoVehiculo.Auto3:
+                return prefabsAutos.Length > 2 && prefabsAutos[2] != null ? prefabsAutos[2] : prefabsAutos[0];
+            case TipoVehiculo.Auto4:
+                return prefabsAutos.Length > 3 && prefabsAutos[3] != null ? prefabsAutos[3] : prefabsAutos[0];
+            case TipoVehiculo.Auto5:
+                return prefabsAutos.Length > 4 && prefabsAutos[4] != null ? prefabsAutos[4] : prefabsAutos[0];
+            case TipoVehiculo.Random:
+                int randomIndex = Random.Range(0, prefabsAutos.Length);
+                return prefabsAutos[randomIndex] != null ? prefabsAutos[randomIndex] : prefabsAutos[0];
             default:
-                Debug.LogWarning($"[AutoGenerator] Tipo de vehículo no reconocido: {tipo}. Usando vehículo normal.");
-                return autoPrefab;
+                return prefabsAutos.Length > 0 ? prefabsAutos[0] : null;
         }
     }
     
@@ -1521,15 +1521,22 @@ public class AutoGenerator : MonoBehaviour
     {
         switch (tipo)
         {
-            case TipoVehiculo.Normal:
-                return velocidadAutoNormal;
-            case TipoVehiculo.AutoDoble:
-                return velocidadAutoDoble;
+            case TipoVehiculo.Auto1:
+                return velocidadesAutos.Length > 0 ? velocidadesAutos[0] : 5f;
+            case TipoVehiculo.Auto2:
+                return velocidadesAutos.Length > 1 ? velocidadesAutos[1] : 6f;
+            case TipoVehiculo.Auto3:
+                return velocidadesAutos.Length > 2 ? velocidadesAutos[2] : 7f;
+            case TipoVehiculo.Auto4:
+                return velocidadesAutos.Length > 3 ? velocidadesAutos[3] : 8f;
+            case TipoVehiculo.Auto5:
+                return velocidadesAutos.Length > 4 ? velocidadesAutos[4] : 9f;
             case TipoVehiculo.Random:
-                // Para Random, elegir entre las dos velocidades aleatoriamente
-                return (Random.Range(0, 2) == 0) ? velocidadAutoNormal : velocidadAutoDoble;
+                // Para Random, elegir entre las velocidades aleatoriamente
+                int randomIndex = Random.Range(0, velocidadesAutos.Length);
+                return velocidadesAutos[randomIndex];
             default:
-                return velocidadAutoNormal;
+                return velocidadesAutos.Length > 0 ? velocidadesAutos[0] : 5f;
         }
     }
     
@@ -1538,15 +1545,18 @@ public class AutoGenerator : MonoBehaviour
     /// </summary>
     private TipoVehiculo DeterminarTipoVehiculo(GameObject vehiculo)
     {
-        if (vehiculo == null) return TipoVehiculo.Normal;
+        if (vehiculo == null) return TipoVehiculo.Auto1;
         
         // Comparar con los prefabs para determinar el tipo
-        if (autoDoblePrefab != null && vehiculo.name.Contains(autoDoblePrefab.name))
+        for (int i = 0; i < prefabsAutos.Length && i < 5; i++)
         {
-            return TipoVehiculo.AutoDoble;
+            if (prefabsAutos[i] != null && vehiculo.name.Contains(prefabsAutos[i].name))
+            {
+                return (TipoVehiculo)i;
+            }
         }
         
-        return TipoVehiculo.Normal;
+        return TipoVehiculo.Auto1;
     }
     
     /// <summary>

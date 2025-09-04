@@ -25,16 +25,20 @@ namespace BridgeItTogether.Gameplay.Rondas
         public PosicionCarril[] posicionesCarrilPorAuto = new PosicionCarril[0];
 
         [Header("Configuración Individual de Vehículos")]
-        [Tooltip("Define el tipo de vehículo (Normal/AutoDoble/Random) para cada auto en esta ronda.")]
+        [Tooltip("Define el tipo de vehículo (Auto1..Auto5/Random) para cada auto en esta ronda.")]
         public TipoVehiculo[] tiposVehiculoPorAuto = new TipoVehiculo[0];
 
         public TipoVehiculo ObtenerTipoVehiculoParaAuto(int indiceAuto)
         {
-            var tipoConfigurado = TipoVehiculo.Normal;
+            var tipoConfigurado = TipoVehiculo.Auto1;
             if (tiposVehiculoPorAuto != null && indiceAuto < tiposVehiculoPorAuto.Length)
                 tipoConfigurado = tiposVehiculoPorAuto[indiceAuto];
             if (tipoConfigurado == TipoVehiculo.Random)
-                return (UnityEngine.Random.Range(0, 2) == 0) ? TipoVehiculo.Normal : TipoVehiculo.AutoDoble;
+            {
+                // Elegir uniformemente entre Auto1..Auto5
+                int idx = UnityEngine.Random.Range(0, 5);
+                return (TipoVehiculo)idx;
+            }
             return tipoConfigurado;
         }
 
@@ -80,7 +84,11 @@ namespace BridgeItTogether.Gameplay.Rondas
                         nuevas[i] = tiposVehiculoPorAuto[i];
                 }
                 for (int i = (tiposVehiculoPorAuto?.Length ?? 0); i < cantidadAutos; i++)
-                    nuevas[i] = (i % 3 == 2) ? TipoVehiculo.Random : (i % 2 == 0 ? TipoVehiculo.Normal : TipoVehiculo.AutoDoble);
+                {
+                    // Semilla por defecto alternando Auto1..Auto5 y Random cada 6
+                    int mod = i % 6;
+                    nuevas[i] = mod == 5 ? TipoVehiculo.Random : (TipoVehiculo)(mod % 5);
+                }
                 tiposVehiculoPorAuto = nuevas;
             }
         }

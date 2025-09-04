@@ -14,9 +14,8 @@ namespace BridgeItTogether.Gameplay.Spawning
     [DisallowMultipleComponent]
     public class VehicleSpawner : MonoBehaviour
     {
-        [Header("Prefabs")]
-        [SerializeField] private GameObject autoPrefab;
-        [SerializeField] private GameObject autoDoblePrefab;
+    [Header("Prefabs (Auto1..Auto5)")]
+    [SerializeField] private GameObject[] autoPrefabs = new GameObject[5];
 
         [Header("Puntos de Spawn")]
         [SerializeField] private Transform puntoSpawnIzquierdo;
@@ -98,12 +97,13 @@ namespace BridgeItTogether.Gameplay.Spawning
 
         private void InitializeVehiclePool()
         {
-            if (autoPrefab == null)
+            var defaultPrefab = ObtenerPrimerPrefabDisponible();
+            if (defaultPrefab == null)
             {
-                Debug.LogError("VehicleSpawner: autoPrefab no asignado");
+                Debug.LogError("VehicleSpawner: No hay prefabs asignados en 'autoPrefabs'. Asigna al menos Auto1.");
                 return;
             }
-            vehiclePool.Initialize(autoPrefab, poolSize, poolExpandible, bridgeGrid);
+            vehiclePool.Initialize(defaultPrefab, poolSize, poolExpandible, bridgeGrid);
         }
 
         private IEnumerator GenerarAutosContinuo()
@@ -111,7 +111,7 @@ namespace BridgeItTogether.Gameplay.Spawning
             while (true)
             {
                 yield return new WaitForSeconds(tiempoEntreAutos);
-                SpawnVehicle(TipoVehiculo.Normal, ObtenerTipoCarrilActual(), spawnDesdeIzquierda);
+                SpawnVehicle(TipoVehiculo.Auto1, ObtenerTipoCarrilActual(), spawnDesdeIzquierda);
                 spawnDesdeIzquierda = !spawnDesdeIzquierda;
             }
         }
@@ -121,6 +121,11 @@ namespace BridgeItTogether.Gameplay.Spawning
             var prefab = ObtenerPrefabSegunTipo(tipoVehiculo);
             var auto = vehiclePool.GetVehicleFromPool(prefab);
             if (auto == null) return null;
+
+            // Renombrar la instancia según el prefab elegido (soporta Random)
+            int idx = PrefabIndex(prefab);
+            if (idx >= 0) auto.name = $"Auto{idx + 1}";
+            else auto.name = ObtenerNombreParaTipo(tipoVehiculo);
 
             ConfigurarPosicionAuto(auto, tipoCarrilUso, desdeIzquierda, carrilIndividual);
             auto.SetActive(true);
@@ -209,19 +214,19 @@ namespace BridgeItTogether.Gameplay.Spawning
 
         private GameObject ObtenerPrefabSegunTipo(TipoVehiculo tipo)
         {
-            switch (tipo)
+            if (tipo == TipoVehiculo.Random)
             {
-                case TipoVehiculo.AutoDoble:
-                    if (autoDoblePrefab == null)
-                    {
-                        Debug.LogWarning("VehicleSpawner: autoDoblePrefab no asignado. Usando autoPrefab.");
-                        return autoPrefab;
-                    }
-                    return autoDoblePrefab;
-                case TipoVehiculo.Normal:
-                default:
-                    return autoPrefab;
+                int count = CountPrefabsDisponibles();
+                int idx = UnityEngine.Random.Range(0, Mathf.Max(count, 1));
+                return ObtenerPrefabPorIndice(idx) ?? ObtenerPrimerPrefabDisponible();
             }
+
+            int index = TipoToIndex(tipo);
+            var p = ObtenerPrefabPorIndice(index);
+            if (p != null) return p;
+
+            // Fallback: primer prefab disponible
+            return ObtenerPrimerPrefabDisponible();
         }
 
         public TipoCarril ObtenerTipoCarrilActual() => tipoCarril;
@@ -230,5 +235,65 @@ namespace BridgeItTogether.Gameplay.Spawning
         public void SetTipoCarril(TipoCarril t) => tipoCarril = t;
         public void SetTiempoEntreAutos(float t) => tiempoEntreAutos = t;
         public void SetModoContinuo(bool enabled) => modoContinuo = enabled;
+
+        private int TipoToIndex(TipoVehiculo tipo)
+        {
+            switch (tipo)
+            {
+                case TipoVehiculo.Auto1: return 0;
+                case TipoVehiculo.Auto2: return 1;
+                case TipoVehiculo.Auto3: return 2;
+                case TipoVehiculo.Auto4: return 3;
+                case TipoVehiculo.Auto5: return 4;
+                default: return 0;
+            }
+        }
+
+        private GameObject ObtenerPrefabPorIndice(int index)
+        {
+            if (autoPrefabs != null && index >= 0 && index < autoPrefabs.Length)
+                return autoPrefabs[index];
+            return null;
+        }
+
+        private int CountPrefabsDisponibles()
+        {
+            if (autoPrefabs == null) return 0;
+            int c = 0;
+            for (int i = 0; i < autoPrefabs.Length; i++) if (autoPrefabs[i] != null) c++;
+            return Mathf.Max(1, c);
+        }
+
+        private GameObject ObtenerPrimerPrefabDisponible()
+        {
+            if (autoPrefabs != null)
+            {
+                for (int i = 0; i < autoPrefabs.Length; i++) if (autoPrefabs[i] != null) return autoPrefabs[i];
+            }
+            return null;
+        }
+
+        private string ObtenerNombreParaTipo(TipoVehiculo tipo)
+        {
+            if (tipo == TipoVehiculo.Random)
+            {
+                // Si llega Random, nombramos según el índice elegido al obtener prefab
+                // Pero como no lo guardamos, asumimos Auto1
+                return "Auto1";
+            }
+            int index = TipoToIndex(tipo) + 1;
+            return $"Auto{index}";
+        }
+
+        private int PrefabIndex(GameObject prefab)
+        {
+            if (prefab == null) return -1;
+            if (autoPrefabs != null)
+            {
+                for (int i = 0; i < autoPrefabs.Length; i++)
+                    if (autoPrefabs[i] == prefab) return i;
+            }
+            return -1;
+        }
     }
 }

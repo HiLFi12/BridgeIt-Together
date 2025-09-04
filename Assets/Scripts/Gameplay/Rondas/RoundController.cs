@@ -81,7 +81,15 @@ namespace BridgeItTogether.Gameplay.Rondas
 
                     // Tipo de carril a usar esta ronda
                     var tipoCarrilUso = ronda.sobrescribirTipoCarril ? ronda.tipoCarrilRonda : spawner.ObtenerTipoCarrilActual();
-                    BridgeItTogether.Gameplay.Spawning.TipoVehiculo tipoVehiculo = (BridgeItTogether.Gameplay.Spawning.TipoVehiculo)ronda.ObtenerTipoVehiculoParaAuto(autosSpawneadosEnRonda);
+                    // Mapear por nombre para evitar desalineaciones entre enums con el mismo nombre
+                    var tipoRondas = ronda.ObtenerTipoVehiculoParaAuto(autosSpawneadosEnRonda);
+                    BridgeItTogether.Gameplay.Spawning.TipoVehiculo tipoVehiculo;
+                    if (!System.Enum.TryParse<BridgeItTogether.Gameplay.Spawning.TipoVehiculo>(tipoRondas.ToString(), out tipoVehiculo))
+                    {
+                        if (mostrarDebugInfo)
+                            Debug.LogWarning($"[RoundController] TipoVehiculo '{tipoRondas}' no se pudo convertir al enum de Spawning. Usando Auto1.");
+                        tipoVehiculo = BridgeItTogether.Gameplay.Spawning.TipoVehiculo.Auto1;
+                    }
                     var posCarril = ronda.ObtenerPosicionCarrilParaAuto(autosSpawneadosEnRonda, ultimoCarrilUsado);
                     ultimoCarrilUsado = posCarril;
 
