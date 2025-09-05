@@ -10,12 +10,19 @@ public abstract class MaterialBaseInteractable : MonoBehaviour, IGrababble, IHit
     [SerializeField] protected bool puedeConstruirse = true; 
     [SerializeField] protected InteractPriority prioridad = InteractPriority.Medium;
 
+    [Header("Estado de Disponibilidad (Ready Gate)")]
+    [Tooltip("Si está activo, la construcción sólo será posible cuando isReady sea true.")]
+    [SerializeField] protected bool useReadyState = false;
+    [Tooltip("Estado actual de disponibilidad. Se ignora si useReadyState es false.")]
+    [SerializeField] protected bool isReady = true;
+
     protected BridgeMaterialInfo materialInfo;
 
     private Vector3 objectPosition;
     private Quaternion objectRotation;
     public InteractPriority InteractPriority => prioridad;
-    public virtual bool PuedeConstruirse => puedeConstruirse;
+    public virtual bool PuedeConstruirse => puedeConstruirse && (!useReadyState || isReady);
+    public bool IsReady => isReady;
 
     protected virtual int LayerIndex => 0; 
 
@@ -78,6 +85,16 @@ public abstract class MaterialBaseInteractable : MonoBehaviour, IGrababble, IHit
     protected virtual void OnInteract(GameObject interactor) { }
 
     public void SetPuedeConstruirse(bool valor) => puedeConstruirse = valor;
+
+    /// <summary>
+    /// Cambia el estado de readiness cuando el gating está activo.
+    /// </summary>
+    /// <param name="valor">Nuevo estado</param>
+    protected void SetReady(bool valor)
+    {
+        if (!useReadyState) return; // No hace nada si no está usando gating
+        isReady = valor;
+    }
 
     public void OnLaunched(Vector3 targetPosition)
     {

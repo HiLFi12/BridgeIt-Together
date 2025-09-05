@@ -6,25 +6,24 @@ public class MaterialTipo2Ready : MaterialTipo2Base
     [SerializeField] private GameObject notReadyMesh;
     [SerializeField] private GameObject readyMesh;
 
-    [Header("Estado")]
-    [SerializeField] private bool isReady = false;
-
-    public bool IsReady => isReady;
-
-    public override bool PuedeConstruirse => base.PuedeConstruirse && isReady;
+    [Header("Estado (heredado)")]
+    [SerializeField, Tooltip("Inicializa el material como listo. Si se desactiva, requiere flecha.")] private bool startReady = false;
+    public override bool PuedeConstruirse => base.PuedeConstruirse; // la base ya combina isReady
 
     protected override void Awake()
     {
         base.Awake();
-        AutoVincularMeshesSiFaltan();
-        AplicarEstadoVisual();
+    // Activar gating en la base y setear estado inicial
+    useReadyState = true;
+    isReady = startReady; // usar campo heredado
+    AutoVincularMeshesSiFaltan();
+    AplicarEstadoVisual();
     }
 
     protected override void PostEnsure()
     {
-        base.PostEnsure();
-        if (!isReady)
-            puedeConstruirse = false;
+    base.PostEnsure();
+    if (!isReady) puedeConstruirse = false;
     }
 
 #if UNITY_EDITOR
@@ -54,17 +53,17 @@ public class MaterialTipo2Ready : MaterialTipo2Base
 
     private void AplicarEstadoVisual()
     {
-        if (notReadyMesh) notReadyMesh.SetActive(!isReady);
-        if (readyMesh) readyMesh.SetActive(isReady);
+    if (notReadyMesh) notReadyMesh.SetActive(!isReady);
+    if (readyMesh) readyMesh.SetActive(isReady);
         // Mantiene coherencia interna aunque el flujo de construcción usa la propiedad override:
-        puedeConstruirse = isReady;
+    puedeConstruirse = isReady; // la propiedad combina gating
     }
 
     private void Activar()
     {
-        if (isReady) return;
-        isReady = true;
-        AplicarEstadoVisual();
+    if (isReady) return;
+    isReady = true; // heredado
+    AplicarEstadoVisual();
     }
 
     private void OnCollisionEnter(Collision collision)
