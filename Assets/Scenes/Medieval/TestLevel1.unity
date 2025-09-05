@@ -1210,6 +1210,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoundController
       objectReference: {fileID: 0}
+    - target: {fileID: 764718891593655724, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: spawner
       value: 
@@ -1398,6 +1402,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 56d4d8676afc37d4baac4091d5a0af1b, type: 3}
+--- !u!1 &704217099
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 704217100}
+  m_Layer: 0
+  m_Name: TempConstructionObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &704217100
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 704217099}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -4811,7 +4846,7 @@ PrefabInstance:
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5092,6 +5127,10 @@ PrefabInstance:
     - target: {fileID: 605774777003266040, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: m_Name
       value: VehicleGen
+      objectReference: {fileID: 0}
+    - target: {fileID: 605774777003266040, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: autoPrefab
@@ -6196,3 +6235,4 @@ SceneRoots:
   - {fileID: 1249926877}
   - {fileID: 1500854689}
   - {fileID: 80064815}
+  - {fileID: 704217100}

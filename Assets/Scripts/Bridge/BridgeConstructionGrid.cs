@@ -405,6 +405,17 @@ public class BridgeConstructionGrid : MonoBehaviour
             return false;
         }
 
+        // 5. Verificar estado de construcción del material si trae componente MaterialBaseInteractable
+        //    Esto permite que materiales como MaterialTipo2Ready bloqueen la construcción hasta estar listos (isReady=true)
+        if (layerObject != null)
+        {
+            var materialInteractable = layerObject.GetComponent<MaterialBaseInteractable>();
+            if (materialInteractable != null && !materialInteractable.PuedeConstruirse)
+            {
+                return false;
+            }
+        }
+
         // DEPURACIÓN - Estado actual del cuadrante
         string estadoCapas = "";
         for (int i = 0; i < constructionGrid[x, z].quadrantSO.requiredLayers.Length; i++)

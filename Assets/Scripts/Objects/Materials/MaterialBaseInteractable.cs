@@ -15,6 +15,7 @@ public abstract class MaterialBaseInteractable : MonoBehaviour, IGrababble, IHit
     private Vector3 objectPosition;
     private Quaternion objectRotation;
     public InteractPriority InteractPriority => prioridad;
+    public virtual bool PuedeConstruirse => puedeConstruirse;
 
     protected virtual int LayerIndex => 0; 
 
@@ -54,13 +55,14 @@ public abstract class MaterialBaseInteractable : MonoBehaviour, IGrababble, IHit
 
     public void Interact(GameObject interactor)
     {
-        if (!puedeConstruirse)
+        // Antes: if (!puedeConstruirse)
+        if (!PuedeConstruirse)
         {
             Debug.Log($"[MaterialBaseInteractable] Material {name} no puede construirse aún (Era: {era}).");
             return;
         }
         OnInteract(interactor);
-        OnInteracted?.Invoke(interactor); // Notificar a scripts anexos
+        OnInteracted?.Invoke(interactor);
     }
 
     public void GrabPosition(Vector3 position)
@@ -80,6 +82,4 @@ public abstract class MaterialBaseInteractable : MonoBehaviour, IGrababble, IHit
     public void OnLaunched(Vector3 targetPosition)
     {
     }
-
-    public bool PuedeConstruirse => puedeConstruirse;
 }
