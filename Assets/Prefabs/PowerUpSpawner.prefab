@@ -44,9 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c875fd6fe5114a347829afda3f166896, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  powerUpPrefabs:
-  - {fileID: 878979549410298085, guid: d43cbed232d4a69409dc812f6f2c5dba, type: 3}
+  prefab: {fileID: 0}
   spawnPoints: []
-  minSpawnInterval: 20
-  maxSpawnInterval: 40
-  cooldownAfterDespawn: 10
+  autoSpawn: 1
+  minSpawnDelay: 5
+  maxSpawnDelay: 15
+  spawnEffectPrefab: {fileID: 104829970813648393, guid: d3015b7eea383f64d8b81f965cc466e7, type: 3}
+  attachEffectAsChild: 1
+  effectOffset: {x: 0, y: 0, z: 0}

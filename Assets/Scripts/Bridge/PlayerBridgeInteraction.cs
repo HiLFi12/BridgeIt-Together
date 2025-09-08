@@ -140,16 +140,34 @@ public class PlayerBridgeInteraction : MonoBehaviour
                 Debug.Log($"Índice de capa determinado automaticamente: {correctLayerIndex}, Material correcto: {materialLayerIndex == correctLayerIndex}");
                 
                 // Intentar construir usando el índice correcto
-                bool success = bridgeGrid.TryBuildLayer(targetX, targetZ, correctLayerIndex, objectInHand);
+                bool success;
+                if (MotivationBuffManager.Active)
+                {
+                    // Construcción motivada: intentar completar todas las capas restantes en esta columna (mismo X) para cada Z del puente
+                    success = false;
+                    int gridLengthLocal = bridgeGrid.gridLength;
+                    for (int zIter = 0; zIter < gridLengthLocal; zIter++)
+                    {
+                        // Para cada cuadrante en la columna X = targetX
+                        for (int layer = correctLayerIndex; layer <= 3; layer++)
+                        {
+                            // Obtener objeto en mano (solo se consume una vez al final si al menos una construcción tuvo éxito)
+                            bool layerBuilt = bridgeGrid.TryBuildLayer(targetX, zIter, layer, objectInHand);
+                            success = success || layerBuilt;
+                            if (!MotivationBuffManager.Active) break; // por si se acaba el buff en medio (poco probable)
+                        }
+                    }
+                }
+                else
+                {
+                    success = bridgeGrid.TryBuildLayer(targetX, targetZ, correctLayerIndex, objectInHand);
+                }
                 
                 if (success)
                 {
-                    // El objeto se utilizó, indicar al holder que ya no tiene nada
-                    objectHolder.UseHeldObject();
-                    
-                    // Actualizar el índice de capa para la próxima construcción
+                    objectHolder.UseHeldObject(); // consumir material una vez
                     currentLayerIndex = GetNextCorrectLayerIndex(targetX, targetZ);
-                    Debug.Log($"Construcción exitosa. Siguiente capa a construir: {currentLayerIndex}");
+                    Debug.Log(MotivationBuffManager.Active ? "Construcción motivada de columna completa." : $"Construcción exitosa. Siguiente capa a construir: {currentLayerIndex}");
                 }
                 else
                 {

@@ -2,202 +2,84 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Versión simplificada rehacida desde cero: un solo prefab y lista de spawn points.
+/// Llama a <see cref="SpawnRandom"/> para instanciarlo en un punto aleatorio.
+/// </summary>
 public class PowerUpSpawner : MonoBehaviour
 {
-    [Header("Configuración de Spawn")]
-    public List<GameObject> powerUpPrefabs;
-    public List<Transform> spawnPoints;
-    
-    [Header("Intervalos de Spawn Aleatorio")]
-    [Tooltip("Tiempo mínimo entre spawns (en segundos)")]
-    public float minSpawnInterval = 15f;
-    [Tooltip("Tiempo máximo entre spawns (en segundos)")]
-    public float maxSpawnInterval = 45f;
-    [Tooltip("Tiempo de espera después de que un power-up es activado")]
-    public float cooldownAfterDespawn = 8f;
-    
-    [Header("Configuración Avanzada")]
-    [Tooltip("Si está activado, solo spawneará UNA vez por partida")]
-    public bool spawnOnlyOnce = true;
-    [Tooltip("Permite múltiples power-ups activos simultáneamente (solo si spawnOnlyOnce está desactivado)")]
-    public bool allowMultiplePowerUps = false;
-    [Tooltip("Máximo número de power-ups activos (solo si allowMultiplePowerUps está activo)")]
-    public int maxActivePowerUps = 2;
-    
-    [Header("Referencias")]
-    public BridgeConstructionGrid bridgeGrid; // Referencia directa a la grilla
+    [Header("Prefab a instanciar")]
+    [Tooltip("PowerUp (o cualquier GameObject) que será instanciado una única vez.")]
+    public GameObject prefab;
 
-    private bool canSpawn = true;
-    private List<GameObject> activePowerUps = new List<GameObject>();
-    private float nextSpawnTime;
-    private bool hasSpawnedOnce = false; // Control para spawn único
+    [Header("Puntos de spawn (Empty Transforms en escena)")]
+    public List<Transform> spawnPoints = new List<Transform>();
+
+    [Header("Spawn Automático Único")] 
+    [Tooltip("Si está activo, hará un único spawn automático tras un retardo aleatorio.")] public bool autoSpawn = true;
+    [Tooltip("Intervalo mínimo antes de spawnear (segundos)")] public float minSpawnDelay = 5f;
+    [Tooltip("Intervalo máximo antes de spawnear (segundos)")] public float maxSpawnDelay = 15f;
+
+    [Header("Efecto de Aparición")]
+    [Tooltip("Prefab de efecto (partícula / VFX / sonido) a instanciar cuando aparece el power-up.")]
+    public GameObject spawnEffectPrefab;
+    [Tooltip("Si true, el efecto se parenta al objeto spawneado.")] public bool attachEffectAsChild = true;
+    [Tooltip("Offset local aplicado a la posición de spawn para el efecto.")] public Vector3 effectOffset = Vector3.zero;
+
+    private bool hasSpawned = false;
+
+    /// <summary>
+    /// Instancia el prefab en un punto aleatorio de la lista.
+    /// </summary>
+    public void SpawnRandom()
+    {
+        if (hasSpawned)
+            return; // Ya se generó el único spawn
+
+        if (prefab == null || spawnPoints == null || spawnPoints.Count == 0)
+        {
+            Debug.LogWarning("[PowerUpSpawner] Prefab o spawnPoints no asignados.");
+            return;
+        }
+
+    Transform point = spawnPoints[Random.Range(0, spawnPoints.Count)];
+    // Combinar la rotación del spawn point con la del prefab para respetar la orientación propia
+    Quaternion finalRot = point.rotation * prefab.transform.rotation;
+    GameObject spawned = Instantiate(prefab, point.position, finalRot);
+
+        // Instanciar efecto de aparición si existe
+        if (spawnEffectPrefab != null)
+        {
+            Vector3 fxPos = point.TransformPoint(effectOffset);
+            GameObject fx = Instantiate(spawnEffectPrefab, fxPos, finalRot);
+            if (attachEffectAsChild && spawned != null)
+            {
+                fx.transform.SetParent(spawned.transform, true);
+            }
+
+            // Auto-destroy si tiene ParticleSystem principal
+            var ps = fx.GetComponent<ParticleSystem>();
+            if (ps != null)
+            {
+                float ttl = ps.main.duration + ps.main.startLifetime.constantMax;
+                Destroy(fx, ttl);
+            }
+        }
+        hasSpawned = true;
+    }
 
     private void Start()
     {
-        // Si no se ha asignado la referencia, intentar encontrarla automáticamente
-        if (bridgeGrid == null)
-        {
-            bridgeGrid = FindObjectOfType<BridgeConstructionGrid>();
-            if (bridgeGrid == null)
-            {
-                Debug.LogError("¡No se encontró referencia a BridgeConstructionGrid! Los PowerUps no funcionarán correctamente.");
-            }
-        }
-        
-        // Configurar el primer tiempo de spawn aleatorio
-        SetNextRandomSpawnTime();
-        StartCoroutine(SpawnRoutine());
+        if (autoSpawn && !hasSpawned)
+            StartCoroutine(SpawnOnceDelayed());
     }
 
-    private void SetNextRandomSpawnTime()
+    private IEnumerator SpawnOnceDelayed()
     {
-        float randomInterval = Random.Range(minSpawnInterval, maxSpawnInterval);
-        nextSpawnTime = Time.time + randomInterval;
-        Debug.Log($"Próximo PowerUp spawneará en {randomInterval:F1} segundos");
+        if (maxSpawnDelay < minSpawnDelay)
+            maxSpawnDelay = minSpawnDelay;
+        float wait = Random.Range(minSpawnDelay, maxSpawnDelay);
+        yield return new WaitForSeconds(wait);
+        SpawnRandom();
     }
-
-    private IEnumerator SpawnRoutine()
-    {
-        while (true)
-        {
-            // Si solo puede spawnear una vez y ya lo hizo, no hacer nada más
-            if (spawnOnlyOnce && hasSpawnedOnce)
-            {
-                yield return new WaitForSeconds(1f); // Verificar cada segundo
-                continue;
-            }
-
-            if (canSpawn && Time.time >= nextSpawnTime)
-            {
-                bool canSpawnNew = false;
-                
-                if (spawnOnlyOnce)
-                {
-                    // Si es spawn único, solo puede spawnear si no ha spawneado antes
-                    canSpawnNew = !hasSpawnedOnce;
-                }
-                else
-                {
-                    // Lógica original para múltiples spawns
-                    canSpawnNew = allowMultiplePowerUps ? 
-                        activePowerUps.Count < maxActivePowerUps : 
-                        activePowerUps.Count == 0;
-                }
-
-                if (canSpawnNew)
-                {
-                    SpawnPowerUp();
-                    
-                    if (spawnOnlyOnce)
-                    {
-                        hasSpawnedOnce = true;
-                        Debug.Log("PowerUp único spawneado. No habrá más spawns en esta partida.");
-                    }
-                    else
-                    {
-                        SetNextRandomSpawnTime(); // Solo configurar siguiente tiempo si no es spawn único
-                    }
-                }
-            }
-            
-            // Limpiar power-ups que han sido destruidos
-            activePowerUps.RemoveAll(powerUp => powerUp == null);
-            
-            yield return new WaitForSeconds(0.5f); // Verificar cada medio segundo
-        }
-    }
-
-    private void SpawnPowerUp()
-    {
-        if (powerUpPrefabs.Count == 0 || spawnPoints.Count == 0) return;
-        
-        int prefabIndex = Random.Range(0, powerUpPrefabs.Count);
-        int pointIndex = Random.Range(0, spawnPoints.Count);
-        
-        Debug.Log($"Spawneando PowerUp: {powerUpPrefabs[prefabIndex].name} en {spawnPoints[pointIndex].name}");
-        GameObject newPowerUp = Instantiate(powerUpPrefabs[prefabIndex], spawnPoints[pointIndex].position, powerUpPrefabs[prefabIndex].transform.rotation);
-        
-        // Añadir a la lista de power-ups activos
-        activePowerUps.Add(newPowerUp);
-
-        // --- INICIO: Asignación de referencias para PowerUps ---
-        // PowerUpRitualGranFuego
-        var ritual = newPowerUp.GetComponent<PowerUpRitualGranFuego>();
-        if (ritual != null)
-        {
-            // Asignar la referencia a BridgeConstructionGrid
-            ritual.bridgeGrid = bridgeGrid;
-            
-            // NOTA: Las antorchas del tótem ahora se configuran directamente en el prefab
-            // del PowerUp asignando los colliders desde el inspector. Ya no necesitamos
-            // buscar antorchas por tags en la escena.
-        }
-        
-        // PowerUpConstructorHolografico
-        var constructor = newPowerUp.GetComponent<PowerUpConstructorHolografico>();
-        if (constructor != null)
-        {
-            // Asignar la referencia a TechUpgradeManager si existe
-            constructor.techUpgradeManager = FindObjectOfType<TechUpgradeManager>();
-        }
-        
-        // PowerUpCalorHumano
-        var calor = newPowerUp.GetComponent<PowerUpCalorHumano>();
-        if (calor != null)
-        {
-            // Si tiene alguna referencia específica, asignarla aquí
-        }
-        // --- FIN: Asignación de referencias para PowerUps ---
-
-        PowerUpBase powerUp = newPowerUp.GetComponent<PowerUpBase>();
-        if (powerUp != null)
-        {
-            PowerUpBase.OnPowerUpActivated += OnPowerUpActivated;
-        }
-    }
-
-    private void OnPowerUpActivated(PowerUpBase powerUp)
-    {
-        PowerUpBase.OnPowerUpActivated -= OnPowerUpActivated;
-        
-        // Remover el power-up de la lista de activos
-        if (powerUp != null && powerUp.gameObject != null)
-        {
-            activePowerUps.Remove(powerUp.gameObject);
-        }
-        
-        StartCoroutine(CooldownCoroutine());
-    }
-
-    private IEnumerator CooldownCoroutine()
-    {
-        canSpawn = false;
-        yield return new WaitForSeconds(cooldownAfterDespawn);
-        canSpawn = true;
-    }
-
-    /// <summary>
-    /// Resetea el estado del spawner para permitir un nuevo spawn único.
-    /// Útil para reiniciar partidas o testing.
-    /// </summary>
-    public void ResetSpawner()
-    {
-        hasSpawnedOnce = false;
-        canSpawn = true;
-        
-        // Destruir todos los power-ups activos
-        foreach (GameObject powerUp in activePowerUps)
-        {
-            if (powerUp != null)
-            {
-                Destroy(powerUp);
-            }
-        }
-        activePowerUps.Clear();
-        
-        // Configurar nuevo tiempo de spawn
-        SetNextRandomSpawnTime();
-        
-        Debug.Log("PowerUpSpawner reseteado. Listo para nuevo spawn.");
-    }
-} 
+}

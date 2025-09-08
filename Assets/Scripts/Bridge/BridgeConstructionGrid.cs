@@ -485,6 +485,32 @@ public class BridgeConstructionGrid : MonoBehaviour
         return success;
     }
 
+    /// <summary>
+    /// Fuerza la finalización de todas las capas restantes de un cuadrante, sin requerir materiales.
+    /// No construye capas ya completas. Devuelve true si al menos una capa cambió a completada.
+    /// </summary>
+    public bool ForceCompleteRemainingLayers(int x, int z)
+    {
+        if (!IsValidQuadrant(x, z) || constructionGrid[x, z].quadrantSO == null)
+            return false;
+
+        bool changed = false;
+        var so = constructionGrid[x, z].quadrantSO;
+        for (int i = 0; i < so.requiredLayers.Length; i++)
+        {
+            if (!so.requiredLayers[i].isCompleted)
+            {
+                so.requiredLayers[i].isCompleted = true; // Marcado directo
+                changed = true;
+            }
+        }
+        if (changed)
+        {
+            UpdateQuadrantVisuals(x, z);
+        }
+        return changed;
+    }
+
     // Método para simular el impacto de un vehículo en un cuadrante
     public void OnVehicleImpact(int x, int z)
     {

@@ -54,4 +54,30 @@ public class PowerUpMotivacionEstatua : PowerUpBase
         yield return new WaitForSeconds(effectDuration);
         Despawn();
     }
+
+    // Entrada directa si el collider está en el mismo GameObject
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (isActive) return;        
+        if (collision.collider && collision.collider.GetComponent<Arrow>() != null)
+        {
+            HandleArrowHit(collision.collider.gameObject);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (isActive) return;
+        if (other.GetComponent<Arrow>() != null)
+        {
+            HandleArrowHit(other.gameObject);
+        }
+    }
+
+    // Método usado también por el relay en hijos
+    public void HandleArrowHit(GameObject arrow)
+    {
+        if (isActive) return;
+        TryActivate(arrow);
+    }
 } 

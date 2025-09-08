@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4358172720008895142}
@@ -50,12 +50,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   duration: 100
-  timeToLive: 150
-  leftTorchCollider: {fileID: 0}
-  rightTorchCollider: {fileID: 0}
+  timeToLive: 20
+  leftTorchCollider: {fileID: 3991762860544308919}
+  rightTorchCollider: {fileID: 7616528472772056046}
   bridgeGrid: {fileID: 0}
-  torchActiveTime: 1
-  torchFireEffectPrefab: {fileID: 0}
+  torchActiveTime: 10
+  torchFireEffectPrefab: {fileID: 3863016212730197731, guid: da5327b0ffd9bb849b596274a49961c3, type: 3}
+  dieEffectPrefab: {fileID: 104829970813648393, guid: bf8e1e805eecef548b1d9c7963c9ed8f, type: 3}
+  attachDieEffect: 0
 --- !u!136 &2629408831071568527
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -158,8 +160,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.965805, y: 3.1890419, z: 3.482478}
-  m_Center: {x: 0.48290253, y: -0.1886363, z: 1.241238}
+  m_Size: {x: 1.5412277, y: 0.91882944, z: 1.29828}
+  m_Center: {x: 0.27061385, y: -0.38945627, z: -0.06653899}
 --- !u!114 &4046831122907294055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,8 +228,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.965805, y: 3.1890419, z: 3.482478}
-  m_Center: {x: 0.48290253, y: -0.1886363, z: 1.241238}
+  m_Size: {x: 1.3532451, y: 0.91882944, z: 1.4547997}
+  m_Center: {x: -0.14261198, y: -0.38945627, z: -0.018434644}
 --- !u!114 &7036981601641062061
 MonoBehaviour:
   m_ObjectHideFlags: 0

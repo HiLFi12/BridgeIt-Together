@@ -28,6 +28,14 @@ public class PowerUpRitualGranFuego : PowerUpBase
     private GameObject leftTorchFireEffect;
     private GameObject rightTorchFireEffect;
 
+    [Header("Lifetime / Despawn")]
+    [SerializeField, Tooltip("Efecto visual al morir (opcional)")]
+    private GameObject dieEffectPrefab;
+    [SerializeField, Tooltip("Si true, el efecto se parenta al tótem antes de ocultarlo")]
+    private bool attachDieEffect = false;
+    private bool isDead = false;
+    public System.Action OnDie;
+
     protected override void Start()
     {
         base.Start();
@@ -89,6 +97,16 @@ public class PowerUpRitualGranFuego : PowerUpBase
         if (leftTorchLit && rightTorchLit)
         {
             TryActivate(null); // Activación cooperativa sin activador específico
+        }
+    }
+
+    // Usar el TTL heredado del PowerUpBase para disparar la muerte si no se activó a tiempo
+    protected override IEnumerator LifeTimer()
+    {
+        yield return new WaitForSeconds(timeToLive);
+        if (!isActive)
+        {
+            Die();
         }
     }
 
@@ -186,6 +204,33 @@ public class PowerUpRitualGranFuego : PowerUpBase
         }
 
         Despawn();
+    }
+
+    /// <summary>
+    /// Lógica de muerte por tiempo: dispara efecto opcional, evento y oculta el objeto.
+    /// </summary>
+    public void Die()
+    {
+        if (isDead) return;
+        isDead = true;
+
+        if (dieEffectPrefab != null)
+        {
+            GameObject fx = Instantiate(dieEffectPrefab, transform.position, transform.rotation);
+            if (attachDieEffect && fx != null)
+            {
+                fx.transform.SetParent(transform, true);
+            }
+            var ps = fx.GetComponent<ParticleSystem>();
+            if (ps != null)
+            {
+                float ttl = ps.main.duration + ps.main.startLifetime.constantMax;
+                Destroy(fx, ttl);
+            }
+        }
+
+        OnDie?.Invoke();
+        base.Despawn();
     }
 
     /// <summary>
