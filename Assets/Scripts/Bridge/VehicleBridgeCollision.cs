@@ -1,352 +1,209 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class VehicleBridgeCollision : MonoBehaviour
-{    [Header("Referencias")]
-    public BridgeConstructionGrid bridgeGrid;
-      [Header("Configuración")]
+{
+    [Header("Configuración")]
     public string bridgeQuadrantTag = "BridgeQuadrant";
     public string vehicleTag = "Vehicle";
     public bool debugMode = true;
+
     [Header("Control de Colisiones")]
-    public float collisionCooldown = 1.0f; // Tiempo en segundos antes de poder impactar el mismo cuadrante otra vez
-      // Diccionario para rastrear las colisiones recientes por cuadrante
-    private System.Collections.Generic.Dictionary<string, float> recentCollisions = new System.Collections.Generic.Dictionary<string, float>();
-    
+    public float collisionCooldown = 1.0f;
+
+    [Header("Compatibilidad (legacy)")]
+    [Tooltip("Campo mantenido solo para compatibilidad con scripts que asignaban el grid manualmente. El sistema ahora detecta dinámicamente el BridgeConstructionGrid. Se usa como fallback si no se puede resolver desde el collider.")]
+    public BridgeConstructionGrid bridgeGrid; // legacy
+
+    // Key: "<gridID>_<x>_<z>"
+    private Dictionary<string, float> recentCollisions = new Dictionary<string, float>();
+
+    private void Start()
+    {
+        // Validación de tags (mantiene tu lógica original)
+        ValidateTag(bridgeQuadrantTag, "cuadrantes del puente");
+        ValidateTag(vehicleTag, "vehículos");
+    }
+
     private void Update()
     {
-        // Limpiar colisiones antiguas cada pocos segundos para evitar memory leaks
-        if (Time.time % 5.0f < Time.deltaTime) // Aproximadamente cada 5 segundos
-        {
+        if (Time.time % 5.0f < Time.deltaTime)
             CleanupOldCollisions();
-        }
     }
-      private void Start()
+
+    private void ValidateTag(string tagName, string desc)
     {
-        if (bridgeGrid == null)
+        bool exists = true;
+        try
         {
-            bridgeGrid = FindObjectOfType<BridgeConstructionGrid>();
-            
-            if (bridgeGrid == null)
-            {
-                Debug.LogError("No se ha encontrado BridgeConstructionGrid. El vehículo no dañará el puente.");
-            }
-            else
-            {
-                Debug.Log("BridgeConstructionGrid encontrado automáticamente: " + bridgeGrid.name);
-            }
+            var go = new GameObject();
+            go.tag = tagName;
+            Object.Destroy(go);
         }
-        else 
-        {
-            Debug.Log("BridgeConstructionGrid asignado: " + bridgeGrid.name);
-        }
-        
-        bool tagExists = false;
-        try 
-        {
-            GameObject testObj = new GameObject();
-            testObj.tag = bridgeQuadrantTag;
-            Destroy(testObj);
-            tagExists = true;
-        }
-        catch (UnityException)
-        {
-            tagExists = false;
-        }
-          if (!tagExists)
-        {
-            Debug.LogError("El tag '" + bridgeQuadrantTag + "' no existe en el proyecto. Las colisiones con el puente no funcionarán.");
-        }
-        else
-        {
-            if (debugMode) Debug.Log("Tag '" + bridgeQuadrantTag + "' verificado correctamente.");
-        }
-        
-        // Verificar que el tag de vehículo existe
-        bool vehicleTagExists = false;
-        try 
-        {
-            GameObject testVehicleObj = new GameObject();
-            testVehicleObj.tag = vehicleTag;
-            Destroy(testVehicleObj);
-            vehicleTagExists = true;
-        }
-        catch (UnityException)
-        {
-            vehicleTagExists = false;
-        }
-        
-        if (!vehicleTagExists)
-        {
-            Debug.LogError("El tag '" + vehicleTag + "' no existe en el proyecto. Solo los objetos con este tag podrán dañar el puente.");
-        }        else
-        {
-            if (debugMode) Debug.Log("Tag '" + vehicleTag + "' verificado correctamente.");
-        }
+        catch { exists = false; }
+
+        if (!exists)
+            Debug.LogError($"El tag '{tagName}' no existe. Afecta a {desc}.");
+        else if (debugMode) Debug.Log($"Tag '{tagName}' verificado.");
     }
-      /// <summary>
-    /// Limpia las colisiones antiguas del diccionario para evitar memory leaks
-    /// </summary>
+
     private void CleanupOldCollisions()
     {
-        float currentTime = Time.time;
-        var keysToRemove = new System.Collections.Generic.List<string>();
-        
-        foreach (var kvp in recentCollisions)
-        {
-            if (currentTime - kvp.Value > collisionCooldown * 2) // Limpiar colisiones que son el doble del tiempo de cooldown
-            {
-                keysToRemove.Add(kvp.Key);
-            }
-        }
-        
-        foreach (string key in keysToRemove)
-        {
-            recentCollisions.Remove(key);
-        }
-        
-        if (debugMode && keysToRemove.Count > 0)
-        {
-            Debug.Log($"Limpiadas {keysToRemove.Count} colisiones antiguas del registro.");
-        }
+        float now = Time.time;
+        List<string> toRemove = new List<string>();
+        foreach (var kv in recentCollisions)
+            if (now - kv.Value > collisionCooldown * 2f)
+                toRemove.Add(kv.Key);
+        foreach (var k in toRemove) recentCollisions.Remove(k);
+        if (debugMode && toRemove.Count > 0)
+            Debug.Log($"Limpiadas {toRemove.Count} entradas antiguas.");
     }
-      /// <summary>
-    /// Verifica si una colisión con un cuadrante específico es válida (no está en cooldown)
-    /// </summary>
-    private bool IsCollisionValid(int x, int z)
+
+    private bool IsVehicleOrChildOfVehicle()
     {
-        string quadrantKey = $"{x}_{z}";
-        float currentTime = Time.time;
-        
-        if (recentCollisions.ContainsKey(quadrantKey))
+        if (CompareTag(vehicleTag)) return true;
+        Transform p = transform.parent;
+        while (p)
         {
-            float timeSinceLastCollision = currentTime - recentCollisions[quadrantKey];
-            if (timeSinceLastCollision < collisionCooldown)
+            if (p.CompareTag(vehicleTag)) return true;
+            p = p.parent;
+        }
+        return false;
+    }
+
+    private bool IsCollisionValid(BridgeConstructionGrid grid, int x, int z)
+    {
+        if (grid == null) return false;
+        string key = $"{grid.GetInstanceID()}_{x}_{z}";
+        float now = Time.time;
+        if (recentCollisions.TryGetValue(key, out float last))
+        {
+            float dt = now - last;
+            if (dt < collisionCooldown)
             {
-                if (debugMode) Debug.Log($"Colisión con cuadrante [{x},{z}] ignorada. Cooldown activo. Tiempo restante: {collisionCooldown - timeSinceLastCollision:F2}s");
+                if (debugMode)
+                    Debug.Log($"Cooldown cuadrante [{x},{z}] en {grid.name}. Restante: {collisionCooldown - dt:F2}s");
                 return false;
             }
         }
-        
-        // Registrar esta colisión
-        recentCollisions[quadrantKey] = currentTime;
-        if (debugMode) Debug.Log($"Colisión con cuadrante [{x},{z}] registrada. Próxima colisión permitida en {collisionCooldown}s");
+        recentCollisions[key] = now;
         return true;
     }
-    
-    /// <summary>
-    /// Verifica si este objeto o alguno de sus padres tiene el tag de vehículo
-    /// </summary>
-    private bool IsVehicleOrChildOfVehicle()
+
+    private void ProcessVehicleImpact(BridgeConstructionGrid grid, int x, int z)
     {
-        // Primero verificar el objeto actual
-        if (gameObject.CompareTag(vehicleTag))
+        if (grid == null) return;
+        if (x < 0 || x >= grid.gridWidth || z < 0 || z >= grid.gridLength)
         {
-            if (debugMode) Debug.Log("Este objeto " + gameObject.name + " es un vehículo.");
+            if (debugMode) Debug.LogWarning($"Cuadrante [{x},{z}] fuera de límites en {grid.name}");
+            return;
+        }
+
+        if (!IsCollisionValid(grid, x, z)) return;
+
+        grid.OnVehicleImpact(x, z);
+        if (debugMode) Debug.Log($"Impacto cuadrante [{x},{z}] en grid {grid.name}");
+
+        ProbabilityAction prob = GetComponentInParent<ProbabilityAction>();
+        if (prob != null)
+            prob.TryExecuteOnQuadrant(x, z);
+    }
+
+    // -------- Obtención dinámica del grid + coordenadas ----------
+    private bool TryResolveQuadrantFromCollider(Component hitComp, out BridgeConstructionGrid grid, out int qx, out int qz)
+    {
+        qx = qz = -1;
+        grid = null;
+
+        // 1) Componente informativo directo
+        BridgeQuadrantInfo info = hitComp.GetComponent<BridgeQuadrantInfo>() ?? hitComp.GetComponentInParent<BridgeQuadrantInfo>();
+        if (info != null && info.grid != null)
+        {
+            grid = info.grid;
+            qx = info.x;
+            qz = info.z;
             return true;
         }
-        
-        // Buscar en los padres
-        Transform currentParent = transform.parent;
-        while (currentParent != null)
+
+        // 2) Fallback: buscar grid padre y calcular por posición
+        grid = hitComp.GetComponentInParent<BridgeConstructionGrid>();
+        if (grid == null)
         {
-            if (currentParent.CompareTag(vehicleTag))
+            // Fallback adicional: usar grid legacy si está asignado (compatibilidad)
+            if (bridgeGrid != null)
             {
-                if (debugMode) Debug.Log("Objeto padre " + currentParent.name + " es un vehículo.");
+                grid = bridgeGrid;
+                Vector3 fallbackWorldPoint = transform.position;
+                Vector3 fallbackLocal = grid.transform.InverseTransformPoint(fallbackWorldPoint);
+                qx = Mathf.FloorToInt(fallbackLocal.x / grid.quadrantSize);
+                qz = Mathf.FloorToInt(fallbackLocal.z / grid.quadrantSize);
                 return true;
             }
-            currentParent = currentParent.parent;
+            return false;
         }
-        
-        if (debugMode) Debug.Log("Este objeto " + gameObject.name + " no es un vehículo ni hijo de uno.");
-        return false;
-    }
-    
-    /// <summary>
-    /// Procesa el impacto del vehículo en un cuadrante específico si la colisión es válida
-    /// </summary>
-    private void ProcessVehicleImpact(int x, int z)
-    {
-        if (x >= 0 && x < bridgeGrid.gridWidth && z >= 0 && z < bridgeGrid.gridLength)
-        {
-            if (IsCollisionValid(x, z))
-            {
-                bridgeGrid.OnVehicleImpact(x, z);
-                Debug.Log($"Vehículo impactó cuadrante {x},{z}");
 
-                // Intentar ejecutar una acción probabilística si el vehículo (o un componente en sus padres)
-                // posee un componente que herede de ProbabilityAction
-                ProbabilityAction prob = GetComponentInParent<ProbabilityAction>();
-                if (prob != null)
-                {
-                    if (debugMode) Debug.Log($"ProbabilityAction encontrado en {prob.gameObject.name}. Intentando ejecutar con probabilidad {prob.probability}.");
-                    prob.TryExecuteOnQuadrant(x, z);
-                }
-            }
-        }
-        else
-        {
-            if (debugMode) Debug.LogWarning("Cuadrante [" + x + "," + z + "] fuera de los límites de la grilla.");
-        }
-    }  
-    
-    /// <summary>
-    /// Lógica de procesamiento de colisiones extraída para reutilización
-    /// </summary>
-    private void ProcessCollisionLogic(Collision collision)
+        // Usar el punto más cercano o posición del collider
+        Vector3 worldPoint = (hitComp is Collider col)
+            ? col.ClosestPoint(transform.position)
+            : hitComp.transform.position;
+
+        Vector3 local = grid.transform.InverseTransformPoint(worldPoint);
+        qx = Mathf.FloorToInt(local.x / grid.quadrantSize);
+        qz = Mathf.FloorToInt(local.z / grid.quadrantSize);
+        return true;
+    }
+
+    // ---------- Colisiones físicas ----------
+    private void OnCollisionEnter(Collision collision)
     {
-        if (debugMode) Debug.Log("Colisión detectada con: " + collision.gameObject.name + " (Tag: " + collision.gameObject.tag + ")");
-        
-        if (bridgeGrid == null)
-        {
-            if (debugMode) Debug.LogWarning("BridgeGrid nulo. Saltando colisión.");
+        HandleCollision(collision);
+    }
+
+    public void HandleCollision(Collision collision)
+    {
+        if (!IsVehicleOrChildOfVehicle()) return;
+
+        // Verificar si el objeto golpeado es un cuadrante (por tag o por componente)
+        if (!collision.gameObject.CompareTag(bridgeQuadrantTag) &&
+            collision.gameObject.GetComponentInParent<BridgeQuadrantInfo>() == null)
             return;
-        }
-        
-        // Verificar que ESTE objeto O su padre es un vehículo
-        if (!IsVehicleOrChildOfVehicle())
-        {
-            if (debugMode) Debug.Log("Este objeto " + gameObject.name + " no es un vehículo ni hijo de uno. No se aplicará daño.");
-            return;
-        }
-          // Verificar que el objeto con el que colisionamos es un cuadrante del puente
-        if (collision.gameObject.CompareTag(bridgeQuadrantTag))
-        {
-            if (debugMode) Debug.Log("Vehículo colisionó con un cuadrante del puente: " + collision.gameObject.name);
-            
-            Vector3 hitPoint = collision.contacts[0].point;
-            Vector3 localPos = hitPoint - bridgeGrid.transform.position;
-            
-            int x = Mathf.FloorToInt(localPos.x / bridgeGrid.quadrantSize);
-            int z = Mathf.FloorToInt(localPos.z / bridgeGrid.quadrantSize);
-            
-            if (debugMode) Debug.Log("Punto de impacto: " + hitPoint + " -> Cuadrante: [" + x + "," + z + "]");
-            
-            ProcessVehicleImpact(x, z);
-        }
-    }    private void OnTriggerEnter(Collider other)
+
+        if (TryResolveQuadrantFromCollider(collision.collider, out var grid, out int x, out int z))
+            ProcessVehicleImpact(grid, x, z);
+        else if (debugMode)
+            Debug.LogWarning("No se pudo resolver cuadrante desde colisión.");
+    }
+
+    // ---------- Triggers ----------
+    private void OnTriggerEnter(Collider other)
     {
         HandleTrigger(other);
     }
-    
-    /// <summary>
-    /// Lógica de procesamiento de triggers extraída para reutilización
-    /// </summary>
-    private void ProcessTriggerLogic(Collider other)
-    {
-        if (debugMode) Debug.Log("Trigger detectado con: " + other.gameObject.name + " (Tag: " + other.gameObject.tag + ")");
-        
-        if (bridgeGrid == null)
-        {
-            if (debugMode) Debug.LogWarning("BridgeGrid nulo. Saltando trigger.");
-            return;
-        }
-        
-        // Verificar que ESTE objeto O su padre es un vehículo
-        if (!IsVehicleOrChildOfVehicle())
-        {
-            if (debugMode) Debug.Log("Este objeto " + gameObject.name + " no es un vehículo ni hijo de uno. No se aplicará daño.");
-            return;
-        }
-        
-        GameObject targetObject = other.gameObject;
-        string targetName = targetObject.name;
-        
-        if (targetName.StartsWith("Layer_"))
-        {
-            if (debugMode) Debug.Log("Colisión con capa de puente: " + targetName);
-            
-            Transform parent = targetObject.transform.parent;
-            if (parent != null && parent.name.StartsWith("Quadrant_"))
-            {
-                string parentName = parent.name;
-                if (debugMode) Debug.Log("Cuadrante padre: " + parentName);
-                
-                string[] parts = parentName.Split('_');
-                if (parts.Length == 3)
-                {                    if (int.TryParse(parts[1], out int x) && int.TryParse(parts[2], out int z))
-                    {
-                        if (debugMode) Debug.Log("Procesando colisión con cuadrante [" + x + "," + z + "]");
-                        ProcessVehicleImpact(x, z);
-                        return;
-                    }
-                }
-            }
-        }
-            
-        if (other.CompareTag(bridgeQuadrantTag))
-        {
-            if (debugMode) Debug.Log("Trigger con un cuadrante del puente confirmado.");
-            
-            Vector3 hitPoint = other.ClosestPoint(transform.position);
-            Vector3 localPos = hitPoint - bridgeGrid.transform.position;
-            
-            int x = Mathf.FloorToInt(localPos.x / bridgeGrid.quadrantSize);
-            int z = Mathf.FloorToInt(localPos.z / bridgeGrid.quadrantSize);
-              if (debugMode) Debug.Log("Punto de trigger: " + hitPoint + " -> Cuadrante: [" + x + "," + z + "]");
-            
-            ProcessVehicleImpact(x, z);
-        }
-    }
-    
-    /// <summary>
-    /// Método estático para que los objetos hijos puedan reportar colisiones al padre vehículo
-    /// </summary>
-    public static void HandleCollisionFromChild(GameObject childObject, Collision collision)
-    {
-        VehicleBridgeCollision vehicleScript = FindVehicleScriptInParents(childObject);
-        if (vehicleScript != null)
-        {
-            vehicleScript.HandleCollision(collision);
-        }
-    }
-    
-    /// <summary>
-    /// Método estático para que los objetos hijos puedan reportar triggers al padre vehículo
-    /// </summary>
-    public static void HandleTriggerFromChild(GameObject childObject, Collider other)
-    {
-        VehicleBridgeCollision vehicleScript = FindVehicleScriptInParents(childObject);
-        if (vehicleScript != null)
-        {
-            vehicleScript.HandleTrigger(other);
-        }
-    }
-    
-    /// <summary>
-    /// Busca el componente VehicleBridgeCollision en el objeto o sus padres
-    /// </summary>
-    private static VehicleBridgeCollision FindVehicleScriptInParents(GameObject obj)
-    {
-        Transform current = obj.transform;
-        while (current != null)
-        {
-            VehicleBridgeCollision script = current.GetComponent<VehicleBridgeCollision>();
-            if (script != null)
-            {
-                return script;
-            }
-            current = current.parent;
-        }
-        return null;
-    }
-    
-    /// <summary>
-    /// Maneja la colisión (puede ser llamado desde el método OnCollisionEnter o desde un hijo)
-    /// </summary>
-    public void HandleCollision(Collision collision)
-    {
-        if (debugMode) Debug.Log("Colisión procesada por VehicleBridgeCollision en: " + gameObject.name);
-        ProcessCollisionLogic(collision);
-    }
-    
-    /// <summary>
-    /// Maneja el trigger (puede ser llamado desde el método OnTriggerEnter o desde un hijo)
-    /// </summary>
+
     public void HandleTrigger(Collider other)
     {
-        if (debugMode) Debug.Log("Trigger procesado por VehicleBridgeCollision en: " + gameObject.name);
-        ProcessTriggerLogic(other);
+        if (!IsVehicleOrChildOfVehicle()) return;
+
+        if (!other.CompareTag(bridgeQuadrantTag) &&
+            other.GetComponentInParent<BridgeQuadrantInfo>() == null)
+            return;
+
+        if (TryResolveQuadrantFromCollider(other, out var grid, out int x, out int z))
+            ProcessVehicleImpact(grid, x, z);
+        else if (debugMode)
+            Debug.LogWarning("No se pudo resolver cuadrante desde trigger.");
+    }
+
+    // Métodos estáticos para hijos (sin cambios sustanciales)
+    public static void HandleCollisionFromChild(GameObject child, Collision c)
+    {
+        var script = child.GetComponentInParent<VehicleBridgeCollision>();
+        if (script) script.HandleCollision(c);
+    }
+
+    public static void HandleTriggerFromChild(GameObject child, Collider other)
+    {
+        var script = child.GetComponentInParent<VehicleBridgeCollision>();
+        if (script) script.HandleTrigger(other);
     }
 }
