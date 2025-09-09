@@ -51,25 +51,51 @@ public class Player2 : MonoBehaviour
 
     private void TryInteract()
     {
-        Debug.Log("🎮 TryInteract() llamado - buscando interacciones...");
-        int elements = Physics.OverlapSphereNonAlloc(interactionPoint.position, interactionRadius, interactables, interactionLayer);
+        // Incluir colliders con IsTrigger (como antorchas del tótem)
+        int elements = Physics.OverlapSphereNonAlloc(
+            interactionPoint.position,
+            interactionRadius,
+            interactables,
+            interactionLayer,
+            QueryTriggerInteraction.Collide);
 
         if (elements == 0)
-            return;
-
-        for (int i = 0; i < interactables.Length; i++)
         {
-            var interactable = interactables[i];
-            if (interactable == null) continue;
+            return;
+        }
 
-            var interactableComponent = interactable.GetComponent<IInteractable>();
+        // Selección por prioridad y distancia
+        IInteractable mejor = null;
+        Collider mejorCol = null;
+        InteractPriority mejorPri = InteractPriority.VeryLow;
+        float mejorDist = float.MaxValue;
 
-            if (interactableComponent != null)
+    // Favorecer TorchInteractable si sostenemos PaloIgnifugo encendido
+        bool paloEncendido = false;
+        var holder = GetComponent<PlayerObjectHolder>();
+        if (holder != null && holder.HasObjectInHand())
+        {
+            var palo = holder.GetHeldObject()?.GetComponent<PaloIgnifugo>();
+            paloEncendido = palo != null && palo.EstaEncendido();
+        }
+
+        for (int i = 0; i < elements; i++)
+        {
+            var col = interactables[i];
+            if (col == null) continue;
+            var comp = col.GetComponentInParent<IInteractable>();
+            if (comp == null) continue;
+            float dist = Vector3.Distance(interactionPoint.position, col.transform.position);
+            var torch = col.GetComponentInParent<TorchInteractable>();
+            var priEff = comp.InteractPriority;
+            if (paloEncendido && torch != null) priEff = InteractPriority.VeryHigh;
+            if (priEff > mejorPri || (priEff == mejorPri && dist < mejorDist))
             {
-                interactableComponent.Interact(this.gameObject);
-                return;
+                mejor = comp; mejorCol = col; mejorPri = priEff; mejorDist = dist;
             }
         }
+
+    if (mejor != null) mejor.Interact(this.gameObject);
     }
 
     private void TryDropObject()

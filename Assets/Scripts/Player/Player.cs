@@ -52,46 +52,60 @@ public class Player : MonoBehaviour, IHitable
 
     private void TryInteract()
     {
-        Debug.Log("🎮 TryInteract() llamado - buscando interacciones...");
-        Debug.Log($"🔍 Punto de interacción: {interactionPoint.position}");
-        Debug.Log($"🔍 Radio de interacción: {interactionRadius}");
-        Debug.Log($"🔍 Layer de interacción: {interactionLayer.value} (bits: {Convert.ToString(interactionLayer.value, 2)})");
-        
-        int elements = Physics.OverlapSphereNonAlloc(interactionPoint.position, interactionRadius, interactables, interactionLayer);
-        
-        Debug.Log($"🔍 Objetos detectados: {elements}");
-        
-        if (elements == 0)
+        // Importante: incluir colliders con IsTrigger (antorchas) en la búsqueda
+        int elements = Physics.OverlapSphereNonAlloc(
+            interactionPoint.position,
+            interactionRadius,
+            interactables,
+            interactionLayer,
+            QueryTriggerInteraction.Collide);
+    if (elements == 0) return;
+
+        // Elegir el mejor candidato por prioridad y distancia
+        IInteractable mejorInteractuable = null;
+        Collider mejorCollider = null;
+        InteractPriority mejorPrioridad = InteractPriority.VeryLow;
+        float distanciaMasCercana = float.MaxValue;
+
+        // ¿Sostiene un PaloIgnífugo encendido? Si sí, favorecemos TorchInteractable
+        bool paloEncendido = false;
+        var holder = GetComponent<PlayerObjectHolder>();
+    if (holder != null && holder.HasObjectInHand())
         {
-            Debug.Log("❌ No se detectaron objetos interactuables");
+            var palo = holder.GetHeldObject()?.GetComponent<PaloIgnifugo>();
+            paloEncendido = palo != null && palo.EstaEncendido();
+        }
+
+        for (int i = 0; i < elements; i++)
+        {
+            var col = interactables[i];
+            if (col == null) continue;
+
+            var candidato = col.GetComponentInParent<IInteractable>();
+            if (candidato == null) continue;
+
+            float distancia = Vector3.Distance(interactionPoint.position, col.transform.position);
+            var torch = col.GetComponentInParent<TorchInteractable>();
+            var prioridadEfectiva = candidato.InteractPriority;
+            if (paloEncendido && torch != null)
+            {
+                prioridadEfectiva = InteractPriority.VeryHigh;
+            }
+            if (prioridadEfectiva > mejorPrioridad ||
+                (prioridadEfectiva == mejorPrioridad && distancia < distanciaMasCercana))
+            {
+                mejorInteractuable = candidato;
+                mejorCollider = col;
+                mejorPrioridad = prioridadEfectiva;
+                distanciaMasCercana = distancia;
+            }
+        }
+
+        if (mejorInteractuable != null)
+        {
+            mejorInteractuable.Interact(this.gameObject);
             return;
         }
-
-        for (int i = 0; i < elements; i++) // Cambié de interactables.Length a elements para solo iterar sobre los detectados
-        {
-            var interactable = interactables[i];
-            if (interactable == null) continue;
-
-            Debug.Log($"🔍 Objeto detectado {i}: {interactable.name} - Layer: {interactable.gameObject.layer} ({LayerMask.LayerToName(interactable.gameObject.layer)})");
-            Debug.Log($"🔍 Posición del objeto: {interactable.transform.position}");
-            Debug.Log($"🔍 Distancia al jugador: {Vector3.Distance(interactionPoint.position, interactable.transform.position)}");
-
-            var interactableComponent = interactable.GetComponent<IInteractable>();
-            Debug.Log($"🔍 ¿Tiene IInteractable? {interactableComponent != null}");
-            
-            if (interactableComponent != null)
-            {
-                Debug.Log($"✅ Interactuando con: {interactable.name}");
-                interactableComponent.Interact(this.gameObject);
-                return;
-            }
-            else
-            {
-                Debug.Log($"❌ {interactable.name} no tiene componente IInteractable");
-            }
-        }
-        
-        Debug.Log("❌ Ningún objeto detectado tenía componente IInteractable");
     }
 
     private void TryDropObject()

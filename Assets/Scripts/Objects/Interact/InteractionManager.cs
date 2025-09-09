@@ -41,7 +41,14 @@ public class InteractionManager : MonoBehaviour
         // Si ya estamos en proceso de interacción, no cambiamos el objeto seleccionado
         if (interaccionEnProceso) return;
         
-        Collider[] colliders = Physics.OverlapSphere(transform.position, radioInteraccion, capaInteractuable);
+        // Incluir colliders Trigger (antorchas usan BoxCollider como Trigger)
+        Collider[] colliders = Physics.OverlapSphere(
+            transform.position,
+            radioInteraccion,
+            capaInteractuable,
+            QueryTriggerInteraction.Collide);
+
+    // sin logs de depuración
         
         GameObject mejorObjeto = null;
         InteractPriority mejorPrioridad = InteractPriority.VeryLow;
@@ -49,7 +56,7 @@ public class InteractionManager : MonoBehaviour
         
         foreach (Collider col in colliders)
         {
-            IInteractable interactable = col.GetComponent<IInteractable>();
+            IInteractable interactable = col.GetComponentInParent<IInteractable>();
             if (interactable != null)
             {
                 float distancia = Vector3.Distance(transform.position, col.transform.position);
@@ -77,10 +84,10 @@ public class InteractionManager : MonoBehaviour
         if (objetoSeleccionado == null) return;
         
         // Intentar obtener un interactuable de tipo "hold"
-        objetoConInteraccionProlongada = objetoSeleccionado.GetComponent<IHoldInteractable>();
+    objetoConInteraccionProlongada = objetoSeleccionado.GetComponentInParent<IHoldInteractable>();
         
         // Obtener el componente IInteractable
-        IInteractable interactable = objetoSeleccionado.GetComponent<IInteractable>();
+    IInteractable interactable = objetoSeleccionado.GetComponentInParent<IInteractable>();
         if (interactable != null)
         {
             interaccionEnProceso = true;

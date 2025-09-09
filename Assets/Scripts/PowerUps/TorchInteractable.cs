@@ -25,6 +25,7 @@ public class TorchInteractable : MonoBehaviour, IInteractable
         ritualPowerUp = powerUp;
     }
 
+
     public void Interact(GameObject interactor)
     {
         if (ritualPowerUp == null)

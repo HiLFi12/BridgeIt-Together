@@ -39,7 +39,6 @@ public class PowerUpRitualGranFuego : PowerUpBase
     protected override void Start()
     {
         base.Start();
-        
         // Configurar los componentes TorchInteractable en los colliders
         SetupTorchInteractables();
     }
@@ -47,7 +46,7 @@ public class PowerUpRitualGranFuego : PowerUpBase
     private void SetupTorchInteractables()
     {
         // Configurar antorcha izquierda
-        if (leftTorchCollider != null)
+    if (leftTorchCollider != null)
         {
             TorchInteractable leftInteractable = leftTorchCollider.GetComponent<TorchInteractable>();
             if (leftInteractable == null)
@@ -58,7 +57,7 @@ public class PowerUpRitualGranFuego : PowerUpBase
         }
 
         // Configurar antorcha derecha
-        if (rightTorchCollider != null)
+    if (rightTorchCollider != null)
         {
             TorchInteractable rightInteractable = rightTorchCollider.GetComponent<TorchInteractable>();
             if (rightInteractable == null)
