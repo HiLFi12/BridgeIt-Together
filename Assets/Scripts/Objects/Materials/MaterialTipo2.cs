@@ -4,7 +4,7 @@ using UnityEngine;
 
 // Obsoleto: usar MaterialTipo2Base + scripts de mecánicas (MaterialTipo2CombinarPalo, etc.)
 [AddComponentMenu("")]
-public class MaterialTipo2 : MonoBehaviour
+public class MaterialTipo2 : MonoBehaviour, IHitable
 {
     private void Awake()
     {
@@ -18,5 +18,9 @@ public class MaterialTipo2 : MonoBehaviour
         }
         Debug.LogWarning("MaterialTipo2 obsoleto. Se añadieron MaterialTipo2Base y MaterialTipo2CombinarPalo.");
         Destroy(this);
+    }
+
+    public void OnLaunched(Vector3 targetPosition)
+    {
     }
 }

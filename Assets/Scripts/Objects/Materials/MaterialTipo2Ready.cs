@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MaterialTipo2Ready : MaterialTipo2Base
+public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
 {
     [Header("Referencias de mallas")]
     [SerializeField] private GameObject notReadyMesh;

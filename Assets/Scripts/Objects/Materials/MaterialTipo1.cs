@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BridgeItTogether.Gameplay.Abstractions;
 
-public class MaterialTipo1 : MonoBehaviour, ICollidableNT
+public class MaterialTipo1 : MonoBehaviour, IHitable
 {
     [Header("Configuración del material")]
     [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;
@@ -32,5 +32,9 @@ public class MaterialTipo1 : MonoBehaviour, ICollidableNT
     public void CombinarConResina()
     {
         Debug.Log("Palo de madera listo para ser combinado con resina.");
+    }
+
+    public void OnLaunched(Vector3 targetPosition)
+    {
     }
 } 

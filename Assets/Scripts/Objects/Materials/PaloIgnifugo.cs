@@ -7,7 +7,7 @@ using BridgeItTogether.Gameplay.Abstractions;
 /// Palo ignífugo, objeto único de la era prehistórica.
 /// Puede encenderse al acercarse a una fogata y luego usarse para obtener resina de la corteza.
 /// </summary>
-public class PaloIgnifugo : MonoBehaviour, ICollidableNT
+public class PaloIgnifugo : MonoBehaviour, IHitable
 {
     [Header("Configuración")]
     [SerializeField] private float radioDeteccion = 2.0f;
@@ -109,5 +109,9 @@ public class PaloIgnifugo : MonoBehaviour, ICollidableNT
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, radioDeteccion);
+    }
+
+    public void OnLaunched(Vector3 targetPosition)
+    {
     }
 } 
