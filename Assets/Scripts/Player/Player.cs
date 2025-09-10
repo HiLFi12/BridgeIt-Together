@@ -124,7 +124,31 @@ public class Player : MonoBehaviour, IHitable
     
     public void OnLaunched(Vector3 targetPosition)
     {
-        
+        var holder = GetComponent<PlayerObjectHolder>();
+        if (holder != null && holder.HasObjectInHand())
+        {
+            var obj = holder.GetHeldObject();
+            if (obj != null)
+            {
+                // Dejar de ser hijo del jugador y mantener posición/rotación en mundo
+                obj.transform.SetParent(null, true);
+
+                // Reactivar física del objeto para que pueda ser impactado inmediatamente
+                var rb = obj.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.isKinematic = false;
+                    rb.useGravity = true;
+                }
+            }
+
+            // Limpiar estado interno del holder sin usar DropObject
+            var t = typeof(PlayerObjectHolder);
+            var fObj = t.GetField("heldObject", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (fObj != null) fObj.SetValue(holder, null);
+            var fRb = t.GetField("heldRigidbody", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (fRb != null) fRb.SetValue(holder, null);
+        }
     }
 
     private void OnDrawGizmos()

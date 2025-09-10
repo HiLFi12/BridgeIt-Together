@@ -2860,7 +2860,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9126ecea228bff408a0576bf04a3499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vehiculosParaVictoria: 10
+  vehiculosParaVictoria: 19
   tagTriggerVictoria: PassTrigger
   usarVictoriaPorRondas: 0
   autoGenerator: {fileID: 0}
@@ -3720,8 +3720,16 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: 'configuracionRondas.Array.data[0].tiposVehiculoPorAuto.Array.data[2]'
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].posicionesCarrilPorAuto.Array.size
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: 'configuracionRondas.Array.data[1].tiposVehiculoPorAuto.Array.data[2]'
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[1].tiposVehiculoPorAuto.Array.data[3]'
@@ -3745,7 +3753,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[3].tiposVehiculoPorAuto.Array.data[1]'
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[3].tiposVehiculoPorAuto.Array.data[2]'
@@ -3761,7 +3769,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[4].tiposVehiculoPorAuto.Array.data[1]'
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[4].tiposVehiculoPorAuto.Array.data[2]'
@@ -3947,7 +3955,7 @@ MonoBehaviour:
   tagTriggerVictoria: PassTrigger
   tagTriggerDerrota: FallTrigger
   tagVehiculo: Vehicle
-  vehiculosParaVictoria: 10
+  vehiculosParaVictoria: 19
   vehiculosParaDerrota: 3
   triggersVictoriaPersonalizados:
   - {fileID: 83119060}
@@ -4969,5 +4977,5 @@ SceneRoots:
   - {fileID: 707292732}
   - {fileID: 817843590}
   - {fileID: 2308181347344511826}
-  - {fileID: 777630860}
   - {fileID: 646342129}
+  - {fileID: 777630860}

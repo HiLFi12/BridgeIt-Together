@@ -117,5 +117,30 @@ public class Player2 : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(interactionPoint.position, interactionRadius);
     }
+
+    public void OnLaunched(Vector3 targetPosition)
+    {
+        var holder = GetComponent<PlayerObjectHolder>();
+        if (holder != null && holder.HasObjectInHand())
+        {
+            var obj = holder.GetHeldObject();
+            if (obj != null)
+            {
+                obj.transform.SetParent(null, true);
+                var rb = obj.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.isKinematic = false;
+                    rb.useGravity = true;
+                }
+            }
+
+            var t = typeof(PlayerObjectHolder);
+            var fObj = t.GetField("heldObject", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (fObj != null) fObj.SetValue(holder, null);
+            var fRb = t.GetField("heldRigidbody", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (fRb != null) fRb.SetValue(holder, null);
+        }
+    }
 }
 
