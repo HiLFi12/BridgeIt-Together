@@ -2722,7 +2722,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -305.05997
+      value: -308.6
       objectReference: {fileID: 0}
     - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -12020,7 +12020,7 @@ Transform:
   m_GameObject: {fileID: 1256788618}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -301.86, y: 236.01, z: 235.90034}
+  m_LocalPosition: {x: -305.40002, y: 236.01, z: 235.90034}
   m_LocalScale: {x: 5.770589, y: 15.748145, z: 18.702177}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13160,7 +13160,7 @@ Transform:
   m_GameObject: {fileID: 1375296324}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -227.2, y: 236.01, z: 237.58035}
+  m_LocalPosition: {x: -222.49, y: 236.01, z: 237.58035}
   m_LocalScale: {x: 5.770589, y: 15.748145, z: 18.702177}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14077,17 +14077,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9126ecea228bff408a0576bf04a3499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vehiculosParaVictoria: 10
   tagTriggerVictoria: PassTrigger
-  usarVictoriaPorRondas: 0
-  autoGenerator: {fileID: 0}
   victoryCanvasPrefab: {fileID: 714906186}
   defeatCanvasPrefab: {fileID: 2072203489}
   pauseCanvas: {fileID: 132076740}
+  objetosAEliminarAlFinal: []
   nextLevelSceneName: 
   useAutoLevelProgression: 0
   desactivarPlayerControllerEnFinDeJuego: 1
-  desactivarAutoGeneratorEnFinDeJuego: 1
   activarAnimacionesFinDeJuego: 1
   vehiculosParaDerrota: 3
   tagTriggerDerrota: FallTrigger
@@ -14104,6 +14101,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnDerrotaProgreso:
+    m_PersistentCalls:
+      m_Calls: []
+  Finished:
     m_PersistentCalls:
       m_Calls: []
 --- !u!4 &1472422793
@@ -16548,7 +16548,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -234.7
+      value: -231.64
       objectReference: {fileID: 0}
     - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
       propertyPath: m_LocalPosition.y
