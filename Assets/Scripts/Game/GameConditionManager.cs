@@ -791,7 +791,7 @@ public class GameConditionManager : MonoBehaviour
             if (roundController != null) roundController.enabled = false;
             if (vehicleSpawner != null)
             {
-                vehicleSpawner.SetModoContinuo(false);
+                // vehicleSpawner.SetModoContinuo(false); // modo continuo eliminado
                 vehicleSpawner.enabled = false;
             }
             if (mostrarDebugInfo)

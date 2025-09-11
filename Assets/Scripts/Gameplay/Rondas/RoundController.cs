@@ -46,8 +46,7 @@ namespace BridgeItTogether.Gameplay.Rondas
                 enabled = false; return;
             }
 
-            // Asegurar que el spawner no esté en modo continuo para evitar doble spawn
-            spawner.SetModoContinuo(false);
+            // Modo continuo eliminado del VehicleSpawner; ya no es necesario desactivarlo.
 
             for (int i = 0; i < configuracionRondas.Length; i++)
                 configuracionRondas[i]?.ValidarConfiguracionCarriles();

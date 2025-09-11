@@ -30,9 +30,7 @@ namespace BridgeItTogether.Gameplay.Spawning
         [SerializeField] private int poolSize = 10;
         [SerializeField] private bool poolExpandible = true;
 
-        [Header("Modo continuo")]
-        [SerializeField] private bool modoContinuo = true;
-        [SerializeField] private float tiempoEntreAutos = 10f;
+    
 
         [Header("Debug")]
         [SerializeField] private bool mostrarDebugInfo = true;
@@ -47,7 +45,7 @@ namespace BridgeItTogether.Gameplay.Spawning
 
     private BridgeItTogether.Gameplay.Abstractions.IVehiclePoolService vehiclePool;
         private bool spawnDesdeIzquierda;
-    private Coroutine generarAutosCoroutine; // manejar corrutina de modo continuo
+    
 
         private void Awake()
         {
@@ -68,18 +66,9 @@ namespace BridgeItTogether.Gameplay.Spawning
             SetupBridgeGrid();
             InitializeVehiclePool();
 
-            // Detectar RoundController antes de iniciar el modo continuo
+            // Obtener RoundController (opcional)
             if (roundController == null) roundController = GetComponent<RoundController>();
-            if (roundController != null && roundController.IsUsandoSistemaRondas())
-            {
-                // Si hay sistema de rondas activo, desactivar el modo continuo para evitar doble spawn
-                modoContinuo = false;
-                if (mostrarDebugInfo)
-                    Debug.Log("[VehicleSpawner] Modo continuo deshabilitado porque RoundController está activo.");
-            }
-
-            if (modoContinuo)
-                IniciarModoContinuo();
+            
 
             // Configurar sistema de retorno a pool si hay triggers
             if (returnTriggers != null && returnTriggers.Length > 0)
@@ -115,18 +104,7 @@ namespace BridgeItTogether.Gameplay.Spawning
             vehiclePool.Initialize(defaultPrefab, poolSize, poolExpandible, bridgeGrid);
         }
 
-        private IEnumerator GenerarAutosContinuo()
-        {
-            // Bucle que respeta la bandera 'modoContinuo'; se detiene cuando se desactiva
-            while (modoContinuo)
-            {
-                yield return new WaitForSeconds(tiempoEntreAutos);
-                if (!modoContinuo) break;
-                SpawnVehicle(TipoVehiculo.Auto1, ObtenerTipoCarrilActual(), spawnDesdeIzquierda);
-                spawnDesdeIzquierda = !spawnDesdeIzquierda;
-            }
-            generarAutosCoroutine = null; // marcar detenida
-        }
+        
 
         public GameObject SpawnVehicle(TipoVehiculo tipoVehiculo, TipoCarril tipoCarrilUso, bool desdeIzquierda, PosicionCarril? carrilIndividual = null)
         {
@@ -245,50 +223,7 @@ namespace BridgeItTogether.Gameplay.Spawning
 
         // Expuestos para configuración desde RoundController
         public void SetTipoCarril(TipoCarril t) => tipoCarril = t;
-        public void SetTiempoEntreAutos(float t) => tiempoEntreAutos = t;
-        public void SetModoContinuo(bool enabled)
-        {
-            // Cambiar estado y gestionar corrutina para evitar spawns inesperados
-            if (enabled == modoContinuo)
-            {
-                // Si no cambia el estado, no hacer nada
-                return;
-            }
-
-            modoContinuo = enabled;
-
-            if (modoContinuo)
-            {
-                IniciarModoContinuo();
-            }
-            else
-            {
-                DetenerModoContinuo();
-            }
-        }
-
-        private void IniciarModoContinuo()
-        {
-            // Evitar múltiples corrutinas concurrentes
-            if (generarAutosCoroutine == null)
-            {
-                generarAutosCoroutine = StartCoroutine(GenerarAutosContinuo());
-                if (mostrarDebugInfo)
-                    Debug.Log("[VehicleSpawner] Modo continuo iniciado.");
-            }
-        }
-
-        private void DetenerModoContinuo()
-        {
-            // Si la corrutina está activa, detenerla inmediatamente
-            if (generarAutosCoroutine != null)
-            {
-                StopCoroutine(generarAutosCoroutine);
-                generarAutosCoroutine = null;
-                if (mostrarDebugInfo)
-                    Debug.Log("[VehicleSpawner] Modo continuo detenido.");
-            }
-        }
+        
 
         private int TipoToIndex(TipoVehiculo tipo)
         {
