@@ -24,6 +24,10 @@ public class BridgeConstructionGrid : MonoBehaviour
         Vector3.one         // Capa 3: Superficie - escala normal
     };
 
+    // Nuevo: modo de escala
+    public enum LayerScaleMode { RelativeToQuadrantSize, AbsoluteWorldScale }
+    public LayerScaleMode layerScaleMode = LayerScaleMode.RelativeToQuadrantSize;
+
     [Header("Visualización de Depuración")]
     public bool showDebugGrid = true;
     public Color completeColor = Color.green;
@@ -337,33 +341,27 @@ public class BridgeConstructionGrid : MonoBehaviour
             {
                 if (constructionGrid[x, z] != null && constructionGrid[x, z].quadrantSO != null)
                 {
-                    // Verificar si hay capas completadas que necesiten escalas aplicadas
                     for (int i = 0; i < constructionGrid[x, z].quadrantSO.requiredLayers.Length; i++)
                     {
                         if (constructionGrid[x, z].quadrantSO.requiredLayers[i].isCompleted)
                         {
-                            // Buscar el objeto de la capa en la jerarquía
                             string nombreCapa = $"Layer_{i}_{constructionGrid[x, z].quadrantSO.requiredLayers[i].layerName}";
                             Transform layerTransform = constructionGrid[x, z].quadrantObject.transform.Find(nombreCapa);
-                            
                             if (layerTransform != null)
                             {
-                                // Aplicar la escala configurada
-                                Vector3 baseScale = new Vector3(quadrantSize, 1f, quadrantSize);
                                 Vector3 layerScale = (i < layerScales.Length) ? layerScales[i] : Vector3.one;
-                                Vector3 finalScale = Vector3.Scale(baseScale, layerScale);
+                                Vector3 finalScale = layerScaleMode == LayerScaleMode.RelativeToQuadrantSize
+                                    ? Vector3.Scale(new Vector3(quadrantSize, 1f, quadrantSize), layerScale)
+                                    : layerScale;
+
                                 layerTransform.localScale = finalScale;
 
-                                // Actualizar la posición también por si cambió la altura
                                 float layerHeight = (i < layerHeights.Length) ? layerHeights[i] : (0.5f * i);
                                 Vector3 posicionCorrecta = constructionGrid[x, z].worldPosition + new Vector3(
-                                    quadrantSize / 2,
-                                    layerHeight,
-                                    quadrantSize / 2
+                                    quadrantSize / 2, layerHeight, quadrantSize / 2
                                 );
                                 layerTransform.position = posicionCorrecta;
-
-                                Debug.Log($"[Init] Escalas aplicadas a capa {i} en cuadrante [{x},{z}]: {finalScale}");
+                                // Nota: aquí ya no tocamos la rotación para respetar la del prefab
                             }
                         }
                     }
@@ -652,61 +650,27 @@ public class BridgeConstructionGrid : MonoBehaviour
                         Destroy(existingLayer.gameObject);
                         info.layerRenderers[i] = null; // Limpiar la referencia
                     }
-                    GameObject layerObj = Instantiate(info.quadrantSO.requiredLayers[i].visualPrefab,
-                      posicionCorrecta, Quaternion.identity, info.quadrantObject.transform);                    layerObj.name = nombreCapa;
+                    var prefab = info.quadrantSO.requiredLayers[i].visualPrefab;
+                    GameObject layerObj = Instantiate(prefab, info.quadrantObject.transform);
+                    layerObj.name = nombreCapa;
+                    layerObj.transform.position = posicionCorrecta;
+                    layerObj.transform.localRotation = prefab.transform.localRotation;
 
-                    // Calcular escala combinando el quadrantSize con la escala específica de la capa
-                    Vector3 baseScale = new Vector3(quadrantSize, 1f, quadrantSize);
+                    // Calcular escala final según el modo
+                    Vector3 finalScale;
                     Vector3 layerScale = (i < layerScales.Length) ? layerScales[i] : Vector3.one;
-                    Vector3 finalScale = Vector3.Scale(baseScale, layerScale);
-                    layerObj.transform.localScale = finalScale;
-
-                    Debug.Log($"Escalando capa {i} con escala final {finalScale} (base: {baseScale}, específica: {layerScale}) para quadrantSize {quadrantSize}");// Si es la capa 4 (índice 3), asignar la layer "BridgeLayer4"
-                    if (i == 3)
+                    if (layerScaleMode == LayerScaleMode.RelativeToQuadrantSize)
                     {
-                        int bridgeLayer = LayerMask.NameToLayer("BridgeLayer4");
-                        if (bridgeLayer != -1)
-                        {
-                            layerObj.layer = bridgeLayer;
-                        }
-                        else
-                        {
-                            Debug.LogWarning("La Layer 'BridgeLayer4' no existe en el proyecto. Asegúrate de crearla en Edit > Project Settings > Tags and Layers.");
-                        }
-                    }
-
-                    // Configurar colliders según si es la última capa o no
-                    bool esUltimaCapa = (i == info.quadrantSO.requiredLayers.Length - 1);
-
-                    // Asegurarnos de que la capa tenga un collider
-                    Collider layerCollider = layerObj.GetComponent<Collider>();
-                    if (layerCollider == null)
-                    {
-                        // Añadir collider si no existe
-                        BoxCollider boxCol = layerObj.AddComponent<BoxCollider>();
-                        // Como el objeto ya está escalado, usar tamaño unitario (1x1x1)
-                        boxCol.size = new Vector3(1f, 0.2f, 1f);
-                        boxCol.center = Vector3.zero;
-                        layerCollider = boxCol;
-                    }
-                    // NOTA: Si ya existe un BoxCollider, no lo redimensionamos porque 
-                    // el escalado del objeto ya se encarga de ajustar su tamaño visual
-
-                    // Si es la última capa y el cuadrante está completo, el collider no es trigger
-                    // Si NO es la última capa o el cuadrante está incompleto, el collider es trigger
-                    if (esUltimaCapa && cuadranteCompleto)
-                    {
-                        layerCollider.isTrigger = false; // Collider sólido para la última capa completa
-                        layerCollider.enabled = true;
+                        Vector3 baseScale = new Vector3(quadrantSize, 1f, quadrantSize);
+                        finalScale = Vector3.Scale(baseScale, layerScale);
                     }
                     else
                     {
-                        // IMPORTANTE: Usar triggers para detectar colisiones en capas incompletas
-                        layerCollider.isTrigger = true;
-                        layerCollider.enabled = true; // Siempre activado para detectar autos
+                        finalScale = layerScale; // Escala absoluta
                     }
+                    layerObj.transform.localScale = finalScale;
 
-                    info.layerRenderers[i] = layerObj.GetComponent<Renderer>();
+                    info.layerRenderers[i] = layerObj.GetComponentInChildren<Renderer>();
 
                     if (info.layerRenderers[i] == null)
                     {
