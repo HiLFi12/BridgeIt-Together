@@ -116,31 +116,22 @@ public class VehicleReturnTrigger : MonoBehaviour
         // Verificar si el objeto que entró es un vehículo
         GameObject targetObject = other.gameObject;
         
-    // Buscar componentes de vehículo en el objeto o en su padre
-    AutoMovement autoMovement = targetObject.GetComponent<AutoMovement>();
-    VehicleBridgeCollision vehicleCollision = targetObject.GetComponent<VehicleBridgeCollision>();
-    BridgeItTogether.Gameplay.AutoControllers.AutoController autoController = targetObject.GetComponent<BridgeItTogether.Gameplay.AutoControllers.AutoController>();
-        
-        // Si no tiene los componentes en sí mismo, buscar en el padre
-        if (autoMovement == null && vehicleCollision == null && autoController == null)
-        {
-            autoMovement = targetObject.GetComponentInParent<AutoMovement>();
-            vehicleCollision = targetObject.GetComponentInParent<VehicleBridgeCollision>();
-            autoController = targetObject.GetComponentInParent<BridgeItTogether.Gameplay.AutoControllers.AutoController>();
-            
-            // Si encontramos los componentes en el padre, usar el GameObject padre
-            if (autoMovement != null || vehicleCollision != null || autoController != null)
-            {
-                if (autoController != null) targetObject = autoController.gameObject;
-                else targetObject = autoMovement != null ? autoMovement.gameObject : vehicleCollision.gameObject;
-            }
-        }
-        
+        // Buscar componentes de vehículo en el objeto o en su jerarquía
+        AutoMovement autoMovement = targetObject.GetComponent<AutoMovement>() ?? targetObject.GetComponentInParent<AutoMovement>();
+        VehicleBridgeCollision vehicleCollision = targetObject.GetComponent<VehicleBridgeCollision>() ?? targetObject.GetComponentInParent<VehicleBridgeCollision>();
+        BridgeItTogether.Gameplay.AutoControllers.AutoController autoController = targetObject.GetComponent<BridgeItTogether.Gameplay.AutoControllers.AutoController>() ?? targetObject.GetComponentInParent<BridgeItTogether.Gameplay.AutoControllers.AutoController>();
+
+        // Si encontramos algún componente de vehículo, usamos el GameObject raíz del vehículo
+        if (autoController != null) targetObject = autoController.gameObject;
+        else if (autoMovement != null) targetObject = autoMovement.gameObject;
+        else if (vehicleCollision != null) targetObject = vehicleCollision.gameObject;
+
         // Si tiene componentes de vehículo, enviar al pool
         if (autoMovement != null || vehicleCollision != null || autoController != null)
         {
             manager.OnVehicleTriggered(targetObject, triggerCollider);
-        }        else
+        }
+        else
         {
             // Intento extra: si el collider pertenece a un Rigidbody vinculado a un AutoController, tratarlo como vehículo
             var rb = other.attachedRigidbody;

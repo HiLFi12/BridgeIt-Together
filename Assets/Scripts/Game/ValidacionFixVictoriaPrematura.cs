@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using BridgeItTogether.Gameplay.Rondas;
 
 /// <summary>
 /// Script de validación final para verificar que el bug de victoria prematura está corregido
@@ -8,7 +9,7 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
 {
     [Header("Referencias")]
     [SerializeField] private GameConditionManager gameConditionManager;
-    [SerializeField] private AutoGenerator autoGenerator;
+    [SerializeField] private RoundController roundController;
     
     private void Start()
     {
@@ -16,8 +17,8 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
         if (gameConditionManager == null)
             gameConditionManager = FindFirstObjectByType<GameConditionManager>();
         
-        if (autoGenerator == null)
-            autoGenerator = FindFirstObjectByType<AutoGenerator>();
+        if (roundController == null)
+            roundController = FindFirstObjectByType<RoundController>();
     }
     
     [ContextMenu("🧪 Test Fix Victoria Prematura")]
@@ -25,7 +26,7 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
     {
         Debug.Log("=== INICIANDO TEST DE VALIDACIÓN ===");
         
-        if (gameConditionManager == null || autoGenerator == null)
+    if (gameConditionManager == null || roundController == null)
         {
             Debug.LogError("❌ No se encontraron las referencias necesarias");
             return;
@@ -45,15 +46,15 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
         Debug.Log("🔧 Configurando rondas de test...");
         
         // Configurar rondas simples y predecibles
-        RondaConfig[] rondasTest = new RondaConfig[]
+        BridgeItTogether.Gameplay.Rondas.RondaConfig[] rondasTest = new BridgeItTogether.Gameplay.Rondas.RondaConfig[]
         {
-            new RondaConfig 
+            new BridgeItTogether.Gameplay.Rondas.RondaConfig 
             { 
                 nombreRonda = "Test Ronda A", 
                 cantidadAutos = 3,  // 3 vehículos
                 tiempoEntreAutos = 2f // Spawn cada 2 segundos
             },
-            new RondaConfig 
+            new BridgeItTogether.Gameplay.Rondas.RondaConfig 
             { 
                 nombreRonda = "Test Ronda B", 
                 cantidadAutos = 2,  // 2 vehículos
@@ -61,12 +62,11 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
             }
         };
         
-        // Configurar AutoGenerator
-        autoGenerator.ConfigurarRondas(rondasTest);
-        autoGenerator.SetSistemaRondasActivo(true);
+    // Configurar RoundController
+    roundController.SetRondas(rondasTest, reiniciar: true);
         
-        // Configurar GameConditionManager
-        gameConditionManager.ConfigurarVictoriaPorRondas(true, autoGenerator);
+    // Configurar GameConditionManager
+    gameConditionManager.ConfigurarVictoriaPorRondas(true, roundController);
         gameConditionManager.ReiniciarJuego();
           Debug.Log("✅ Configuración completada:");
         Debug.Log($"   - Ronda A: {rondasTest[0].cantidadAutos} vehículos");
@@ -88,7 +88,7 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
               // Obtener estado actual
-            int rondaActual = autoGenerator.GetRondaActual();
+            int rondaActual = roundController.GetRondaActual();
             int contadorVictoria = gameConditionManager.GetProgresoVictoria();
             bool juegoTerminado = gameConditionManager.IsJuegoTerminado();
             
@@ -96,7 +96,7 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
             if (rondaActual != ultimaRonda)
             {
                 ultimaRonda = rondaActual;
-                Debug.Log($"📋 Ronda cambiada a: {rondaActual}/{autoGenerator.GetTotalRondas()}");
+                Debug.Log($"📋 Ronda cambiada a: {rondaActual}/{roundController.GetTotalRondas()}");
             }
             
             // Verificar si cambió el contador de victoria
@@ -106,10 +106,10 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
                 Debug.Log($"📊 Contador de victoria: {contadorVictoria}");
                 
                 // VERIFICACIÓN CRÍTICA: La victoria NO debe activarse hasta que todas las rondas terminen
-                if (juegoTerminado && rondaActual < autoGenerator.GetTotalRondas())
+                if (juegoTerminado && rondaActual < roundController.GetTotalRondas())
                 {
                     Debug.LogError("❌ BUG DETECTADO: Victoria activada prematuramente!");
-                    Debug.LogError($"   - Ronda actual: {rondaActual}/{autoGenerator.GetTotalRondas()}");
+                    Debug.LogError($"   - Ronda actual: {rondaActual}/{roundController.GetTotalRondas()}");
                     Debug.LogError($"   - Contador victoria: {contadorVictoria}");
                     Debug.LogError($"   - Juego terminado: {juegoTerminado}");
                     testCompletado = true;
@@ -122,10 +122,10 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
             {
                 victoriaActivada = true;
                 
-                if (rondaActual >= autoGenerator.GetTotalRondas())
+                if (rondaActual >= roundController.GetTotalRondas())
                 {
                     Debug.Log("✅ VICTORIA CORRECTA: Todas las rondas completadas!");
-                    Debug.Log($"   - Rondas completadas: {autoGenerator.GetTotalRondas()}");
+                    Debug.Log($"   - Rondas completadas: {roundController.GetTotalRondas()}");
                     Debug.Log($"   - Vehículos que pasaron: {contadorVictoria}");
                     Debug.Log($"   - Tiempo total: {Time.time - tiempoInicio:F1} segundos");
                     testCompletado = true;
@@ -133,7 +133,7 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
                 else
                 {
                     Debug.LogError("❌ VICTORIA PREMATURA DETECTADA!");
-                    Debug.LogError($"   - Ronda actual: {rondaActual}/{autoGenerator.GetTotalRondas()}");
+                    Debug.LogError($"   - Ronda actual: {rondaActual}/{roundController.GetTotalRondas()}");
                     testCompletado = true;
                 }
             }
@@ -152,7 +152,7 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
     public void LimpiarYResetear()
     {
         StopAllCoroutines();
-        autoGenerator.ClearActiveAutos();
+    // No hay ClearActiveAutos en RoundController; sólo reiniciamos condiciones
         gameConditionManager.ReiniciarJuego();
         Debug.Log("🧹 Sistema limpiado y reseteado");
     }
@@ -161,22 +161,15 @@ public class ValidacionFixVictoriaPrematura : MonoBehaviour
     public void MostrarEstadoActual()
     {
         Debug.Log("=== ESTADO ACTUAL DEL SISTEMA ===");
-        Debug.Log($"AutoGenerator:");
-        Debug.Log($"   - Ronda: {autoGenerator.GetRondaActual()}/{autoGenerator.GetTotalRondas()}");
-        Debug.Log($"   - Info: {autoGenerator.GetInfoRondaActual()}");
-        Debug.Log($"   - Sistema activo: {autoGenerator.IsUsandoSistemaRondas()}");
+    Debug.Log($"RoundController:");
+    Debug.Log($"   - Ronda: {roundController.GetRondaActual()}/{roundController.GetTotalRondas()}");
+    Debug.Log($"   - Sistema activo: {roundController.IsUsandoSistemaRondas()}");
           Debug.Log($"GameConditionManager:");
         Debug.Log($"   - Victoria por rondas: {gameConditionManager.IsUsandoVictoriaPorRondas()}");
         Debug.Log($"   - Contador victoria: {gameConditionManager.GetProgresoVictoria()}");
         Debug.Log($"   - Juego terminado: {gameConditionManager.IsJuegoTerminado()}");
         
-        VehiclePool pool = autoGenerator.GetComponent<VehiclePool>();
-        if (pool != null)
-        {
-            Debug.Log($"VehiclePool:");
-            Debug.Log($"   - Vehículos activos: {pool.GetActiveVehicleCount()}");
-            Debug.Log($"   - Vehículos disponibles: {pool.GetAvailableVehicleCount()}");
-        }
+    // Información de pool omitida: el pooling ahora se administra vía servicios del spawner
         
         Debug.Log("=== FIN ESTADO ===");
     }

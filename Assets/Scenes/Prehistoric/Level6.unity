@@ -4192,6 +4192,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
+--- !u!114 &996012577 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
+  m_PrefabInstance: {fileID: 996012576}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75f34d7c2d8b15442886a49fdd9ce42a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &998506057
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6564,7 +6575,8 @@ MonoBehaviour:
   vehiculosParaVictoria: 10
   tagTriggerVictoria: PassTrigger
   usarVictoriaPorRondas: 0
-  autoGenerator: {fileID: 0}
+  vehicleSpawner: {fileID: 996012577}
+  roundController: {fileID: 352892751}
   victoryCanvasPrefab: {fileID: 216897007}
   defeatCanvasPrefab: {fileID: 238164466}
   pauseCanvas: {fileID: 1752491814}

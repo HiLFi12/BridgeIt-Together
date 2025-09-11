@@ -17,17 +17,10 @@ public class TriggerSystemDiagnostic : MonoBehaviour
         Debug.Log("=== DIAGNÓSTICO DEL SISTEMA DE TRIGGERS ===");
         
         // 1. Verificar que las clases existen
-        CheckClassExists("AutoGenerator");
         CheckClassExists("VehicleReturnTriggerManager");
         CheckClassExists("VehicleReturnTrigger");
         CheckClassExists("AutoMovement");
         CheckClassExists("VehicleBridgeCollision");
-        
-        // 2. Verificar AutoGenerator en la escena
-        CheckAutoGeneratorInScene();
-        
-        // 3. Verificar métodos públicos
-        CheckAutoGeneratorMethods();
         
         Debug.Log("=== FIN DIAGNÓSTICO ===");
     }
@@ -68,64 +61,4 @@ public class TriggerSystemDiagnostic : MonoBehaviour
         }
     }
     
-    void CheckAutoGeneratorInScene()
-    {
-        AutoGenerator autoGen = FindFirstObjectByType<AutoGenerator>();
-        if (autoGen != null)
-        {
-            Debug.Log("✅ AutoGenerator encontrado en la escena");
-            
-            // Verificar si tiene el campo triggersRetorno
-            try
-            {
-                System.Type type = autoGen.GetType();
-                FieldInfo field = type.GetField("triggersRetorno", BindingFlags.NonPublic | BindingFlags.Instance);
-                if (field != null)
-                {
-                    Debug.Log("✅ Campo triggersRetorno encontrado");
-                }
-                else
-                {
-                    Debug.LogWarning("⚠️ Campo triggersRetorno no encontrado");
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"❌ Error verificando campos: {e.Message}");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ AutoGenerator no encontrado en la escena");
-        }
-    }
-    
-    void CheckAutoGeneratorMethods()
-    {
-        AutoGenerator autoGen = FindFirstObjectByType<AutoGenerator>();
-        if (autoGen == null) return;
-        
-        // Lista de métodos que deberían existir
-        string[] methods = {
-            "SetTriggersActive",
-            "AddReturnTrigger", 
-            "RemoveReturnTrigger",
-            "GetActiveTriggerCount"
-        };
-        
-        System.Type type = autoGen.GetType();
-        
-        foreach (string methodName in methods)
-        {
-            MethodInfo method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
-            if (method != null)
-            {
-                Debug.Log($"✅ Método {methodName} encontrado");
-            }
-            else
-            {
-                Debug.LogError($"❌ Método {methodName} NO encontrado");
-            }
-        }
-    }
 }

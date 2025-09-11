@@ -6081,8 +6081,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vehiculosParaVictoria: 10
   tagTriggerVictoria: PassTrigger
-  usarVictoriaPorRondas: 0
-  autoGenerator: {fileID: 0}
+  usarVictoriaPorRondas: 1
+  vehicleSpawner: {fileID: 1086158354}
+  roundController: {fileID: 1623686071}
   victoryCanvasPrefab: {fileID: 1529533023}
   defeatCanvasPrefab: {fileID: 1658591380}
   pauseCanvas: {fileID: 1381561369}
@@ -7961,6 +7962,22 @@ PrefabInstance:
     - target: {fileID: 1561503425602959299, guid: fa205b73bc9a4fd44a930f1c16e04e3f, type: 3}
       propertyPath: m_LocalPosition.z
       value: -0.92
+      objectReference: {fileID: 0}
+    - target: {fileID: 1845363345202128927, guid: fa205b73bc9a4fd44a930f1c16e04e3f, type: 3}
+      propertyPath: m_Size.x
+      value: 2.8141556
+      objectReference: {fileID: 0}
+    - target: {fileID: 1845363345202128927, guid: fa205b73bc9a4fd44a930f1c16e04e3f, type: 3}
+      propertyPath: m_Size.z
+      value: 3.277031
+      objectReference: {fileID: 0}
+    - target: {fileID: 1845363345202128927, guid: fa205b73bc9a4fd44a930f1c16e04e3f, type: 3}
+      propertyPath: m_Center.x
+      value: 1.9042625
+      objectReference: {fileID: 0}
+    - target: {fileID: 1845363345202128927, guid: fa205b73bc9a4fd44a930f1c16e04e3f, type: 3}
+      propertyPath: m_Center.z
+      value: -0.81583786
       objectReference: {fileID: 0}
     - target: {fileID: 4924263508716727573, guid: fa205b73bc9a4fd44a930f1c16e04e3f, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'

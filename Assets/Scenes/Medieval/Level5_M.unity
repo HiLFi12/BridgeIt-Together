@@ -4905,7 +4905,7 @@ MonoBehaviour:
   gridWidth: 6
   gridLength: 2
   quadrantSize: 1.8
-  defaultQuadrantSO: {fileID: 11400000, guid: 77890f5d67c601246b7fb7adfcc8ff49, type: 2}
+  defaultQuadrantSO: {fileID: 11400000, guid: dc289388ff952494da534bf59c75595b, type: 2}
   quadrantPrefab: {fileID: 1437374063}
   quadrantParent: {fileID: 1196880118}
   layerHeights:
@@ -8282,9 +8282,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vehiculosParaVictoria: 10
   tagTriggerVictoria: PassTrigger
-  usarVictoriaPorRondas: 0
-  autoGenerator: {fileID: 0}
-  victoryCanvasPrefab: {fileID: 0}
+  usarVictoriaPorRondas: 1
+  vehicleSpawner: {fileID: 2062008956}
+  roundController: {fileID: 64215444}
+  victoryCanvasPrefab: {fileID: 1782314920}
   defeatCanvasPrefab: {fileID: 2072203489}
   pauseCanvas: {fileID: 132076740}
   nextLevelSceneName: 
@@ -10216,6 +10217,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
+--- !u!1 &1782314920 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1176256308665316814, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
+  m_PrefabInstance: {fileID: 1782314919}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1840213853
 GameObject:
   m_ObjectHideFlags: 0

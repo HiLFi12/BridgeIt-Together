@@ -1,4 +1,5 @@
 using UnityEngine;
+using BridgeItTogether.Gameplay.Rondas;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -127,21 +128,19 @@ public class GameConditionSetup : MonoBehaviour
         }
         if (manager != null)
         {
-            // Si hay un AutoGenerator en la escena, no sobrescribimos la meta estática para evitar
-            // que el valor serializado (p. ej. 10) reemplace la meta calculada desde el generador.
-            AutoGenerator generator = FindFirstObjectByType<AutoGenerator>();
-            if (generator != null)
+            // Si hay un RoundController en la escena, lo usamos para victoria por rondas
+            RoundController controlador = FindFirstObjectByType<RoundController>();
+            if (controlador != null)
             {
-                // Si el generador usa rondas, habilitamos el modo de victoria por rondas y pasamos la referencia.
-                if (generator.IsUsandoSistemaRondas())
+                if (controlador.IsUsandoSistemaRondas())
                 {
-                    manager.ConfigurarVictoriaPorRondas(true, generator);
-                    Debug.Log("✅ GameConditionManager configurado para usar AutoGenerator (victoria por rondas)");
+                    manager.ConfigurarVictoriaPorRondas(true, controlador);
+                    Debug.Log("✅ GameConditionManager configurado para usar RoundController (victoria por rondas)");
                 }
                 else
                 {
-                    // Hay un AutoGenerator pero no usa rondas: no imponer condiciones aquí
-                    Debug.Log("ℹ️ AutoGenerator encontrado pero no usa sistema de rondas: dejando al GameConditionManager inicializar su meta desde el generador si corresponde.");
+                    Debug.Log("ℹ️ RoundController encontrado pero el sistema de rondas está desactivado: usando condiciones estáticas si se configuraron.");
+                    manager.ConfigurarCondiciones(vehiculosParaVictoria, vehiculosParaDerrota);
                 }
             }
             else

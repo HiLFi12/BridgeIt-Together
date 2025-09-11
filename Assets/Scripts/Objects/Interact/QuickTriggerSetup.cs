@@ -7,20 +7,20 @@ using UnityEngine;
 public class QuickTriggerSetup : MonoBehaviour
 {
     [Header("Configuración Rápida")]
-    [SerializeField] private AutoGenerator autoGenerator;
+    [SerializeField] private VehicleReturnTriggerManager triggerManager;
     [SerializeField] private Transform[] posicionesTriggers; // Posiciones donde crear triggers
     [SerializeField] private Vector3 tamaņoTrigger = new Vector3(5f, 3f, 2f); // Tamaño de los box colliders
-    
+
     [Header("Configuración Automática")]
     [SerializeField] private bool crearTriggersAlIniciar = true;
     [SerializeField] private bool crearEnBordesDelMapa = false;
     [SerializeField] private float distanciaBordes = 20f; // Distancia desde el centro para crear bordes
-    
+
     [Header("Debugging")]
     [SerializeField] private bool mostrarGizmosEnScene = true;
-    
+
     private GameObject[] objetosTriggerCreados;
-    
+
     void Start()
     {
         if (crearTriggersAlIniciar)
@@ -28,38 +28,38 @@ public class QuickTriggerSetup : MonoBehaviour
             SetupQuickTriggers();
         }
     }
-    
+
     /// <summary>
     /// Configura triggers rápidamente basándose en las posiciones especificadas
     /// </summary>
     [ContextMenu("Configurar Triggers Rápido")]
     public void SetupQuickTriggers()
     {
-        if (autoGenerator == null)
+        if (triggerManager == null)
         {
-            autoGenerator = FindFirstObjectByType<AutoGenerator>();
-            if (autoGenerator == null)
+            triggerManager = FindFirstObjectByType<VehicleReturnTriggerManager>();
+            if (triggerManager == null)
             {
-                Debug.LogError("No se encontró AutoGenerator en la escena");
+                Debug.LogError("No se encontró VehicleReturnTriggerManager en la escena");
                 return;
             }
         }
-        
+
         // Limpiar triggers existentes si los hay
         CleanupExistingTriggers();
-        
+
         // Crear triggers en posiciones especificadas
         if (posicionesTriggers != null && posicionesTriggers.Length > 0)
         {
             CreateTriggersAtPositions();
         }
-        
+
         // Crear triggers en bordes del mapa si está habilitado
         if (crearEnBordesDelMapa)
         {
             CreateMapBorderTriggers();
         }
-        
+
         Debug.Log($"Configuración rápida de triggers completada");
     }
     
@@ -69,26 +69,26 @@ public class QuickTriggerSetup : MonoBehaviour
     void CreateTriggersAtPositions()
     {
         objetosTriggerCreados = new GameObject[posicionesTriggers.Length];
-        
+
         for (int i = 0; i < posicionesTriggers.Length; i++)
         {
             if (posicionesTriggers[i] == null) continue;
-            
+
             // Crear objeto trigger
             GameObject triggerObj = new GameObject($"VehicleTrigger_{i+1}");
             triggerObj.transform.position = posicionesTriggers[i].position;
             triggerObj.transform.parent = transform; // Organizar bajo este objeto
-            
+
             // Agregar y configurar BoxCollider
             BoxCollider boxCol = triggerObj.AddComponent<BoxCollider>();
             boxCol.isTrigger = true;
             boxCol.size = tamaņoTrigger;
-            
-            // Agregar al AutoGenerator
-            autoGenerator.AddReturnTrigger(boxCol, true);
-            
+
+            // Agregar al sistema moderno
+            triggerManager.AddTrigger(boxCol, true);
+
             objetosTriggerCreados[i] = triggerObj;
-            
+
             Debug.Log($"Trigger creado en posición {i+1}: {triggerObj.name}");
         }
     }
@@ -120,7 +120,7 @@ public class QuickTriggerSetup : MonoBehaviour
             boxCol.isTrigger = true;
             boxCol.size = new Vector3(tamaņoTrigger.x * 2, tamaņoTrigger.y, tamaņoTrigger.z);
             
-            autoGenerator.AddReturnTrigger(boxCol, true);
+            triggerManager.AddTrigger(boxCol, true);
             
             Debug.Log($"Trigger de borde creado: {triggerObj.name}");
         }
@@ -153,7 +153,7 @@ public class QuickTriggerSetup : MonoBehaviour
     /// </summary>
     public GameObject CreateTriggerAtPosition(Vector3 position, string nombre = "CustomTrigger")
     {
-        if (autoGenerator == null) return null;
+    if (triggerManager == null) return null;
         
         GameObject triggerObj = new GameObject(nombre);
         triggerObj.transform.position = position;
@@ -163,7 +163,7 @@ public class QuickTriggerSetup : MonoBehaviour
         boxCol.isTrigger = true;
         boxCol.size = tamaņoTrigger;
         
-        autoGenerator.AddReturnTrigger(boxCol, true);
+    triggerManager.AddTrigger(boxCol, true);
         
         Debug.Log($"Trigger personalizado creado: {nombre}");
         return triggerObj;

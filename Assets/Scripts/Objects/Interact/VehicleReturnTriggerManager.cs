@@ -5,30 +5,12 @@ using UnityEngine;
 /// <summary>
 /// Maneja los triggers que devuelven vehículos al pool cuando los tocan
 /// </summary>
+
 public class VehicleReturnTriggerManager : MonoBehaviour
 {
-    private AutoGenerator autoGenerator;
     private BridgeItTogether.Gameplay.Abstractions.IVehiclePoolService poolService;
     private Collider[] triggers;
     private Dictionary<Collider, VehicleReturnTrigger> triggerComponents = new Dictionary<Collider, VehicleReturnTrigger>();
-    
-    /// <summary>
-    /// Inicializa el manager con los triggers proporcionados
-    /// </summary>
-    /// <param name="generator">Referencia al AutoGenerator</param>
-    /// <param name="triggerColliders">Array de colliders que actuarán como triggers</param>
-    /// <param name="activateOnStart">Si activar los triggers inmediatamente</param>
-    public void Initialize(AutoGenerator generator, Collider[] triggerColliders, bool activateOnStart = true)
-    {
-        autoGenerator = generator;
-        poolService = null;
-        triggers = triggerColliders;
-        
-        if (triggers != null && triggers.Length > 0)
-        {
-            SetupTriggers(activateOnStart);
-        }
-    }
 
     /// <summary>
     /// Inicializa el manager usando un servicio de pool genérico (para VehicleSpawner)
@@ -38,7 +20,7 @@ public class VehicleReturnTriggerManager : MonoBehaviour
     /// <param name="activateOnStart">Activar inmediatamente</param>
     public void Initialize(BridgeItTogether.Gameplay.Abstractions.IVehiclePoolService pool, Collider[] triggerColliders, bool activateOnStart = true)
     {
-        autoGenerator = null;
+    // autoGenerator eliminado: sistema legacy removido
         poolService = pool;
         triggers = triggerColliders;
 
@@ -86,35 +68,7 @@ public class VehicleReturnTriggerManager : MonoBehaviour
     {
         if (vehicle == null) return;
 
-        if (autoGenerator != null)
-        {
-            // Verificar que el objeto tenga los componentes de vehículo
-            AutoMovement autoMovement = vehicle.GetComponent<AutoMovement>();
-            VehicleBridgeCollision vehicleCollision = vehicle.GetComponent<VehicleBridgeCollision>();
-            
-            if (autoMovement != null || vehicleCollision != null)
-            {
-                // Debug: Mostrar información sobre los vehículos activos antes de devolver uno
-                VehiclePool pool = autoGenerator.GetComponent<VehiclePool>();
-                if (pool != null)
-                {
-                    int vehiculosAntesDeRetorno = pool.GetActiveVehicleCount();
-                    Debug.Log($"Vehículo {vehicle.name} devuelto al pool. Vehículos activos antes: {vehiculosAntesDeRetorno}, después: {vehiculosAntesDeRetorno - 1}");
-                }
-                else
-                {
-                    Debug.Log($"Vehículo {vehicle.name} devuelto al pool");
-                }
-                  // SOLUCIÓN AL PROBLEMA: Limpiar el vehículo de todos los triggers de condición antes de devolverlo al pool
-                LimpiarVehiculoDeTriggersDeCondicion(vehicle);
-                
-                autoGenerator.ReturnAutoToPool(vehicle);
-                
-                // NOTA: No necesitamos llamar OnAutoReturnedToPool() aquí porque ReturnAutoToPool 
-                // ya llama internamente a NotificarAutoDevueltoAlPool que maneja el conteo de rondas
-            }
-        }
-        else if (poolService != null)
+    if (poolService != null)
         {
             // Limpieza de triggers de condición igual que en el flujo legacy
             LimpiarVehiculoDeTriggersDeCondicion(vehicle);

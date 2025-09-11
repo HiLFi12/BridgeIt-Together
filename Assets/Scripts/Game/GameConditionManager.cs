@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using BridgeItTogether.Gameplay.Spawning;
+using BridgeItTogether.Gameplay.Rondas;
 
 /// <summary>
 /// Maneja las condiciones de victoria y derrota del juego basadas en triggers con tags
@@ -15,7 +17,8 @@ public class GameConditionManager : MonoBehaviour
     
     [Header("Configuración de Victoria por Rondas")]
     [SerializeField] private bool usarVictoriaPorRondas = false;
-    [SerializeField] private AutoGenerator autoGenerator;
+    [SerializeField] private VehicleSpawner vehicleSpawner; // reemplaza AutoGenerator como sistema de spawn
+    [SerializeField] private RoundController roundController; // controlador de rondas
     
     [Header("Canvas de Fin de Juego")]
     [SerializeField] private GameObject victoryCanvasPrefab;
@@ -29,7 +32,7 @@ public class GameConditionManager : MonoBehaviour
     
     [Header("Control de Jugador")]
     [SerializeField] private bool desactivarPlayerControllerEnFinDeJuego = true;
-    [SerializeField] private bool desactivarAutoGeneratorEnFinDeJuego = true;
+    [SerializeField] private bool desactivarAutoGeneratorEnFinDeJuego = true; // reutilizado para controlar Spawner/RoundController
     [SerializeField] private bool activarAnimacionesFinDeJuego = true;
     private PlayerController[] playerControllers;
     private PlayerAnimator[] playerAnimators;
@@ -502,21 +505,25 @@ public class GameConditionManager : MonoBehaviour
             Debug.Log("🔄 Juego reiniciado - Sistemas reactivados y canvas eliminados");
         }
         
-        // Intentar obtener el total de vehículos para la victoria desde AutoGenerator si existe
-        if (autoGenerator == null)
+        // Intentar obtener el total de vehículos para la victoria desde RoundController si existe
+        if (roundController == null)
         {
-            autoGenerator = FindFirstObjectByType<AutoGenerator>();
+            roundController = FindFirstObjectByType<RoundController>();
+        }
+        if (vehicleSpawner == null)
+        {
+            vehicleSpawner = FindFirstObjectByType<VehicleSpawner>();
         }
 
-        if (autoGenerator != null)
+        if (roundController != null)
         {
             int antes = vehiculosParaVictoria;
-            int totalDesdeGenerator = autoGenerator.GetTotalVehiclesForLevel();
-            if (mostrarDebugInfo) Debug.Log($"GameConditionManager.ReiniciarJuego() - antes vehiculosParaVictoria={antes}, totalDesdeGenerator={totalDesdeGenerator}");
-            if (totalDesdeGenerator > 0)
+            int totalDesdeRondas = roundController.GetTotalVehiclesForLevel();
+            if (mostrarDebugInfo) Debug.Log($"GameConditionManager.ReiniciarJuego() - antes vehiculosParaVictoria={antes}, totalDesdeRondas={totalDesdeRondas}");
+            if (totalDesdeRondas > 0)
             {
-                vehiculosParaVictoria = totalDesdeGenerator;
-                if (mostrarDebugInfo) Debug.Log($"GameConditionManager: vehiculosParaVictoria seteado desde AutoGenerator = {vehiculosParaVictoria}");
+                vehiculosParaVictoria = totalDesdeRondas;
+                if (mostrarDebugInfo) Debug.Log($"GameConditionManager: vehiculosParaVictoria seteado desde RoundController = {vehiculosParaVictoria}");
             }
         }
 
@@ -571,9 +578,8 @@ public class GameConditionManager : MonoBehaviour
     /// </summary>
     public string GetInfoProgresoRondas()
     {
-        if (!usarVictoriaPorRondas || autoGenerator == null) return "";
-        
-        return $"Ronda {autoGenerator.GetRondaActual() + 1}/{autoGenerator.GetTotalRondas()}";
+        if (!usarVictoriaPorRondas || roundController == null) return "";
+        return $"Ronda {roundController.GetRondaActual() + 1}/{roundController.GetTotalRondas()}";
     }
     
     /// <summary>
@@ -593,13 +599,10 @@ public class GameConditionManager : MonoBehaviour
     /// <summary>
     /// Configura el sistema de victoria por rondas
     /// </summary>
-    public void ConfigurarVictoriaPorRondas(bool habilitar, AutoGenerator generador = null)
+    public void ConfigurarVictoriaPorRondas(bool habilitar, RoundController controlador = null)
     {
         usarVictoriaPorRondas = habilitar;
-        if (generador != null)
-        {
-            autoGenerator = generador;
-        }
+        if (controlador != null) roundController = controlador;
         
         if (habilitar)
         {
@@ -730,35 +733,31 @@ public class GameConditionManager : MonoBehaviour
     private void ConfigurarVictoriaPorRondas()
     {
         if (!usarVictoriaPorRondas) return;
-        
-        // Buscar AutoGenerator automáticamente si no está asignado
-        if (autoGenerator == null)
+
+        // Buscar RoundController/VehicleSpawner automáticamente si no están asignados
+        if (roundController == null) roundController = FindFirstObjectByType<RoundController>();
+        if (vehicleSpawner == null) vehicleSpawner = FindFirstObjectByType<VehicleSpawner>();
+        if (roundController == null)
         {
-            autoGenerator = FindFirstObjectByType<AutoGenerator>();
-            if (autoGenerator == null)
-            {
-                Debug.LogWarning("[GameConditionManager] No se encontró AutoGenerator. Desactivando victoria por rondas.");
-                usarVictoriaPorRondas = false;
-                return;
-            }
+            Debug.LogWarning("[GameConditionManager] No se encontró RoundController. Desactivando victoria por rondas.");
+            usarVictoriaPorRondas = false; return;
         }
-        
-        // Validar que el AutoGenerator tenga sistema de rondas habilitado
-        if (!autoGenerator.IsUsandoSistemaRondas())
+
+        // Validar que el RoundController tenga sistema de rondas habilitado
+        if (!roundController.IsUsandoSistemaRondas())
         {
-            Debug.LogWarning("[GameConditionManager] El AutoGenerator no tiene sistema de rondas habilitado. Desactivando victoria por rondas.");
-            usarVictoriaPorRondas = false;
-            return;
+            Debug.LogWarning("[GameConditionManager] El RoundController no tiene sistema de rondas habilitado. Desactivando victoria por rondas.");
+            usarVictoriaPorRondas = false; return;
         }
-        
+
         if (mostrarDebugInfo)
         {
-            Debug.Log($"[GameConditionManager] Sistema de victoria por rondas habilitado. Total de rondas: {autoGenerator.GetTotalRondas()}");
+            Debug.Log($"[GameConditionManager] Sistema de victoria por rondas habilitado. Total de rondas: {roundController.GetTotalRondas()}");
         }
     }
     
     /// <summary>
-    /// Método público para que AutoGenerator notifique que todas las rondas han terminado
+    /// Método público para que el controlador de rondas notifique que todas las rondas han terminado
     /// </summary>
     public void NotificarTodasLasRondasCompletadas()
     {
@@ -783,17 +782,21 @@ public class GameConditionManager : MonoBehaviour
     /// </summary>
     private void DesactivarSistemasDeJuego()
     {
-        // Desactivar AutoGenerator y detener autos activos
-        if (desactivarAutoGeneratorEnFinDeJuego && autoGenerator != null)
+        // Desactivar Spawner/RoundController y detener autos activos
+        if (desactivarAutoGeneratorEnFinDeJuego)
         {
-            // Primero detener todos los autos activos
             DetenerTodosLosAutosActivos();
-            
-            // Luego desactivar el generador para que no spawne más
-            autoGenerator.enabled = false;
+            if (roundController == null) roundController = FindFirstObjectByType<RoundController>();
+            if (vehicleSpawner == null) vehicleSpawner = FindFirstObjectByType<VehicleSpawner>();
+            if (roundController != null) roundController.enabled = false;
+            if (vehicleSpawner != null)
+            {
+                vehicleSpawner.SetModoContinuo(false);
+                vehicleSpawner.enabled = false;
+            }
             if (mostrarDebugInfo)
             {
-                Debug.Log("🛑 AutoGenerator desactivado y autos detenidos");
+                Debug.Log("🛑 Spawner/RoundController desactivados y autos detenidos");
             }
         }
         
@@ -819,8 +822,6 @@ public class GameConditionManager : MonoBehaviour
     /// </summary>
     private void DetenerTodosLosAutosActivos()
     {
-        if (autoGenerator == null) return;
-        
         // Buscar todos los vehículos activos en la escena con el tag Vehicle
         GameObject[] vehiculosActivos = GameObject.FindGameObjectsWithTag(tagVehiculo);
         
@@ -829,12 +830,9 @@ public class GameConditionManager : MonoBehaviour
         {
             if (vehiculo != null && vehiculo.activeInHierarchy)
             {
-                // Verificar si el vehículo pertenece al pool del AutoGenerator
-                if (autoGenerator.IsVehicleFromPool(vehiculo))
-                {
-                    DetenerMovimientoVehiculo(vehiculo);
-                    autosDetenidos++;
-                }
+                // Detener cualquier vehículo etiquetado
+                DetenerMovimientoVehiculo(vehiculo);
+                autosDetenidos++;
             }
         }
         
@@ -855,15 +853,13 @@ public class GameConditionManager : MonoBehaviour
         while (juegoTerminado)
         {
             yield return new WaitForSeconds(0.1f); // Verificar cada 0.1 segundos
-            
-            if (autoGenerator == null) break;
-            
+
             // Buscar todos los vehículos activos
             GameObject[] vehiculosActivos = GameObject.FindGameObjectsWithTag(tagVehiculo);
             
             foreach (GameObject vehiculo in vehiculosActivos)
             {
-                if (vehiculo != null && vehiculo.activeInHierarchy && autoGenerator.IsVehicleFromPool(vehiculo))
+                if (vehiculo != null && vehiculo.activeInHierarchy)
                 {
                     Rigidbody rb = vehiculo.GetComponent<Rigidbody>();
                     if (rb != null && (!rb.isKinematic || rb.linearVelocity.magnitude > 0.001f))
@@ -960,14 +956,18 @@ public class GameConditionManager : MonoBehaviour
     /// </summary>
     private void ReactivarSistemasDeJuego()
     {
-        // Reactivar AutoGenerator
-        if (autoGenerator != null)
+        // Reactivar Spawner/RoundController
+        if (vehicleSpawner == null) vehicleSpawner = FindFirstObjectByType<VehicleSpawner>();
+        if (roundController == null) roundController = FindFirstObjectByType<RoundController>();
+        if (vehicleSpawner != null)
         {
-            autoGenerator.enabled = true;
-            if (mostrarDebugInfo)
-            {
-                Debug.Log("▶️ AutoGenerator reactivado");
-            }
+            vehicleSpawner.enabled = true;
+            if (mostrarDebugInfo) { Debug.Log("▶️ VehicleSpawner reactivado"); }
+        }
+        if (roundController != null)
+        {
+            roundController.enabled = true;
+            if (mostrarDebugInfo) { Debug.Log("▶️ RoundController reactivado"); }
         }
         
         // Reactivar PlayerController
@@ -1011,8 +1011,6 @@ public class GameConditionManager : MonoBehaviour
     /// </summary>
     private void ReactivarMovimientoAutos()
     {
-        if (autoGenerator == null) return;
-        
         // Buscar todos los vehículos con el tag Vehicle
         GameObject[] vehiculosActivos = GameObject.FindGameObjectsWithTag(tagVehiculo);
         
@@ -1021,12 +1019,8 @@ public class GameConditionManager : MonoBehaviour
         {
             if (vehiculo != null && vehiculo.activeInHierarchy)
             {
-                // Verificar si el vehículo pertenece al pool del AutoGenerator
-                if (autoGenerator.IsVehicleFromPool(vehiculo))
-                {
-                    ReactivarMovimientoVehiculo(vehiculo);
-                    autosReactivados++;
-                }
+                ReactivarMovimientoVehiculo(vehiculo);
+                autosReactivados++;
             }
         }
         
@@ -1475,12 +1469,6 @@ public class GameConditionManager : MonoBehaviour
     [ContextMenu("Test - Verificar Estado Autos")]
     public void TestVerificarEstadoAutos()
     {
-        if (autoGenerator == null)
-        {
-            Debug.Log("[TEST] AutoGenerator no encontrado");
-            return;
-        }
-
         GameObject[] vehiculosActivos = GameObject.FindGameObjectsWithTag(tagVehiculo);
         Debug.Log($"[TEST] Encontrados {vehiculosActivos.Length} vehículos con tag '{tagVehiculo}'");
 
@@ -1490,7 +1478,7 @@ public class GameConditionManager : MonoBehaviour
 
         foreach (GameObject vehiculo in vehiculosActivos)
         {
-            if (vehiculo != null && vehiculo.activeInHierarchy && autoGenerator.IsVehicleFromPool(vehiculo))
+            if (vehiculo != null && vehiculo.activeInHierarchy)
             {
                 autosDelPool++;
 
@@ -1516,7 +1504,7 @@ public class GameConditionManager : MonoBehaviour
             }
         }
 
-        Debug.Log($"[TEST] Resumen: {autosDelPool} autos del pool, {autosMoviendose} moviéndose, {autosDetenidos} detenidos");
+    Debug.Log($"[TEST] Resumen: {autosDelPool} autos (por tag), {autosMoviendose} moviéndose, {autosDetenidos} detenidos");
         Debug.Log($"[TEST] Juego terminado: {juegoTerminado}");
     }
     
