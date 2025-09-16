@@ -63,6 +63,14 @@ public class BridgeQuadrantSO : ScriptableObject
     public float batteryLife = 100f;
     public float batteryDrainRate = 5f;
 
+    [Header("Calor / Agua")]
+    [Tooltip("Indica si actualmente el cuadrante recibe calor (true) o no (false). Afecta al decaimiento.")]
+    public bool isTurned = false; // Estado visible para otros sistemas
+    [Tooltip("Marcador interno de si hay una fuente de calor aplicando (ignora agua).")]
+    public bool heatActive = false;
+    [Tooltip("Cuenta cuántas fuentes de agua lo están bloqueando; >0 fuerza isTurned=false aun con calor.")]
+    public int waterBlockers = 0;
+
     [Header("Efectos Visuales")]
     public Material damagedMaterial;
     public Material destroyedMaterial;
@@ -104,6 +112,9 @@ public class BridgeQuadrantSO : ScriptableObject
                 batteryLife = 100f;
                 break;
         }
+        heatActive = false;
+        waterBlockers = 0;
+        RecalculateTurned();
     }
 
     public bool TryAddLayer(int layerIndex, GameObject layerObject)
@@ -200,7 +211,11 @@ public class BridgeQuadrantSO : ScriptableObject
             case EraType.Industrial:
                 if (lastLayerState == LastLayerState.Complete)
                 {
-                    currentTemperature -= temperatureDecayRate * deltaTime;
+                    // Sólo decae si NO tiene calor o si el calor está bloqueado por agua
+                    if (!isTurned)
+                    {
+                        currentTemperature -= temperatureDecayRate * deltaTime;
+                    }
                     if (currentTemperature < maxTemperature / 2)
                     {
                         lastLayerState = LastLayerState.Damaged;
@@ -270,7 +285,45 @@ public class BridgeQuadrantSO : ScriptableObject
     {
         if (era == EraType.Industrial && lastLayerState != LastLayerState.Destroyed)
         {
+            heatActive = true;
+            RecalculateTurned();
         }
+    }
+
+    /// <summary>
+    /// Indica que ya no se aplica calor (por ejemplo fuente removida)
+    /// </summary>
+    public void RemoveHeat()
+    {
+        heatActive = false;
+        RecalculateTurned();
+    }
+
+    /// <summary>
+    /// Llamar cuando agua (script Water) comienza a tocar el cuadrante.
+    /// </summary>
+    public void AddWaterBlocker()
+    {
+        waterBlockers++;
+        if (waterBlockers < 0) waterBlockers = 0;
+        RecalculateTurned();
+    }
+
+    /// <summary>
+    /// Llamar cuando agua deja de tocar el cuadrante.
+    /// </summary>
+    public void RemoveWaterBlocker()
+    {
+        waterBlockers--;
+        if (waterBlockers < 0) waterBlockers = 0;
+        RecalculateTurned();
+    }
+
+    private void RecalculateTurned()
+    {
+        // isTurned true solo si hay calor activo y no está bloqueado por agua.
+        bool newTurned = heatActive && waterBlockers == 0;
+        isTurned = newTurned;
     }
 
     public void ReplaceBattery()
