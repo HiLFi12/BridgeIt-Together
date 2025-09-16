@@ -98,31 +98,32 @@ public class BaseProbabilitySkill : MonoBehaviour
 
     // Returns success; virtual so subclasses can override spawn logic or probability handling.
     protected virtual bool RollFor(Collider col)
+{
+    if (ammo <= 0) return false;
+
+    float roll = Random.value;
+    bool success = roll <= probability;
+
+    GameObject spawned = null;
+    if (success)
     {
-        if (ammo <= 0) return false;
-
-        float roll = Random.value;
-        bool success = roll <= probability;
-
-        GameObject spawned = null;
-        if (success)
+        if (prefab != null)
         {
-            if (prefab != null)
-            {
-                Vector3 pos = col.bounds.center + spawnOffset;
-                Quaternion rot = prefab.transform.rotation;
-                spawned = Instantiate(prefab, pos, rot);
-                // Ensure detached
-                if (spawned && spawned.transform.parent != null)
-                    spawned.transform.SetParent(null, true);
-            }
+            
+            Vector3 basePos = spawnParent != null ? spawnParent.position : detectionPoint.position;
+            Quaternion rot = prefab.transform.rotation;
 
-            ammo = Mathf.Max(0, ammo - 1);
-            OnProbabilitySuccess(col, spawned);
+            Vector3 pos = basePos + spawnOffset;
+
+            spawned = Instantiate(prefab, pos, rot);
         }
 
-        return success;
+        ammo = Mathf.Max(0, ammo - 1);
+        OnProbabilitySuccess(col, spawned);
     }
+
+    return success;
+}
 
     // Success hook (empty by default).
     protected virtual void OnProbabilitySuccess(Collider col, GameObject spawnedInstance) { }

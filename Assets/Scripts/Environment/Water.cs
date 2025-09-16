@@ -10,17 +10,17 @@ public class Water : MonoBehaviour
 {
     [Header("Escala Splash")] 
     [Tooltip("Escala inicial relativa al spawn (aplicada inmediatamente al instanciar)." )]
-    public Vector3 startScale = new Vector3(0.2f,0.2f,0.2f);
+    public Vector3 startScale = new Vector3(0.15f,0.1f,0.15f);
     [Tooltip("Escala máxima a la que crece el splash.")]
-    public Vector3 peakScale = new Vector3(2.5f, 0.5f, 2.5f);
+    public Vector3 peakScale = new Vector3(1.05f, 0.25f, 1.05f); // Aproximado a un cuadrante
     [Tooltip("Escala final luego de volver a encogerse.")]
-    public Vector3 endScale = new Vector3(1f, 0.2f, 1f);
+    public Vector3 endScale = new Vector3(0.8f, 0.15f, 0.8f);
     [Tooltip("Tiempo de crecimiento hasta peak.")]
-    public float growTime = 0.4f;
+    public float growTime = 0.25f;
     [Tooltip("Tiempo de retorno desde peak hasta end.")]
-    public float shrinkTime = 1.2f;
+    public float shrinkTime = 0.9f;
     [Tooltip("Destruir este objeto tras completar la animación (si 0 => no destruir)." )]
-    public float destroyAfter = 2.5f;
+    public float destroyAfter = 2.2f;
 
     [Header("Bridge Quadrant Detección")] 
     [Tooltip("Radio extra para debug (no usado en lógica)." )]
@@ -34,6 +34,22 @@ public class Water : MonoBehaviour
     {
         var col = GetComponent<Collider>();
         if (col && !col.isTrigger) col.isTrigger = true;
+        transform.localScale = startScale;
+    }
+
+    /// <summary>
+    /// Permite configurar dinámicamente el splash tras instanciarlo (ej. desde un spawner probabilístico).
+    /// Cualquier parámetro puede dejarse en null para no modificarlo.
+    /// </summary>
+    public void ConfigureSplash(Vector3? start = null, Vector3? peak = null, Vector3? end = null, float? grow = null, float? shrink = null, float? life = null)
+    {
+        if (start.HasValue) startScale = start.Value;
+        if (peak.HasValue) peakScale = peak.Value;
+        if (end.HasValue) endScale = end.Value;
+        if (grow.HasValue) growTime = grow.Value;
+        if (shrink.HasValue) shrinkTime = shrink.Value;
+        if (life.HasValue) destroyAfter = life.Value;
+        // Reiniciar estado inicial si se llama antes de OnEnable
         transform.localScale = startScale;
     }
 
@@ -97,11 +113,15 @@ public class Water : MonoBehaviour
 
     private BridgeQuadrantSO GetQuadrantSO(GameObject quadrantGO)
     {
-        // Los cuadrantes parecen instanciar SOs vía BridgeConstructionGrid; necesitamos acceso.
-        // Buscamos componente que pueda contener referencia indirecta (no existe directo aquí), así que se asume un gestor externo actualiza.
-        // Simplificación: intentar encontrar un script que exponga el SO no implementado -> se podría extender si existe.
-        // Como fallback imposible (no hay script de vínculo), retornamos null y se esperaría agregar un contenedor.
-        return null; // TODO: enlazar con sistema real si se agrega componente de instancia.
+        // Buscar el vínculo de instancia -> SO
+        var link = quadrantGO.GetComponent<BridgeQuadrantInstance>();
+        if (link != null && link.quadrantSO != null)
+            return link.quadrantSO;
+        // Si no está en el mismo GO, intentar en padres (por si el collider es hijo)
+        link = quadrantGO.GetComponentInParent<BridgeQuadrantInstance>();
+        if (link != null && link.quadrantSO != null)
+            return link.quadrantSO;
+        return null;
     }
 
 #if UNITY_EDITOR

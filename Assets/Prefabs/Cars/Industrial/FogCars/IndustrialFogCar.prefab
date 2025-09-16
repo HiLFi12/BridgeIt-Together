@@ -189,10 +189,10 @@ MonoBehaviour:
     m_Bits: 256
   bridgeQuadrantTag: BridgeQuadrant
   probability: 1
-  prefab: {fileID: 3020340873426311695, guid: f9f427581002e61479c2cfcd335a0b4b, type: 3}
+  prefab: {fileID: 0}
   spawnOffset: {x: 0, y: 0.25, z: 0}
-  spawnParent: {fileID: 8407545163346415659}
-  ammo: 5
+  spawnParent: {fileID: 0}
+  ammo: 1
   oneRollPerCollider: 1
   effectPrefab: {fileID: 3020340873426311695, guid: f9f427581002e61479c2cfcd335a0b4b, type: 3}
   effectSpawnPoint: {fileID: 5321527989781004840}
@@ -203,6 +203,7 @@ MonoBehaviour:
   debugLogs: 0
   gizmoColor: {r: 0.8, g: 0.9, b: 1, a: 0.6}
   gizmoSphereRadius: 0.25
+  suppressBasePrefabSpawn: 1
 --- !u!1 &5412072648001714427
 GameObject:
   m_ObjectHideFlags: 0

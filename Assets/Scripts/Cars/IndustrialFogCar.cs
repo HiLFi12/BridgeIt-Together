@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 /// <summary>
@@ -34,6 +35,10 @@ public class IndustrialFogCar : BaseProbabilitySkill
     private Coroutine activeEffectRoutine;
     private bool effectActive;
 
+    [Header("Compatibilidad Base Spawn")]
+    [Tooltip("Si está activo, se suprime programáticamente el prefab del BaseProbabilitySkill para que no spawnee nada.")]
+    [SerializeField] private bool suppressBasePrefabSpawn = true;
+
     private void Reset()
     {
         effectSpawnPoint = transform;
@@ -42,6 +47,19 @@ public class IndustrialFogCar : BaseProbabilitySkill
     private void Awake()
     {
         if (!effectSpawnPoint) effectSpawnPoint = transform;
+        // Suprimir el prefab del BaseProbabilitySkill si así se configura
+        if (suppressBasePrefabSpawn)
+        {
+            try
+            {
+                var field = typeof(BaseProbabilitySkill).GetField("prefab", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (field != null)
+                {
+                    field.SetValue(this, null);
+                }
+            }
+            catch { /* Ignorar si reflexión falla */ }
+        }
     }
 
     private void OnDisable()
@@ -51,7 +69,11 @@ public class IndustrialFogCar : BaseProbabilitySkill
 
     protected override void OnProbabilitySuccess(Collider col, GameObject spawnedInstance)
     {
-        // Ignorar el spawnedInstance del base; esta skill gestiona su propio efecto.
+        // Reemplazamos el spawn normal de la base: si la base instanció algo, lo destruimos.
+        if (spawnedInstance != null)
+        {
+            Destroy(spawnedInstance);
+        }
         if (effectActive) return; // Evitar duplicar mientras activo
         StartEffect();
     }
