@@ -1844,7 +1844,7 @@ MonoBehaviour:
   gridWidth: 6
   gridLength: 4
   quadrantSize: 1.8
-  defaultQuadrantSO: {fileID: 11400000, guid: dc289388ff952494da534bf59c75595b, type: 2}
+  defaultQuadrantSO: {fileID: 11400000, guid: b338c7d0318145546978c7258e063255, type: 2}
   quadrantPrefab: {fileID: 1437374063}
   quadrantParent: {fileID: 1196880118}
   layerHeights:
@@ -1977,7 +1977,7 @@ PrefabInstance:
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'autoPrefabs.Array.data[1]'
       value: 
-      objectReference: {fileID: 248325544060308125, guid: 7343e7e8ac960bf44a616c51b049fc4a, type: 3}
+      objectReference: {fileID: 2948579226618137670, guid: fed571c88eda2a8408040875d1f52865, type: 3}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: returnTriggers.Array.size
       value: 5
@@ -2688,6 +2688,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7059573964150791199, guid: 3a5054450548d4440854a00973a4b017, type: 3}
   m_PrefabInstance: {fileID: 7567158235566962814}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1437374067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1437374063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf48f1a202fa1374da7f384d0baedb0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  quadrantSO: {fileID: 11400000, guid: b338c7d0318145546978c7258e063255, type: 2}
 --- !u!1 &1440527762 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7187154040181281835, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
@@ -4833,7 +4846,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7059573964150791199, guid: 3a5054450548d4440854a00973a4b017, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1437374067}
   m_SourcePrefab: {fileID: 100100000, guid: 3a5054450548d4440854a00973a4b017, type: 3}
 --- !u!1001 &7910053364870045549
 PrefabInstance:
