@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Variante direccional de la skill de vapor industrial.
@@ -24,7 +25,8 @@ public class IndustrialDirectionalSteamCar : IndustrialFogCar
     [SerializeField] private float autoDestroyAfter = 8f;
 
     [Header("Debug")] 
-    [SerializeField] private bool debugLogs = false;
+    [FormerlySerializedAs("debugLogs")]
+    [SerializeField] private bool debugLogsDirectional = false;
     [SerializeField] private Color searchGizmoColor = new Color(1f,0.8f,0.4f,0.15f);
 
     private readonly Collider[] _overlapResults = new Collider[64];
@@ -40,19 +42,19 @@ public class IndustrialDirectionalSteamCar : IndustrialFogCar
     {
         if (steamPrefab == null)
         {
-            if (debugLogs) Debug.LogWarning("[IndustrialDirectionalSteamCar] No hay steamPrefab asignado.", this);
+            if (debugLogsDirectional) Debug.LogWarning("[IndustrialDirectionalSteamCar] No hay steamPrefab asignado.", this);
             return;
         }
         if (!forwardSpawn || !backwardSpawn)
         {
-            if (debugLogs) Debug.LogWarning("[IndustrialDirectionalSteamCar] Falta asignar forwardSpawn o backwardSpawn.", this);
+            if (debugLogsDirectional) Debug.LogWarning("[IndustrialDirectionalSteamCar] Falta asignar forwardSpawn o backwardSpawn.", this);
             return;
         }
 
         // Buscar hornos cercanos.
         Vector3 center = transform.position;
         int count = Physics.OverlapSphereNonAlloc(center, furnaceSearchRadius, _overlapResults, furnaceLayerMask, QueryTriggerInteraction.Collide);
-        if (debugLogs) Debug.Log($"[IndustrialDirectionalSteamCar] Hornos detectados: {count}", this);
+        if (debugLogsDirectional) Debug.Log($"[IndustrialDirectionalSteamCar] Hornos detectados: {count}", this);
 
         int forwardVotes = 0;
         int backwardVotes = 0;
@@ -83,7 +85,7 @@ public class IndustrialDirectionalSteamCar : IndustrialFogCar
         activeSteamInstance = Instantiate(steamPrefab, chosen.position, chosen.rotation);
         if (parentSteam && activeSteamInstance) activeSteamInstance.transform.SetParent(chosen, true);
 
-        if (debugLogs)
+        if (debugLogsDirectional)
         {
             Debug.Log($"[IndustrialDirectionalSteamCar] Vapor instanciado en {(chosen == forwardSpawn ? "DELANTE" : "ATRÁS")} (FwdVotes={forwardVotes} / BackVotes={backwardVotes}).", this);
         }
