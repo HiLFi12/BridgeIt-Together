@@ -66,18 +66,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4c5ea817ee12ad43b191c03e3525182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vidaMaxima: 30
-  vidaActual: 0
-  consumoPorSegundo: 1
-  carbonesNecesarios: 3
-  carbonesActuales: 0
-  prefabCarbon: {fileID: 8251136370303857422, guid: f993e8b12d573bb4984521fb9d19da5e, type: 3}
-  cooldownActivo: 0
-  detectionSphere: {fileID: 4855349743986988166}
-  turnableLayerMask:
+  detectionRadius: 3
+  detectionLayer:
     serializedVersion: 2
     m_Bits: 4294967295
-  efectoCalor: {fileID: 0}
-  mostrarDebugLogs: 0
-  gizmoColorEncendido: {r: 1, g: 0.4, b: 0, a: 0.35}
-  gizmoColorApagado: {r: 0.3, g: 0.3, b: 0.3, a: 0.25}
+  heatSphereMaterial: {fileID: 0}
+  cooldown: 10
