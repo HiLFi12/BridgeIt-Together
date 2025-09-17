@@ -21,6 +21,7 @@ public class HeatSphere : MonoBehaviour
     private void Start()
     {
         CreateVisualSphere();
+        currentCooldown = cooldown;
     }
 
     private void CreateVisualSphere()
@@ -30,15 +31,19 @@ public class HeatSphere : MonoBehaviour
         visualSphere.transform.localPosition = Vector3.zero;
         visualSphere.transform.localScale = Vector3.one * (detectionRadius * 2f);
 
-        Destroy(visualSphere.GetComponent<Collider>());
+        var collider = visualSphere.GetComponent<Collider>();
+        if (collider != null)
+        {
+            collider.enabled = false;
+        }
 
         var renderer = visualSphere.GetComponent<MeshRenderer>();
-    
+
         if (heatSphereMaterial != null)
         {
             renderer.material = heatSphereMaterial;
         }
-    
+
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;
     }

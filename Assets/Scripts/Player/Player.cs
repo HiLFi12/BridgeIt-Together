@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour, IHitable
 {
@@ -14,6 +15,9 @@ public class Player : MonoBehaviour, IHitable
     [SerializeField] private KeyCode interactKey = KeyCode.E;
     [SerializeField] private KeyCode dropKey = KeyCode.Q;
     [SerializeField] private KeyCode buildKey = KeyCode.F;
+    
+    [Header("Interaction UI")]
+    [SerializeField] private Image interactionUIImage;
 
     private PlayerObjectHolder objectHolder;
     private PlayerBridgeInteraction bridgeInteraction;
@@ -24,14 +28,12 @@ public class Player : MonoBehaviour, IHitable
         objectHolder = GetComponent<PlayerObjectHolder>();
         bridgeInteraction = GetComponent<PlayerBridgeInteraction>();
         playerAnimator = GetComponent<PlayerAnimator>();
+        interactionUIImage.gameObject.SetActive(false);
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(interactKey))
-        {
-            TryInteract();
-        }
+        TryInteract();
 
         if (Input.GetKeyDown(dropKey))
         {
@@ -52,25 +54,27 @@ public class Player : MonoBehaviour, IHitable
 
     private void TryInteract()
     {
-        // Importante: incluir colliders con IsTrigger (antorchas) en la búsqueda
         int elements = Physics.OverlapSphereNonAlloc(
             interactionPoint.position,
             interactionRadius,
             interactables,
             interactionLayer,
             QueryTriggerInteraction.Collide);
-    if (elements == 0) return;
 
-        // Elegir el mejor candidato por prioridad y distancia
+        if (elements == 0) 
+        {
+            HideInteractionUI();
+            return;
+        }
+
         IInteractable mejorInteractuable = null;
         Collider mejorCollider = null;
         InteractPriority mejorPrioridad = InteractPriority.VeryLow;
         float distanciaMasCercana = float.MaxValue;
 
-        // ¿Sostiene un PaloIgnífugo encendido? Si sí, favorecemos TorchInteractable
         bool paloEncendido = false;
         var holder = GetComponent<PlayerObjectHolder>();
-    if (holder != null && holder.HasObjectInHand())
+        if (holder != null && holder.HasObjectInHand())
         {
             var palo = holder.GetHeldObject()?.GetComponent<PaloIgnifugo>();
             paloEncendido = palo != null && palo.EstaEncendido();
@@ -103,8 +107,32 @@ public class Player : MonoBehaviour, IHitable
 
         if (mejorInteractuable != null)
         {
-            mejorInteractuable.Interact(this.gameObject);
-            return;
+            ShowInteractionUI();
+
+            if (Input.GetKeyDown(interactKey))
+            {
+                mejorInteractuable.Interact(this.gameObject);
+            }
+        }
+        else
+        {
+            HideInteractionUI();
+        }
+    }
+
+    private void ShowInteractionUI()
+    {
+        if (interactionUIImage != null && !interactionUIImage.gameObject.activeInHierarchy)
+        {
+            interactionUIImage.gameObject.SetActive(true);
+        }
+    }
+
+    private void HideInteractionUI()
+    {
+        if (interactionUIImage != null && interactionUIImage.gameObject.activeInHierarchy)
+        {
+            interactionUIImage.gameObject.SetActive(false);
         }
     }
 
