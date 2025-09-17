@@ -2,9 +2,10 @@ using UnityEngine;
 using System.Collections;
 
 [DisallowMultipleComponent]
+[RequireComponent(typeof(Collider))]
 public class Furnace : MonoBehaviour, IInteractable
 {
-    [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
+    [SerializeField] private InteractPriority interactPriority = InteractPriority.High;
 
     [Header("Carbón")]
     [SerializeField] private int maxCoal = 1;
@@ -18,8 +19,22 @@ public class Furnace : MonoBehaviour, IInteractable
     [SerializeField] private bool debugLogs = false;
     private bool cooking = false;
     private bool canCook = false;
+    [Header("Interacción Simple")]
+    [Tooltip("Si está activo, al entrar un jugador con carbón en el trigger del horno, se consume automáticamente el carbón.")]
+    [SerializeField] private bool autoAcceptCoalOnTrigger = false;
 
     public InteractPriority InteractPriority => interactPriority;
+
+    private void OnValidate()
+    {
+        var col = GetComponent<Collider>();
+        if (col != null && !autoAcceptCoalOnTrigger && col.isTrigger)
+        {
+            // Aviso: si querés horno sólido, desactiva isTrigger en el collider
+            // No lo cambiamos automáticamente para no sorprender en el editor.
+            // Debug.LogWarning("[Furnace] El collider está en modo Trigger pero 'autoAcceptCoalOnTrigger' está desactivado. Para horno sólido, desactiva IsTrigger.", this);
+        }
+    }
 
     public void Interact(GameObject interactor)
     {
@@ -41,7 +56,27 @@ public class Furnace : MonoBehaviour, IInteractable
         }
     }
 
-    private bool TryAddCoal(GameObject interactor)
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!autoAcceptCoalOnTrigger) return;
+        var holder = other.GetComponentInParent<PlayerObjectHolder>();
+        if (holder != null && currentCoal < maxCoal)
+        {
+            TryAddCoal(holder.gameObject);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (!autoAcceptCoalOnTrigger) return;
+        var holder = other.GetComponentInParent<PlayerObjectHolder>();
+        if (holder != null && currentCoal < maxCoal)
+        {
+            TryAddCoal(holder.gameObject);
+        }
+    }
+
+    public bool TryAddCoal(GameObject interactor)
     {
         var holder = interactor.GetComponent<PlayerObjectHolder>();
         if (holder == null || !holder.HasObjectInHand()) 
@@ -59,7 +94,12 @@ public class Furnace : MonoBehaviour, IInteractable
 
         Debug.Log($"[Furnace] Checking object: {held.name}");
 
+        // Aceptar carbón incluso si el componente está en un hijo
         CoalItem coalComponent = held.GetComponent<CoalItem>();
+        if (coalComponent == null)
+        {
+            coalComponent = held.GetComponentInChildren<CoalItem>();
+        }
         if (coalComponent == null) 
         {
             Debug.Log($"[Furnace] Object {held.name} does not have CoalItem component");
