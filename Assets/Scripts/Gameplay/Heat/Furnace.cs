@@ -177,5 +177,11 @@ public class Furnace : MonoBehaviour, IInteractable
     {
         canCook = false;
         if (debugLogs) Debug.Log("[Furnace] Furnace turned off - cooking disabled.", this);
+
+        // Apagar visual y efecto de calor para liberar turnables dentro del rango
+        if (heatSphere != null && heatSphere.gameObject.activeSelf)
+        {
+            heatSphere.gameObject.SetActive(false); // Esto ejecuta OnDisable() en HeatSphere y llama TurnOff() a los ITurnable
+        }
     }
 }

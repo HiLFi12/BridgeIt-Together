@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewBridgeQuadrant", menuName = "Bridge/Quadrant")]
-public class BridgeQuadrantSO : ScriptableObject
+public class BridgeQuadrantSO : ScriptableObject, ITurnable
 {
     [System.Serializable]
     public class LayerInfo
@@ -65,11 +65,18 @@ public class BridgeQuadrantSO : ScriptableObject
 
     [Header("Calor / Agua")]
     [Tooltip("Indica si actualmente el cuadrante recibe calor (true) o no (false). Afecta al decaimiento.")]
-    public bool isTurned = false; // Estado visible para otros sistemas
+    public bool isTurned { get; private set; } // Estado visible para otros sistemas, controlado por ITurnable/agua
     [Tooltip("Marcador interno de si hay una fuente de calor aplicando (ignora agua).")]
     public bool heatActive = false;
     [Tooltip("Cuenta cuántas fuentes de agua lo están bloqueando; >0 fuerza isTurned=false aun con calor.")]
     public int waterBlockers = 0;
+
+    [Header("Debug Vida (Industrial)")]
+    [Tooltip("Si está activo, loggea periódicamente la vida del puente como currentTemperature/maxTemperature.")]
+    public bool debugLife = false;
+    [Tooltip("Intervalo entre logs de debug en segundos.")]
+    public float debugLifeInterval = 0.5f;
+    private float _debugLifeTimer = 0f;
 
     [Header("Efectos Visuales")]
     public Material damagedMaterial;
@@ -209,16 +216,38 @@ public class BridgeQuadrantSO : ScriptableObject
         switch (era)
         {
             case EraType.Industrial:
-                if (lastLayerState == LastLayerState.Complete)
+                if (lastLayerState != LastLayerState.Destroyed)
                 {
                     // Sólo decae si NO tiene calor o si el calor está bloqueado por agua
                     if (!isTurned)
                     {
                         currentTemperature -= temperatureDecayRate * deltaTime;
+                        if (currentTemperature < 0f) currentTemperature = 0f;
                     }
-                    if (currentTemperature < maxTemperature / 2)
+
+                    // Transición de Complete -> Damaged al pasar 50%
+                    if (lastLayerState == LastLayerState.Complete && currentTemperature < maxTemperature / 2f)
                     {
                         lastLayerState = LastLayerState.Damaged;
+                    }
+
+                    // Si llega a 0, destruir TODAS las capas y marcar Destroyed
+                    if (currentTemperature <= 0f)
+                    {
+                        lastLayerState = LastLayerState.Destroyed;
+                        DestroyQuadrant();
+                    }
+                }
+
+                // Mini debug de vida (Industrial): current/max
+                if (debugLife && maxTemperature > 0f)
+                {
+                    _debugLifeTimer -= deltaTime;
+                    if (_debugLifeTimer <= 0f)
+                    {
+                        float ratio = Mathf.Clamp01(currentTemperature / maxTemperature);
+                        Debug.Log($"[BridgeQuadrantSO] '{name}' Vida: {currentTemperature:F1}/{maxTemperature:F1} ({ratio:P0}) | isTurned={isTurned} | waterBlockers={waterBlockers} | heatActive={heatActive} | state={lastLayerState}");
+                        _debugLifeTimer = Mathf.Max(0.1f, debugLifeInterval);
                     }
                 }
                 break;
@@ -297,6 +326,17 @@ public class BridgeQuadrantSO : ScriptableObject
     {
         heatActive = false;
         RecalculateTurned();
+    }
+
+    // Implementación ITurnable para que HeatSphere pueda controlar el calor sin modificar su script
+    public void TurnOn()
+    {
+        ApplyHeat();
+    }
+
+    public void TurnOff()
+    {
+        RemoveHeat();
     }
 
     /// <summary>
