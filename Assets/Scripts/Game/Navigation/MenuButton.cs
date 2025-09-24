@@ -25,6 +25,9 @@ public class MenuButton : MonoBehaviour
         PrototypeLevel,
         PrehistoricLevels,
     MedievalLevels,
+        ContemporaryLevels,
+        FutureLevels,
+        IndustrialLevels,
         Back,
         Custom,
         // Nuevos tipos específicos para fin de juego
@@ -83,6 +86,15 @@ public class MenuButton : MonoBehaviour
                     break;
                 case NavigationType.MedievalLevels:
                     SceneNavigatorCanvas.NavigateToMedievalLevels();
+                    break;
+                case NavigationType.ContemporaryLevels:
+                    SceneNavigatorCanvas.NavigateToContemporaryLevels();
+                    break;
+                case NavigationType.FutureLevels:
+                    SceneNavigatorCanvas.NavigateToFutureLevels();
+                    break;
+                case NavigationType.IndustrialLevels:
+                    SceneNavigatorCanvas.NavigateToIndustrialLevels();
                     break;
                     
                 case NavigationType.Back:
@@ -153,6 +165,15 @@ public class MenuButton : MonoBehaviour
                 case NavigationType.MedievalLevels:
                     // Para SceneNavigator tradicional, no hay implementación específica
                     Debug.LogWarning("MedievalLevels solo está disponible con SceneNavigatorCanvas");
+                    break;
+                case NavigationType.ContemporaryLevels:
+                    Debug.LogWarning("ContemporaryLevels solo está disponible con SceneNavigatorCanvas");
+                    break;
+                case NavigationType.FutureLevels:
+                    Debug.LogWarning("FutureLevels solo está disponible con SceneNavigatorCanvas");
+                    break;
+                case NavigationType.IndustrialLevels:
+                    Debug.LogWarning("IndustrialLevels solo está disponible con SceneNavigatorCanvas");
                     break;
                 
             case NavigationType.Back:
