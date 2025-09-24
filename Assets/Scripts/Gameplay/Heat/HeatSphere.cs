@@ -14,7 +14,8 @@ public class HeatSphere : MonoBehaviour
     [SerializeField] private float cooldown = 10f;
     private float currentCooldown = 0f;
 
-    private Collider[] detectedColliders = new Collider[10];
+    // Aumentado para abarcar más colliders en escenas densas (rocas, decoraciones, capas visuales)
+    private Collider[] detectedColliders = new Collider[128];
     private HashSet<ITurnable> activeTurnables = new HashSet<ITurnable>();
     private GameObject visualSphere;
 

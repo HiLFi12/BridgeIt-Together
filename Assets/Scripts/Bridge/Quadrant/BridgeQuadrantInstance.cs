@@ -1,0 +1,122 @@
+using UnityEngine;
+
+/// <summary>
+/// Vincula un objeto de cuadrante físico con su ScriptableObject correspondiente.
+/// Añádelo al GameObject del cuadrante (etiquetado como "BridgeQuadrant").
+/// </summary>
+[DisallowMultipleComponent]
+public class BridgeQuadrantInstance : MonoBehaviour, ITurnable
+{
+    [Tooltip("Referencia al ScriptableObject que representa el estado lógico de este cuadrante.")]
+    public BridgeQuadrantSO quadrantSO;
+
+    // ITurnable delega al SO para que HeatSphere pueda activar/desactivar el calor
+    public bool isTurned => quadrantSO != null && quadrantSO.isTurned;
+    public void TurnOn()
+    {
+        if (quadrantSO != null)
+        {
+            quadrantSO.TurnOn();
+            // Failsafe: refrescar último calor visto para evitar apagado inmediato
+            _lastHeatSeenTime = Time.time;
+        }
+    }
+    public void TurnOff()
+    {
+        if (quadrantSO != null) quadrantSO.TurnOff();
+    }
+
+    // ===== Failsafe: validar calor por proximidad sin modificar HeatSphere =====
+    [Header("Validación de calor por proximidad (failsafe)")]
+    [Tooltip("Sondea si hay un HeatSphere activo cerca. Si no hay por un tiempo de gracia, apaga el calor del cuadrante.")]
+    [SerializeField] private bool validateHeatByProbing = true;
+
+    [Tooltip("Radio de chequeo. Ajústalo similar (o un poco menor) al radio del HeatSphere.")]
+    [SerializeField] private float heatCheckRadius = 1.6f;
+
+    [Tooltip("Capas que se consideran al buscar HeatSphere.")]
+    [SerializeField] private LayerMask heatLayerMask = ~0;
+
+    [Tooltip("Cada cuánto sondear (segundos).")]
+    [SerializeField] private float probeInterval = 0.15f;
+
+    [Tooltip("Tiempo de gracia sin ver HeatSphere antes de apagar (segundos).")]
+    [SerializeField] private float heatLoseGraceSeconds = 0.5f;
+
+    [Header("Debug (failsafe)")]
+    [SerializeField] private bool debugHeatProbe = false;
+    [SerializeField] private Color probeGizmoColor = new Color(1f, 0.5f, 0f, 0.25f);
+
+    private float _nextProbeTime;
+    private float _lastHeatSeenTime;
+    private static readonly Collider[] _probe = new Collider[128];
+
+    private void OnEnable()
+    {
+        _nextProbeTime = Time.time + probeInterval;
+        if (quadrantSO != null && quadrantSO.isTurned)
+            _lastHeatSeenTime = Time.time;
+    }
+
+    private void Update()
+    {
+        if (!Application.isPlaying || !validateHeatByProbing) return;
+        if (quadrantSO == null) return;
+
+        // Solo validar si creemos que hay calor aplicado
+        if (!quadrantSO.heatActive) return;
+
+        if (Time.time < _nextProbeTime) return;
+        _nextProbeTime = Time.time + probeInterval;
+
+        bool anyHeat = ProbeAnyHeat();
+        if (anyHeat)
+        {
+            _lastHeatSeenTime = Time.time;
+        }
+        else
+        {
+            if (Time.time - _lastHeatSeenTime > heatLoseGraceSeconds)
+            {
+                if (debugHeatProbe)
+                    Debug.Log($"[BridgeQuadrantInstance] Apagando calor por ausencia de HeatSphere en '{name}'.");
+                quadrantSO.RemoveHeat();
+            }
+        }
+    }
+
+    private bool ProbeAnyHeat()
+    {
+        // Fallback: si el mask quedó en Nothing (0), usar AllLayers
+        int mask = (heatLayerMask.value == 0) ? Physics.AllLayers : heatLayerMask.value;
+        int count = Physics.OverlapSphereNonAlloc(transform.position, heatCheckRadius, _probe, mask, QueryTriggerInteraction.Collide);
+        for (int i = 0; i < count; i++)
+        {
+            var col = _probe[i];
+            if (col == null) continue;
+
+            var hs = col.GetComponentInParent<HeatSphere>();
+            if (hs != null && hs.isActiveAndEnabled && hs.gameObject.activeInHierarchy)
+                return true;
+        }
+        return false;
+    }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        if (validateHeatByProbing)
+        {
+            Gizmos.color = probeGizmoColor;
+            Gizmos.DrawWireSphere(transform.position, heatCheckRadius);
+        }
+    }
+
+    private void OnValidate()
+    {
+        if (heatCheckRadius < 0.1f) heatCheckRadius = 0.1f;
+        if (probeInterval < 0.02f) probeInterval = 0.02f;
+        if (heatLoseGraceSeconds < 0f) heatLoseGraceSeconds = 0f;
+    }
+#endif
+}

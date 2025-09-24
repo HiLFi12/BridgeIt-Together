@@ -47,13 +47,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd23c4b6a0be996479134e95ff89b0d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  heatSphere: {fileID: 2923221507408702265}
-  flameEffect: {fileID: 0}
   interactPriority: 2
+  maxCoal: 3
+  heatSphere: {fileID: 2923221507408702265}
   cookTime: 2
-  fullFlameScale: {x: 1, y: 1, z: 1}
-  minFlameScale: {x: 0.25, y: 0.25, z: 0.25}
   debugLogs: 0
+  autoAcceptCoalOnTrigger: 1
 --- !u!65 &2812501365257972867
 BoxCollider:
   m_ObjectHideFlags: 0

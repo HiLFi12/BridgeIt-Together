@@ -34,6 +34,10 @@ public class BridgeConstructionGrid : MonoBehaviour
     public Color incompleteColor = Color.red;
     public Color damagedColor = Color.yellow;
 
+    [Header("Debug Vida en Scene View")]
+    public bool showLifeInScene = true;
+    public Color lifeTextColor = new Color(1f, 0.95f, 0.6f);
+
     [Header("Sistema de Power Ups")]
     public float powerUpEffectMultiplier = 1.5f;
     public bool isPowerUpActive = false;
@@ -280,6 +284,14 @@ public class BridgeConstructionGrid : MonoBehaviour
                         quadrantObj.tag = "BridgeQuadrant";
 
                         constructionGrid[x, z].quadrantObject = quadrantObj;
+
+                        // Asegurar que el objeto de cuadrante tenga BridgeQuadrantInstance y vincular el SO
+                        var instance = quadrantObj.GetComponent<BridgeQuadrantInstance>();
+                        if (instance == null)
+                        {
+                            instance = quadrantObj.AddComponent<BridgeQuadrantInstance>();
+                        }
+                        instance.quadrantSO = newQuadrantSO;
 
                         // Obtener el collider y guardarlo
                         constructionGrid[x, z].quadrantCollider = quadrantObj.GetComponent<Collider>();
@@ -630,6 +642,22 @@ public class BridgeConstructionGrid : MonoBehaviour
         // Actualizar las visuales de cada capa
         for (int i = 0; i < info.quadrantSO.requiredLayers.Length; i++)
         {
+            // Si la capa NO está completa pero existe su renderer, eliminar el objeto visual y limpiar referencia
+            if (!info.quadrantSO.requiredLayers[i].isCompleted)
+            {
+                if (info.layerRenderers[i] != null)
+                {
+                    var go = info.layerRenderers[i].gameObject;
+                    if (go != null)
+                    {
+                        Destroy(go);
+                    }
+                    info.layerRenderers[i] = null;
+                }
+                // Pasamos a la siguiente capa
+                continue;
+            }
+
             if (info.quadrantSO.requiredLayers[i].isCompleted)
             {
                 // Si aún no hay un renderizador para esta capa, crearlo
@@ -672,6 +700,13 @@ public class BridgeConstructionGrid : MonoBehaviour
 
                     info.layerRenderers[i] = layerObj.GetComponentInChildren<Renderer>();
 
+                    // Importante: desactivar colliders en objetos visuales de la capa para no contaminar detecciones (HeatSphere)
+                    var visualColliders = layerObj.GetComponentsInChildren<Collider>(true);
+                    foreach (var vc in visualColliders)
+                    {
+                        vc.enabled = false;
+                    }
+
                     if (info.layerRenderers[i] == null)
                     {
                         // Intenta buscar un Renderer en los hijos
@@ -685,31 +720,7 @@ public class BridgeConstructionGrid : MonoBehaviour
                     Debug.Log($"Creada visualización para capa {i} en posición {posicionCorrecta}");
                 }
             }
-            else if (info.layerRenderers[i] != null && info.layerRenderers[i].gameObject != null)
-            {
-                // Actualizar el estado del collider para una capa existente
-                Collider[] layerColliders = info.layerRenderers[i].gameObject.GetComponentsInChildren<Collider>();
-                bool esUltimaCapa = (i == info.quadrantSO.requiredLayers.Length - 1);
-
-                foreach (Collider col in layerColliders)
-                {
-                    if (esUltimaCapa && cuadranteCompleto)
-                    {
-                        col.isTrigger = false;
-                        col.enabled = true;
-                    }
-                    else
-                    {
-                        col.isTrigger = true;
-                        col.enabled = true;
-                    }
-                }
-            }
-            else if (info.layerRenderers[i] != null)
-            {
-                // Si la capa no está completa pero hay un renderizador, desactivarlo
-                info.layerRenderers[i].gameObject.SetActive(false);
-            }
+            // Ya no hay ramas para capas incompletas aquí, se limpian al inicio del ciclo
 
             // Si es la última capa, aplicar el material según el estado
             if (i == info.quadrantSO.requiredLayers.Length - 1 && info.layerRenderers[i] != null)
@@ -723,8 +734,13 @@ public class BridgeConstructionGrid : MonoBehaviour
                         info.layerRenderers[i].material = info.quadrantSO.damagedMaterial;
                         break;
                     case BridgeQuadrantSO.LastLayerState.Destroyed:
-                        // Si está destruida, desactivamos el renderizador
-                        info.layerRenderers[i].gameObject.SetActive(false);
+                        // Si está destruida, asegurarnos de quitar también la visual de la última capa
+                        var go = info.layerRenderers[i].gameObject;
+                        if (go != null)
+                        {
+                            Destroy(go);
+                        }
+                        info.layerRenderers[i] = null;
                         break;
                 }
             }
@@ -802,6 +818,33 @@ public class BridgeConstructionGrid : MonoBehaviour
 
                     Gizmos.color = Color.green;
                     Gizmos.DrawSphere(center, 0.05f); // Posición central
+
+#if UNITY_EDITOR
+                    if (showLifeInScene)
+                    {
+                        var so = constructionGrid[x, z].quadrantSO;
+                        string vidaTxt = string.Empty;
+                        if (so.era == BridgeQuadrantSO.EraType.Industrial)
+                        {
+                            vidaTxt = $"{so.currentTemperature:F1}/{so.maxTemperature:F1}";
+                        }
+                        else if (so.era == BridgeQuadrantSO.EraType.Futuristic)
+                        {
+                            vidaTxt = $"BAT {so.batteryLife:F0}%";
+                        }
+                        else
+                        {
+                            vidaTxt = so.lastLayerState.ToString();
+                        }
+
+                        string turned = so.isTurned ? "ON" : "off";
+                        string label = $"{vidaTxt} | {so.lastLayerState} | turned:{turned}";
+
+                        UnityEditor.Handles.color = lifeTextColor;
+                        Vector3 labelPos = center + Vector3.up * 0.25f;
+                        UnityEditor.Handles.Label(labelPos, label);
+                    }
+#endif
                 }
             }
         }
