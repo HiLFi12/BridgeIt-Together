@@ -6111,27 +6111,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2231339667409995528, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
       propertyPath: navigationType
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2231339667409995528, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
       propertyPath: customScene.sceneName
-      value: Level4
+      value: Level4_M
       objectReference: {fileID: 0}
     - target: {fileID: 2231339667409995528, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
       propertyPath: customScene.buildIndex
-      value: 15
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 8978861638815104216, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
       propertyPath: navigationType
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8978861638815104216, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
       propertyPath: customScene.sceneName
-      value: Level3
+      value: Level3_M
       objectReference: {fileID: 0}
     - target: {fileID: 8978861638815104216, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
       propertyPath: customScene.buildIndex
-      value: 14
+      value: 17
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7223,6 +7223,8 @@ MonoBehaviour:
   completeColor: {r: 0, g: 1, b: 0, a: 1}
   incompleteColor: {r: 1, g: 0, b: 0, a: 1}
   damagedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  showLifeInScene: 1
+  lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
   showDebugTools: 1
@@ -9266,6 +9268,8 @@ MonoBehaviour:
   completeColor: {r: 0, g: 1, b: 0, a: 1}
   incompleteColor: {r: 1, g: 0, b: 0, a: 1}
   damagedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  showLifeInScene: 1
+  lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
   showDebugTools: 1
@@ -19494,15 +19498,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7973957407066286574, guid: 5fbee28b0aae9034997db87d82217882, type: 3}
       propertyPath: navigationType
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7973957407066286574, guid: 5fbee28b0aae9034997db87d82217882, type: 3}
       propertyPath: customScene.sceneName
-      value: Level3
+      value: Level3_M
       objectReference: {fileID: 0}
     - target: {fileID: 7973957407066286574, guid: 5fbee28b0aae9034997db87d82217882, type: 3}
       propertyPath: customScene.buildIndex
-      value: 14
+      value: 17
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20479,7 +20483,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8978105061550062323, guid: 8679cf095520648408f96059b46151ac, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

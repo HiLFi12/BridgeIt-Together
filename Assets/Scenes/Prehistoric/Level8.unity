@@ -3574,6 +3574,8 @@ MonoBehaviour:
   completeColor: {r: 0, g: 1, b: 0, a: 1}
   incompleteColor: {r: 1, g: 0, b: 0, a: 1}
   damagedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  showLifeInScene: 1
+  lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
   showDebugTools: 1
@@ -4202,6 +4204,10 @@ PrefabInstance:
     - target: {fileID: 1176256308665316814, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2231339667409995528, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
+      propertyPath: navigationType
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 2231339667409995528, guid: 2ff5a5929b5966d47bac24edb01891a4, type: 3}
       propertyPath: customSceneName

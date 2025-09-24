@@ -19,6 +19,9 @@ public class SceneNavigatorCanvas : MonoBehaviour
     [SerializeField] private Canvas creditsCanvas;
     [SerializeField] private Canvas prehistoricLevelsCanvas;
     [SerializeField] private Canvas medievalLevelsCanvas;
+    [SerializeField] private Canvas industrialLevelsCanvas;
+    [SerializeField] private Canvas contemporaryLevelsCanvas;
+    [SerializeField] private Canvas futureLevelsCanvas;
     
     [Header("Panel References (dentro de LevelSelector)")]
     [SerializeField] private GameObject prehistoricLevelsPanel;
@@ -40,7 +43,10 @@ public class SceneNavigatorCanvas : MonoBehaviour
         LevelSelector,
         Credits,
     PrehistoricLevels,
-    MedievalLevels
+    MedievalLevels,
+    IndustrialLevels,
+    ContemporaryLevels,
+    FutureLevels
     }
     
     private MenuState currentState = MenuState.MainMenu;
@@ -144,6 +150,18 @@ public class SceneNavigatorCanvas : MonoBehaviour
             else if (medievalLevelsCanvas == null && canvasName == "medievallevels")
             {
                 medievalLevelsCanvas = canvas;
+            }
+            else if (industrialLevelsCanvas == null && (canvasName == "industriallevels" || canvasName == "industriallevel"))
+            {
+                industrialLevelsCanvas = canvas;
+            }
+            else if (contemporaryLevelsCanvas == null && (canvasName == "contemporarylevels" || canvasName == "contemporarylevel"))
+            {
+                contemporaryLevelsCanvas = canvas;
+            }
+            else if (futureLevelsCanvas == null && (canvasName == "futurelevels" || canvasName == "futurelevel"))
+            {
+                futureLevelsCanvas = canvas;
             }
         }
         
@@ -251,6 +269,9 @@ public class SceneNavigatorCanvas : MonoBehaviour
     prehistoricLevelsPanel = null;
     medievalLevelsCanvas = null;
     medievalLevelsPanel = null;
+    industrialLevelsCanvas = null;
+    contemporaryLevelsCanvas = null;
+    futureLevelsCanvas = null;
         
         // Reasignar automáticamente
         AutoAssignCanvasReferences();
@@ -302,6 +323,18 @@ public class SceneNavigatorCanvas : MonoBehaviour
         if (prehistoricLevelsCanvas != null) 
         {
             prehistoricLevelsCanvas.gameObject.SetActive(false);
+        }
+        if (industrialLevelsCanvas != null)
+        {
+            industrialLevelsCanvas.gameObject.SetActive(false);
+        }
+        if (contemporaryLevelsCanvas != null)
+        {
+            contemporaryLevelsCanvas.gameObject.SetActive(false);
+        }
+        if (futureLevelsCanvas != null)
+        {
+            futureLevelsCanvas.gameObject.SetActive(false);
         }
         
         // Activar el canvas correspondiente
@@ -377,6 +410,91 @@ public class SceneNavigatorCanvas : MonoBehaviour
                     }
 
                     if (medievalLevelsCanvas == null)
+                    {
+                        if (levelSelectorCanvas != null)
+                        {
+                            levelSelectorCanvas.gameObject.SetActive(true);
+                        }
+                    }
+                }
+                break;
+            case MenuState.IndustrialLevels:
+                if (industrialLevelsCanvas != null)
+                {
+                    industrialLevelsCanvas.gameObject.SetActive(true);
+                }
+                else
+                {
+                    // Buscar automáticamente por nombres posibles
+                    Canvas[] allCanvas = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+                    foreach (Canvas canvas in allCanvas)
+                    {
+                        string n = canvas.name.ToLower();
+                        if (n == "industriallevels" || n == "industriallevel")
+                        {
+                            industrialLevelsCanvas = canvas;
+                            industrialLevelsCanvas.gameObject.SetActive(true);
+                            break;
+                        }
+                    }
+
+                    if (industrialLevelsCanvas == null)
+                    {
+                        if (levelSelectorCanvas != null)
+                        {
+                            levelSelectorCanvas.gameObject.SetActive(true);
+                        }
+                    }
+                }
+                break;
+            case MenuState.ContemporaryLevels:
+                if (contemporaryLevelsCanvas != null)
+                {
+                    contemporaryLevelsCanvas.gameObject.SetActive(true);
+                }
+                else
+                {
+                    Canvas[] allCanvas = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+                    foreach (Canvas canvas in allCanvas)
+                    {
+                        string n = canvas.name.ToLower();
+                        if (n == "contemporarylevels" || n == "contemporarylevel")
+                        {
+                            contemporaryLevelsCanvas = canvas;
+                            contemporaryLevelsCanvas.gameObject.SetActive(true);
+                            break;
+                        }
+                    }
+
+                    if (contemporaryLevelsCanvas == null)
+                    {
+                        if (levelSelectorCanvas != null)
+                        {
+                            levelSelectorCanvas.gameObject.SetActive(true);
+                        }
+                    }
+                }
+                break;
+            case MenuState.FutureLevels:
+                if (futureLevelsCanvas != null)
+                {
+                    futureLevelsCanvas.gameObject.SetActive(true);
+                }
+                else
+                {
+                    Canvas[] allCanvas = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+                    foreach (Canvas canvas in allCanvas)
+                    {
+                        string n = canvas.name.ToLower();
+                        if (n == "futurelevels" || n == "futurelevel")
+                        {
+                            futureLevelsCanvas = canvas;
+                            futureLevelsCanvas.gameObject.SetActive(true);
+                            break;
+                        }
+                    }
+
+                    if (futureLevelsCanvas == null)
                     {
                         if (levelSelectorCanvas != null)
                         {
@@ -463,6 +581,63 @@ public class SceneNavigatorCanvas : MonoBehaviour
         currentState = MenuState.MedievalLevels;
 
         SceneNavigationEvents.InvokeMenuSpecificEvent("medievallevels");
+        SceneNavigationEvents.InvokeAfterMenuChange();
+    }
+
+    /// <summary>
+    /// Navega al menú de niveles industriales
+    /// </summary>
+    public void GoToIndustrialLevels()
+    {
+        SceneNavigationEvents.InvokeBeforeMenuChange();
+
+        if (industrialLevelsCanvas == null)
+        {
+            AutoAssignCanvasReferences();
+        }
+
+        SetCanvasActive(MenuState.IndustrialLevels);
+        currentState = MenuState.IndustrialLevels;
+
+        SceneNavigationEvents.InvokeMenuSpecificEvent("industriallevels");
+        SceneNavigationEvents.InvokeAfterMenuChange();
+    }
+
+    /// <summary>
+    /// Navega al menú de niveles contemporáneos
+    /// </summary>
+    public void GoToContemporaryLevels()
+    {
+        SceneNavigationEvents.InvokeBeforeMenuChange();
+
+        if (contemporaryLevelsCanvas == null)
+        {
+            AutoAssignCanvasReferences();
+        }
+
+        SetCanvasActive(MenuState.ContemporaryLevels);
+        currentState = MenuState.ContemporaryLevels;
+
+        SceneNavigationEvents.InvokeMenuSpecificEvent("contemporarylevels");
+        SceneNavigationEvents.InvokeAfterMenuChange();
+    }
+
+    /// <summary>
+    /// Navega al menú de niveles futuros
+    /// </summary>
+    public void GoToFutureLevels()
+    {
+        SceneNavigationEvents.InvokeBeforeMenuChange();
+
+        if (futureLevelsCanvas == null)
+        {
+            AutoAssignCanvasReferences();
+        }
+
+        SetCanvasActive(MenuState.FutureLevels);
+        currentState = MenuState.FutureLevels;
+
+        SceneNavigationEvents.InvokeMenuSpecificEvent("futurelevels");
         SceneNavigationEvents.InvokeAfterMenuChange();
     }
 
@@ -569,6 +744,42 @@ public class SceneNavigatorCanvas : MonoBehaviour
         SceneManager.LoadScene("Menu");
     }
 
+    public static void NavigateToIndustrialLevels()
+    {
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Menu" && Instance != null)
+        {
+            Instance.GoToIndustrialLevels();
+            return;
+        }
+
+        SetInitialMenuState(MenuState.IndustrialLevels);
+        SceneManager.LoadScene("Menu");
+    }
+
+    public static void NavigateToContemporaryLevels()
+    {
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Menu" && Instance != null)
+        {
+            Instance.GoToContemporaryLevels();
+            return;
+        }
+
+        SetInitialMenuState(MenuState.ContemporaryLevels);
+        SceneManager.LoadScene("Menu");
+    }
+
+    public static void NavigateToFutureLevels()
+    {
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Menu" && Instance != null)
+        {
+            Instance.GoToFutureLevels();
+            return;
+        }
+
+        SetInitialMenuState(MenuState.FutureLevels);
+        SceneManager.LoadScene("Menu");
+    }
+
     /// <summary>
     /// Navega al nivel prototipo desde un método estático
     /// </summary>
@@ -635,6 +846,21 @@ public class SceneNavigatorCanvas : MonoBehaviour
     public bool IsInMedievalLevels()
     {
         return currentState == MenuState.MedievalLevels;
+    }
+
+    public bool IsInIndustrialLevels()
+    {
+        return currentState == MenuState.IndustrialLevels;
+    }
+
+    public bool IsInContemporaryLevels()
+    {
+        return currentState == MenuState.ContemporaryLevels;
+    }
+
+    public bool IsInFutureLevels()
+    {
+        return currentState == MenuState.FutureLevels;
     }
 
     // Métodos compatibles con versiones anteriores
