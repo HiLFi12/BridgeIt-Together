@@ -9,7 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 882737915605281792}
-  m_Layer: 0
+  - component: {fileID: -3613937109806452905}
+  - component: {fileID: 6315738702186448380}
+  m_Layer: 3
   m_Name: CoalSource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -36,6 +38,42 @@ Transform:
   - {fileID: 5987729192341791503}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-3613937109806452905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154333752488484697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32ae3c96631a29443beee3e9a3a75322, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  paloIgnifugoPrefab: {fileID: 8251136370303857422, guid: f993e8b12d573bb4984521fb9d19da5e, type: 3}
+  interactPriority: 2
+  tiempoRecarga: 0.5
+--- !u!65 &6315738702186448380
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154333752488484697}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.8626404, y: 2.1673737, z: 2.6421356}
+  m_Center: {x: -0.15361023, y: -0.5836868, z: 0.15329742}
 --- !u!1001 &4304419299539118240
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -47,6 +85,10 @@ PrefabInstance:
     - target: {fileID: 199271363605451099, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
       propertyPath: m_Name
       value: Coal (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 199271363605451099, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 686839158079753185, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -110,6 +152,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Coal (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 199271363605451099, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 686839158079753185, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.21
@@ -171,6 +217,10 @@ PrefabInstance:
     - target: {fileID: 199271363605451099, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
       propertyPath: m_Name
       value: Coal (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 199271363605451099, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 686839158079753185, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -234,6 +284,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Coal (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 199271363605451099, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 686839158079753185, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.48
@@ -295,6 +349,10 @@ PrefabInstance:
     - target: {fileID: 199271363605451099, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
       propertyPath: m_Name
       value: Coal (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 199271363605451099, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 686839158079753185, guid: af8b511df5ad7f746b1b9343a139dae4, type: 3}
       propertyPath: m_LocalPosition.x

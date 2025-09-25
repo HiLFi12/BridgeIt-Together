@@ -51,13 +51,16 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
         if (era == BridgeQuadrantSO.EraType.Medieval && esperandoHold && jugadorInteractuando != null)
         {
             // Solo avanzar si ambos materiales siguen cargados y no hay cocción en curso
-            if (slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion)
+            if (slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion && CanStartProcess())
             {
                 tiempoHoldActual += Time.deltaTime;
                 if (tiempoHoldActual >= tiempoMantenerE)
                 {
                     // Iniciar el proceso de creación y resetear el hold
-                    StartCoroutine(ProcesarMaterial());
+                    if (CanStartProcess())
+                    {
+                        StartCoroutine(ProcesarMaterial());
+                    }
                     ResetearHold();
                 }
             }
@@ -86,7 +89,10 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
             {
                 if (era == BridgeQuadrantSO.EraType.Prehistoric && !enProcesoCoccion)
                 {
-                    StartCoroutine(ProcesarMaterial());
+                    if (CanStartProcess())
+                    {
+                        StartCoroutine(ProcesarMaterial());
+                    }
                 }
                 else if (era == BridgeQuadrantSO.EraType.Medieval)
                 {
@@ -192,7 +198,7 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
 
     private void VerificarCoccionAutomatica()
     {
-        if (era == BridgeQuadrantSO.EraType.Prehistoric && slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion)
+        if (era == BridgeQuadrantSO.EraType.Prehistoric && slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion && CanStartProcess())
         {
             StartCoroutine(ProcesarMaterial());
         }
@@ -226,10 +232,16 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
     
     public void IniciarCoccionManual()
     {
-        if (era == BridgeQuadrantSO.EraType.Medieval && slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion)
+        if (era == BridgeQuadrantSO.EraType.Medieval && slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion && CanStartProcess())
         {
             StartCoroutine(ProcesarMaterial());
         }
+    }
+
+    // Punto de extensión para clases derivadas (e.g., hornos con gating por calor)
+    protected virtual bool CanStartProcess()
+    {
+        return true;
     }
 
     private void ResetearHold()

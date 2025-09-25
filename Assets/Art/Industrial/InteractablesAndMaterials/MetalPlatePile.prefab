@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 5173842190087429491}
   - component: {fileID: 8991664726535078747}
   - component: {fileID: 7069368916565759014}
-  m_Layer: 0
+  - component: {fileID: -143516212325676848}
+  m_Layer: 3
   m_Name: MetalPlatePile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,8 +115,23 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 12.346353, z: 1}
-  m_Center: {x: 0, y: 5.6731777, z: 0}
+  m_Size: {x: 1.0410017, y: 22.169836, z: 1.2689496}
+  m_Center: {x: -0.0010950047, y: 10.584919, z: -0.095792525}
+--- !u!114 &-143516212325676848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9063805606127122027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32ae3c96631a29443beee3e9a3a75322, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  paloIgnifugoPrefab: {fileID: 4229766862634349845, guid: d91ff4b40d381504e8fd97450a466cdc, type: 3}
+  interactPriority: 2
+  tiempoRecarga: 0.5
 --- !u!1001 &3091270711122656
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -127,6 +143,10 @@ PrefabInstance:
     - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Name
       value: WoodenPlatePile (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5482992742900556574, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Enabled
@@ -211,6 +231,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WoodenPlatePile (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5482992742900556574, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -293,6 +317,10 @@ PrefabInstance:
     - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Name
       value: WoodenPlatePile (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5482992742900556574, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Enabled
@@ -377,6 +405,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WoodenPlatePile (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5482992742900556574, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -459,6 +491,10 @@ PrefabInstance:
     - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Name
       value: WoodenPlatePile (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5482992742900556574, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Enabled
@@ -543,6 +579,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WoodenPlatePile (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5482992742900556574, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -626,6 +666,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WoodenPlatePile (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5482992742900556574, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -708,6 +752,10 @@ PrefabInstance:
     - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Name
       value: WoodenPlatePile (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1442342057331004173, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5482992742900556574, guid: d8c7eb73b4b28ab429a64e8437368cd3, type: 3}
       propertyPath: m_Enabled

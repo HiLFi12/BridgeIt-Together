@@ -3,8 +3,8 @@ using UnityEngine;
 public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
 {
     [Header("Referencias de mallas")]
-    [SerializeField] private GameObject notReadyMesh;
-    [SerializeField] private GameObject readyMesh;
+    [SerializeField] protected GameObject notReadyMesh;
+    [SerializeField] protected GameObject readyMesh;
 
     [Header("Estado (heredado)")]
     [SerializeField, Tooltip("Inicializa el material como listo. Si se desactiva, requiere flecha.")] private bool startReady = false;
@@ -37,7 +37,7 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
     }
 #endif
 
-    private void AutoVincularMeshesSiFaltan()
+    protected void AutoVincularMeshesSiFaltan()
     {
         if (notReadyMesh && readyMesh) return;
 
@@ -51,7 +51,7 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
         }
     }
 
-    private void AplicarEstadoVisual()
+    protected virtual void AplicarEstadoVisual()
     {
     if (notReadyMesh) notReadyMesh.SetActive(!isReady);
     if (readyMesh) readyMesh.SetActive(isReady);
@@ -59,7 +59,7 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
     puedeConstruirse = isReady; // la propiedad combina gating
     }
 
-    private void Activar()
+    protected virtual void Activar()
     {
     if (isReady) return;
     isReady = true; // heredado

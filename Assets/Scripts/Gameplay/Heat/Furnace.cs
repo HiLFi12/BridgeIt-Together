@@ -14,11 +14,6 @@ public class Furnace : MonoBehaviour, IInteractable
     [Header("Heat")]
     [SerializeField] private HeatSphere heatSphere;
 
-    [Header("Cooking")]
-    [SerializeField] private float cookTime = 2f;
-    [SerializeField] private bool debugLogs = false;
-    private bool cooking = false;
-    private bool canCook = false;
     [Header("Interacción Simple")]
     [Tooltip("Si está activo, al entrar un jugador con carbón en el trigger del horno, se consume automáticamente el carbón.")]
     [SerializeField] private bool autoAcceptCoalOnTrigger = false;
@@ -38,22 +33,8 @@ public class Furnace : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
-        // Si no hay carbón suficiente, tratar de agregar carbón
-        if (currentCoal < maxCoal)
-        {
-            TryAddCoal(interactor);
-            return;
-        }
-
-        // Si puede cocinar y no está cocinando, cocinar
-        if (canCook && !cooking)
-        {
-            StartCoroutine(CookRoutine(interactor));
-        }
-        else if (debugLogs)
-        {
-            Debug.Log("[Furnace] Cannot cook - furnace is not ready or busy.", this);
-        }
+        // Tratar de agregar carbón cuando se interactúa
+        TryAddCoal(interactor);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -139,45 +120,11 @@ public class Furnace : MonoBehaviour, IInteractable
             heatSphere.gameObject.SetActive(true);
             heatSphere.ResetCooldown();
         }
-
-        // Activar capacidad de cocinar del horno
-        canCook = true;
-    }
-
-    private IEnumerator CookRoutine(GameObject user)
-    {
-        cooking = true;
-        float t = 0f;
-
-        if (debugLogs) Debug.Log("[Furnace] Starting cooking process...", this);
-
-        while (t < cookTime)
-        {
-            // Verificar si el horno todavía puede cocinar
-            if (!canCook)
-            {
-                if (debugLogs) Debug.Log("[Furnace] Cooking aborted - furnace can no longer cook.", this);
-                cooking = false;
-                yield break;
-            }
-
-            t += Time.deltaTime;
-            yield return null;
-        }
-
-        if (debugLogs) Debug.Log("[Furnace] Cooking completed!", this);
-        cooking = false;
-
-        // Aquí agregas la lógica de mezclar materiales
-        // ProcessCookedItems(user);
     }
 
     // Método para cuando el carbón se agote (opcional)
     public void TurnOff()
     {
-        canCook = false;
-        if (debugLogs) Debug.Log("[Furnace] Furnace turned off - cooking disabled.", this);
-
         // Apagar visual y efecto de calor para liberar turnables dentro del rango
         if (heatSphere != null && heatSphere.gameObject.activeSelf)
         {
