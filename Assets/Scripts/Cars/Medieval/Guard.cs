@@ -8,7 +8,11 @@ public class Guard : AutoController
     [SerializeField, Min(0f)] private float feetRadius = 0.25f;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask caravanLayer;
-
+    
+    [Header("Tag Switching")]
+    [SerializeField] private string deadlyTag = "Vehicle";
+    [SerializeField] private string safeTag = "Material";
+    
     [Header("Animation (optional)")]
     [SerializeField] private Animator animator;
     [SerializeField] private string isIdleParam = "IsIdle";
@@ -61,6 +65,15 @@ public class Guard : AutoController
         UpdateState();
         suMuerteCuenta = !IsIdle || IsWalking || IsFlying;
         UpdateAnimator();
+        
+        if (IsFlying && !string.IsNullOrEmpty(deadlyTag) && tag != deadlyTag)
+        {
+            tag = deadlyTag;
+        }
+        else if (!IsFlying && !string.IsNullOrEmpty(safeTag) && tag != safeTag)
+        {
+            tag = safeTag;
+        }
     }
 
     private void UpdateState()
