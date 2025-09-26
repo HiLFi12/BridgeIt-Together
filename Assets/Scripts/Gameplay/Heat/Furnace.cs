@@ -13,6 +13,10 @@ public class Furnace : MonoBehaviour, IInteractable
 
     [Header("Heat")]
     [SerializeField] private HeatSphere heatSphere;
+    [SerializeField, Tooltip("Si está activo, al apagarse la HeatSphere el horno vacía el carbón para permitir recarga.")] private bool resetCoalWhenHeatEnds = true;
+    [SerializeField, Tooltip("Tiempo de bloqueo tras apagarse antes de aceptar nuevo carbón.")] private float reloadDelay = 0f;
+    private float reloadTimer = 0f;
+    private bool lastHeatActive = false;
 
     [Header("Interacción Simple")]
     [Tooltip("Si está activo, al entrar un jugador con carbón en el trigger del horno, se consume automáticamente el carbón.")]
@@ -33,13 +37,44 @@ public class Furnace : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
-        // Tratar de agregar carbón cuando se interactúa
+        // Verificación explícita: solo interactuar si el jugador tiene carbón en la mano
+        if (interactor == null) return;
+
+        if (reloadTimer > 0f) return; // todavía en cooldown de recarga tras apagarse
+
+        var holder = interactor.GetComponent<PlayerObjectHolder>();
+        if (holder == null || !holder.HasObjectInHand())
+        {
+            return;
+        }
+
+        GameObject held = holder.GetHeldObject();
+        if (held == null)
+        {
+            return;
+        }
+
+        // ¿Es carbón?
+        CoalItem coalComponent = held.GetComponent<CoalItem>();
+        if (coalComponent == null)
+        {
+            coalComponent = held.GetComponentInChildren<CoalItem>();
+        }
+
+        if (coalComponent == null)
+        {
+            // No es carbón; no hacemos nada
+            return;
+        }
+
+        // Es carbón: intentar agregar
         TryAddCoal(interactor);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (!autoAcceptCoalOnTrigger) return;
+        if (reloadTimer > 0f) return;
         var holder = other.GetComponentInParent<PlayerObjectHolder>();
         if (holder != null && currentCoal < maxCoal)
         {
@@ -50,6 +85,7 @@ public class Furnace : MonoBehaviour, IInteractable
     private void OnTriggerStay(Collider other)
     {
         if (!autoAcceptCoalOnTrigger) return;
+        if (reloadTimer > 0f) return;
         var holder = other.GetComponentInParent<PlayerObjectHolder>();
         if (holder != null && currentCoal < maxCoal)
         {
@@ -59,6 +95,7 @@ public class Furnace : MonoBehaviour, IInteractable
 
     public bool TryAddCoal(GameObject interactor)
     {
+        if (reloadTimer > 0f) return false;
         var holder = interactor.GetComponent<PlayerObjectHolder>();
         if (holder == null || !holder.HasObjectInHand()) 
         {
@@ -119,6 +156,7 @@ public class Furnace : MonoBehaviour, IInteractable
         {
             heatSphere.gameObject.SetActive(true);
             heatSphere.ResetCooldown();
+            lastHeatActive = true;
         }
     }
 
@@ -129,6 +167,35 @@ public class Furnace : MonoBehaviour, IInteractable
         if (heatSphere != null && heatSphere.gameObject.activeSelf)
         {
             heatSphere.gameObject.SetActive(false); // Esto ejecuta OnDisable() en HeatSphere y llama TurnOff() a los ITurnable
+        }
+        HandleHeatSphereJustTurnedOff();
+    }
+
+    private void Update()
+    {
+        if (reloadTimer > 0f)
+        {
+            reloadTimer -= Time.deltaTime;
+        }
+
+        if (heatSphere != null)
+        {
+            bool active = heatSphere.gameObject.activeSelf;
+            if (lastHeatActive && !active)
+            {
+                // flanco de apagado
+                HandleHeatSphereJustTurnedOff();
+            }
+            lastHeatActive = active;
+        }
+    }
+
+    private void HandleHeatSphereJustTurnedOff()
+    {
+        if (resetCoalWhenHeatEnds)
+        {
+            currentCoal = 0;
+            if (reloadDelay > 0f) reloadTimer = reloadDelay;
         }
     }
 }

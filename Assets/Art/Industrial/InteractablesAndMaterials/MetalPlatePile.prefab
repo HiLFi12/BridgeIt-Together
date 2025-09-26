@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5173842190087429491}
   - component: {fileID: 8991664726535078747}
   - component: {fileID: 7069368916565759014}
-  - component: {fileID: -143516212325676848}
+  - component: {fileID: 4702662817741875581}
   m_Layer: 3
   m_Name: MetalPlatePile
   m_TagString: Untagged
@@ -117,7 +117,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0410017, y: 22.169836, z: 1.2689496}
   m_Center: {x: -0.0010950047, y: 10.584919, z: -0.095792525}
---- !u!114 &-143516212325676848
+--- !u!114 &4702662817741875581
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -126,12 +126,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 9063805606127122027}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32ae3c96631a29443beee3e9a3a75322, type: 3}
+  m_Script: {fileID: 11500000, guid: 22258290ad6f7624e9591e2aa2c3fa07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paloIgnifugoPrefab: {fileID: 4229766862634349845, guid: d91ff4b40d381504e8fd97450a466cdc, type: 3}
+  materialPrefabsSO: {fileID: 11400000, guid: 7567e59779a33e64da8bee3decc6056b, type: 2}
+  era: 2
   interactPriority: 2
-  tiempoRecarga: 0.5
+  tiempoRecarga: 1
+  modeloVisual: {fileID: 0}
 --- !u!1001 &3091270711122656
 PrefabInstance:
   m_ObjectHideFlags: 0
