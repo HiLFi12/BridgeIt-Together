@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5967447243184117792
 Transform:
   m_ObjectHideFlags: 0
@@ -95,10 +95,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 646268772977413161}
-  - component: {fileID: 8293674701466913267}
   - component: {fileID: 1444555255236314429}
   - component: {fileID: 1545639839266587332}
   - component: {fileID: -6218352354317095808}
+  - component: {fileID: 247113756052342959}
   m_Layer: 3
   m_Name: Marble
   m_TagString: Material
@@ -123,27 +123,6 @@ Transform:
   - {fileID: 5967447243184117792}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8293674701466913267
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8074991521777721662}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee76e958c94ab4f468c332f6b3986c7b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  era: 2
-  puedeConstruirse: 0
-  prioridad: 2
-  useReadyState: 1
-  isReady: 0
-  notReadyMesh: {fileID: 8999286848888531176}
-  readyMesh: {fileID: 6351290698376413311}
-  startReady: 0
-  revertWhenOutOfHeat: 0
 --- !u!65 &1444555255236314429
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -204,6 +183,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d2692f286e8ec1479d9b41570c3e6d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &247113756052342959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8074991521777721662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40ec92debf01b16419a3009031eb87f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  era: 2
+  puedeConstruirse: 1
+  prioridad: 2
+  useReadyState: 0
+  isReady: 1
+  notReadyMesh: {fileID: 8999286848888531176}
+  readyMesh: {fileID: 6351290698376413311}
+  startReady: 0
 --- !u!1 &8999286848888531176
 GameObject:
   m_ObjectHideFlags: 0
@@ -221,7 +220,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9217856800646377639
 Transform:
   m_ObjectHideFlags: 0

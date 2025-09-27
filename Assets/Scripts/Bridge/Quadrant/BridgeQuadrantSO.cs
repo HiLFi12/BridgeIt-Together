@@ -246,7 +246,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
                     if (_debugLifeTimer <= 0f)
                     {
                         float ratio = Mathf.Clamp01(currentTemperature / maxTemperature);
-                        Debug.Log($"[BridgeQuadrantSO] '{name}' Vida: {currentTemperature:F1}/{maxTemperature:F1} ({ratio:P0}) | isTurned={isTurned} | waterBlockers={waterBlockers} | heatActive={heatActive} | state={lastLayerState}");
+                    //    Debug.Log($"[BridgeQuadrantSO] '{name}' Vida: {currentTemperature:F1}/{maxTemperature:F1} ({ratio:P0}) | isTurned={isTurned} | waterBlockers={waterBlockers} | heatActive={heatActive} | state={lastLayerState}");
                         _debugLifeTimer = Mathf.Max(0.1f, debugLifeInterval);
                     }
                 }

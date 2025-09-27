@@ -70,6 +70,13 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
                 ResetearHold();
             }
         }
+
+        // Auto-arranque para eras que lo permitan (p.ej. Prehistoric por defecto, Industrial vía override)
+        if (ShouldAutoStart() && slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion && CanStartProcess())
+        {
+            Debug.Log("Auto-arrancando proceso de cocción.");
+            StartCoroutine(ProcesarMaterial());
+        }
     }
     
 
@@ -198,7 +205,7 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
 
     private void VerificarCoccionAutomatica()
     {
-        if (era == BridgeQuadrantSO.EraType.Prehistoric && slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion && CanStartProcess())
+        if (ShouldAutoStart() && slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion && CanStartProcess())
         {
             StartCoroutine(ProcesarMaterial());
         }
@@ -242,6 +249,12 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
     protected virtual bool CanStartProcess()
     {
         return true;
+    }
+
+    // Nuevo punto de extensión: por defecto sólo auto-arranca en Prehistórica; derivadas pueden habilitar otras eras
+    protected virtual bool ShouldAutoStart()
+    {
+        return era == BridgeQuadrantSO.EraType.Prehistoric;
     }
 
     private void ResetearHold()
