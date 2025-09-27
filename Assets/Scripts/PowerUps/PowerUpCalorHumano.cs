@@ -32,6 +32,8 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
 
     // Indicador de que el apagado fue iniciado por la propia rutina interna
     private bool internalTurnOffRequest = false;
+    // Indicador de que el encendido fue solicitado internamente (al cumplir carbones)
+    private bool internalTurnOnRequest = false;
 
     // Estado interno
     private int carbonesActuales = 0;
@@ -53,7 +55,7 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
 
     public bool TryAddCoal(GameObject interactor)
     {
-        if (carbonesActuales >= carbonesNecesarios) return false;
+        if (carbonesActuales >= carbonesNecesarios || isActive) return false;
         if (interactor == null) return false;
 
         var holder = interactor.GetComponent<PlayerObjectHolder>();
@@ -74,7 +76,8 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
 
         if (carbonesActuales >= carbonesNecesarios)
         {
-            if (debugLogs) Debug.Log("[CalorHumano] Requisitos completos. TurnOn().", this);
+            if (debugLogs) Debug.Log("[CalorHumano] Requisitos completos. (TurnOn interno)", this);
+            internalTurnOnRequest = true;
             TurnOn();
         }
         return true;
@@ -84,11 +87,12 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
     // Método legacy opcional (retiene compatibilidad si alguien lo llama explícitamente)
     public void InsertarCarbon()
     {
-        if (carbonesActuales >= carbonesNecesarios) return;
+        if (carbonesActuales >= carbonesNecesarios || isActive) return;
         carbonesActuales++;
         if (debugLogs) Debug.Log($"[CalorHumano] (Legacy) Carbón insertado {carbonesActuales}/{carbonesNecesarios}", this);
-        if (carbonesActuales >= carbonesNecesarios && !isActive)
+        if (carbonesActuales >= carbonesNecesarios)
         {
+            internalTurnOnRequest = true;
             TurnOn();
         }
     }
@@ -104,12 +108,21 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
     public void TurnOn()
     {
         if (isActive) return;
-        // Equivalente a TryActivate pero sin GameObject activator; controla coroutine propia
+        // Si NO es un encendido interno (carbones completos) y aún no se cumple requisito, ignorar
+        if (!internalTurnOnRequest && carbonesActuales < carbonesNecesarios)
+        {
+            if (debugLogs) Debug.Log("[CalorHumano] TurnOn externo ignorado (no cumple requisitos).", this);
+            return;
+        }
+
+        // Consumir la bandera de encendido interno
+        internalTurnOnRequest = false;
+
         isActive = true;
         isAvailable = false;
         internalTurnOffRequest = false;
         if (lifeCoroutine != null) StopCoroutine(lifeCoroutine);
-        if (debugLogs) Debug.Log("[CalorHumano] TurnOn() -> iniciando efecto.", this);
+        if (debugLogs) Debug.Log("[CalorHumano] TurnOn() -> iniciando efecto válido.", this);
         StartCoroutine(RunHeatEffect());
     }
 

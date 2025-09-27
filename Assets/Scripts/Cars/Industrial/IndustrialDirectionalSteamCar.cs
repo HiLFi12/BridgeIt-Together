@@ -94,6 +94,46 @@ public class IndustrialDirectionalSteamCar : IndustrialFogCar
         {
             Destroy(activeSteamInstance, autoDestroyAfter);
         }
+
+        // NUEVO: Apagar todos los HeatSphere existentes forzando cooldown a 0 y desactivándolos.
+        DisableAllHeatSpheres();
+    }
+
+    /// <summary>
+    /// Busca todos los HeatSphere en escena y los apaga inmediatamente.
+    /// Nota: El script HeatSphere sólo desactiva en Update cuando el cooldown cruza a <=0 dentro de su bloque.
+    /// Para garantizar apagado inmediato, además de poner cooldown en 0, se desactiva el GameObject.
+    /// </summary>
+    private void DisableAllHeatSpheres()
+    {
+        var all = FindObjectsOfType<HeatSphere>(true);
+        int count = 0;
+        foreach (var hs in all)
+        {
+            if (hs == null) continue;
+            ForceExpireHeatSphere(hs);
+            count++;
+        }
+        if (debugLogsDirectional) Debug.Log($"[IndustrialDirectionalSteamCar] HeatSphere apagados: {count}", this);
+    }
+
+    /// <summary>
+    /// Fuerza el apagado de un HeatSphere estableciendo su cooldown interno en 0 y desactivando el objeto.
+    /// </summary>
+    private void ForceExpireHeatSphere(HeatSphere hs)
+    {
+        if (hs == null) return;
+        // Reflejar el campo privado currentCooldown si se desea consistencia futura.
+        var field = typeof(HeatSphere).GetField("currentCooldown", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (field != null)
+        {
+            field.SetValue(hs, 0f);
+        }
+        // Desactivar directamente para disparar OnDisable() y liberar ITurnable.
+        if (hs.gameObject.activeSelf)
+        {
+            hs.gameObject.SetActive(false);
+        }
     }
 
 #if UNITY_EDITOR
