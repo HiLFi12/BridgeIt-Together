@@ -373,6 +373,16 @@ public class PlayerBridgeInteraction : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Indica si hay un cuadrante objetivo válido dentro de rango desde el buildPoint.
+    /// No construye; solo reutiliza la detección.
+    /// </summary>
+    public bool HasTargetQuadrantInRange()
+    {
+        if (bridgeGrid == null || buildPoint == null) return false;
+        return FindTargetQuadrant(buildPoint.position);
+    }
+    
     // Buscar el cuadrante más cercano en rango
     private bool FindTargetQuadrant(Vector3 position)
     {

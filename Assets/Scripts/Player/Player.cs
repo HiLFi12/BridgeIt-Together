@@ -19,6 +19,9 @@ public class Player : MonoBehaviour, IHitable
     [Header("Interaction UI")]
     [SerializeField] private Image interactionUIImage;
 
+    [Header("Build UI")]
+    [SerializeField] private Image buildUIImage;
+
     private PlayerObjectHolder objectHolder;
     private PlayerBridgeInteraction bridgeInteraction;
     private PlayerAnimator playerAnimator;
@@ -29,6 +32,8 @@ public class Player : MonoBehaviour, IHitable
         bridgeInteraction = GetComponent<PlayerBridgeInteraction>();
         playerAnimator = GetComponent<PlayerAnimator>();
         interactionUIImage.gameObject.SetActive(false);
+        // Inicializar BuildUI oculto
+        if (buildUIImage != null) buildUIImage.gameObject.SetActive(false);
     }
 
     void Update()
@@ -50,6 +55,9 @@ public class Player : MonoBehaviour, IHitable
                 playerAnimator.TriggerBuildAnimation();
             }
         }
+
+        // Mostrar/ocultar BuildUI según condiciones
+        UpdateBuildUI();
     }
 
     private void TryInteract()
@@ -122,6 +130,13 @@ public class Player : MonoBehaviour, IHitable
 
     private void ShowInteractionUI()
     {
+        // Si las manos están ocupadas, no mostrar el InteractionUI
+        if (objectHolder != null && objectHolder.HasObjectInHand())
+        {
+            HideInteractionUI();
+            return;
+        }
+
         if (interactionUIImage != null && !interactionUIImage.gameObject.activeInHierarchy)
         {
             interactionUIImage.gameObject.SetActive(true);
@@ -134,6 +149,37 @@ public class Player : MonoBehaviour, IHitable
         {
             interactionUIImage.gameObject.SetActive(false);
         }
+    }
+
+    // Mostrar/ocultar BuildUI (similar a InteractionUI)
+    private void UpdateBuildUI()
+    {
+        if (buildUIImage == null || bridgeInteraction == null || objectHolder == null)
+        {
+            HideBuildUI();
+            return;
+        }
+
+        bool hasMaterialInHand = objectHolder.HasObjectInHand() &&
+                                 objectHolder.GetHeldObject() != null &&
+                                 objectHolder.GetHeldObject().GetComponent<BridgeMaterialInfo>() != null;
+
+        bool targetInRange = hasMaterialInHand && bridgeInteraction.HasTargetQuadrantInRange();
+
+        if (targetInRange) ShowBuildUI();
+        else HideBuildUI();
+    }
+
+    private void ShowBuildUI()
+    {
+        if (!buildUIImage.gameObject.activeInHierarchy)
+            buildUIImage.gameObject.SetActive(true);
+    }
+
+    private void HideBuildUI()
+    {
+        if (buildUIImage.gameObject.activeInHierarchy)
+            buildUIImage.gameObject.SetActive(false);
     }
 
     private void TryDropObject()

@@ -41,7 +41,7 @@ public class Tutorial2End : MonoBehaviour
 
     private void Update()
     {
-        if (triggered) return;
+        if (triggered);
         if (string.IsNullOrWhiteSpace(nextSceneName)) return;
         if (materialsInside <= 0) return;
 
