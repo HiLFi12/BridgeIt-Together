@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 8551482216539278869}
   - component: {fileID: 8158330371517495356}
   - component: {fileID: 5591345975481553843}
-  - component: {fileID: 7646493513063092065}
+  - component: {fileID: 8677812294004501661}
   m_Layer: 0
   m_Name: IndustrialSteamCar
   m_TagString: Vehicle
@@ -172,7 +172,7 @@ MonoBehaviour:
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
---- !u!114 &7646493513063092065
+--- !u!114 &8677812294004501661
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -181,7 +181,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2948579226618137670}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d2473bd20ff58b4ca63303c99d614bc, type: 3}
+  m_Script: {fileID: 11500000, guid: 44dd5b731c13ec44790538fc65eb9118, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 7470908911745804188}
@@ -196,27 +196,6 @@ MonoBehaviour:
   spawnParent: {fileID: 0}
   ammo: 5
   oneRollPerCollider: 1
-  effectPrefab: {fileID: 0}
-  effectSpawnPoint: {fileID: 7470908911745804188}
-  effectDuration: 5
-  parentEffectToCar: 1
-  localOffset: {x: 0, y: 0, z: 0}
-  additionalEulerRotation: {x: 0, y: 0, z: 0}
-  debugLogs: 0
-  gizmoColor: {r: 0.8, g: 0.9, b: 1, a: 0.6}
-  gizmoSphereRadius: 0.25
-  forwardSpawn: {fileID: 5789234562553598633}
-  backwardSpawn: {fileID: 3061667609909314977}
-  steamPrefab: {fileID: 0}
-  furnaceSearchRadius: 25
-  furnaceLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  maxFurnaceColliders: 32
-  parentSteam: 1
-  autoDestroyAfter: 8
-  debugLogs: 0
-  searchGizmoColor: {r: 1, g: 0.8, b: 0.4, a: 0.15}
 --- !u!1 &4003403637283946591
 GameObject:
   m_ObjectHideFlags: 0

@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 8551482216539278869}
   - component: {fileID: 8158330371517495356}
   - component: {fileID: 1763032722423227207}
-  - component: {fileID: 7266370339310072158}
+  - component: {fileID: -9196359997409664779}
   m_Layer: 0
   m_Name: IndustrialFogCar
   m_TagString: Vehicle
@@ -170,7 +170,7 @@ MonoBehaviour:
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
---- !u!114 &7266370339310072158
+--- !u!114 &-9196359997409664779
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -179,31 +179,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 2948579226618137670}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8bb6cbc3d1355d41826ab8607c756aa, type: 3}
+  m_Script: {fileID: 11500000, guid: 44dd5b731c13ec44790538fc65eb9118, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 1495764639211940229}
   detectionRadius: 1.5
   bridgeLayer:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 320
   bridgeQuadrantTag: BridgeQuadrant
   probability: 1
-  prefab: {fileID: 0}
+  prefab: {fileID: 5797428246745224015, guid: 1566cd756e07d6341ab4a50c8795bf4f, type: 3}
   spawnOffset: {x: 0, y: 0.25, z: 0}
-  spawnParent: {fileID: 0}
-  ammo: 1
+  spawnParent: {fileID: 5321527989781004840}
+  ammo: 5
   oneRollPerCollider: 1
-  effectPrefab: {fileID: 3020340873426311695, guid: f9f427581002e61479c2cfcd335a0b4b, type: 3}
-  effectSpawnPoint: {fileID: 5321527989781004840}
-  effectDuration: 5
-  parentEffectToCar: 1
-  localOffset: {x: 0, y: 0, z: 0}
-  additionalEulerRotation: {x: 0, y: 0, z: 0}
-  debugLogs: 0
-  gizmoColor: {r: 0.8, g: 0.9, b: 1, a: 0.6}
-  gizmoSphereRadius: 0.25
-  suppressBasePrefabSpawn: 1
 --- !u!1 &5412072648001714427
 GameObject:
   m_ObjectHideFlags: 0
@@ -260,7 +250,7 @@ Transform:
   m_GameObject: {fileID: 7411909121647403840}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.057, y: 2.032, z: 1.551}
+  m_LocalPosition: {x: 0.057, y: -2.88, z: -0.11}
   m_LocalScale: {x: 0.54603034, y: 3.9252632, z: 0.95007366}
   m_ConstrainProportionsScale: 0
   m_Children: []
