@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player2 : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class Player2 : MonoBehaviour
     [SerializeField] private KeyCode dropKey = KeyCode.O;
     [SerializeField] private KeyCode buildKey = KeyCode.L;
 
+    [Header("Build UI")]
+    [SerializeField] private Image buildUIImage;
+
     private PlayerObjectHolder objectHolder;
     private PlayerBridgeInteraction bridgeInteraction;
     private PlayerAnimator playerAnimator;
@@ -23,6 +27,8 @@ public class Player2 : MonoBehaviour
         objectHolder = GetComponent<PlayerObjectHolder>();
         bridgeInteraction = GetComponent<PlayerBridgeInteraction>();
         playerAnimator = GetComponent<PlayerAnimator>();
+        // Inicializar BuildUI oculto
+        if (buildUIImage != null) buildUIImage.gameObject.SetActive(false);
     }
 
     void Update()
@@ -47,6 +53,9 @@ public class Player2 : MonoBehaviour
                 playerAnimator.TriggerBuildAnimation();
             }
         }
+
+        // Mostrar/ocultar BuildUI según condiciones
+        UpdateBuildUI();
     }
 
     private void TryInteract()
@@ -110,6 +119,36 @@ public class Player2 : MonoBehaviour
                 playerAnimator.TriggerDropAnimation();
             }
         }
+    }
+
+    private void UpdateBuildUI()
+    {
+        if (buildUIImage == null || bridgeInteraction == null || objectHolder == null)
+        {
+            HideBuildUI();
+            return;
+        }
+
+        bool hasMaterialInHand = objectHolder.HasObjectInHand() &&
+                                 objectHolder.GetHeldObject() != null &&
+                                 objectHolder.GetHeldObject().GetComponent<BridgeMaterialInfo>() != null;
+
+        bool targetInRange = hasMaterialInHand && bridgeInteraction.HasTargetQuadrantInRange();
+
+        if (targetInRange) ShowBuildUI();
+        else HideBuildUI();
+    }
+
+    private void ShowBuildUI()
+    {
+        if (!buildUIImage.gameObject.activeInHierarchy)
+            buildUIImage.gameObject.SetActive(true);
+    }
+
+    private void HideBuildUI()
+    {
+        if (buildUIImage.gameObject.activeInHierarchy)
+            buildUIImage.gameObject.SetActive(false);
     }
 
     private void OnDrawGizmos()

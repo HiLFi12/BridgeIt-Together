@@ -1074,18 +1074,21 @@ public class BridgeConstructionGrid : MonoBehaviour
                         if (constructionGrid[x, z].layerRenderers[i] != null &&
                             constructionGrid[x, z].layerRenderers[i].gameObject != null)
                         {
-                            GameObject layerObj = constructionGrid[x, z].layerRenderers[i].gameObject;                            // Reposicionar la capa usando las alturas configurables
+                            GameObject layerObj = constructionGrid[x, z].layerRenderers[i].gameObject;
+                            // Reposicionar la capa usando las alturas configurables
                             float layerHeight = (i < layerHeights.Length) ? layerHeights[i] : (0.5f * i);
                             Vector3 newLayerPosition = newPosition + new Vector3(
                                 quadrantSize / 2,  // Centrado en X
                                 layerHeight,       // Altura específica para esta capa
                                 quadrantSize / 2   // Centrado en Z
-                            );                            layerObj.transform.position = newLayerPosition;
+                            );
+                            layerObj.transform.position = newLayerPosition;
 
-                            // Reescalar la capa usando escalas configurables
-                            Vector3 baseScale = new Vector3(quadrantSize, 1f, quadrantSize);
+                            // Reescalar la capa usando escalas configurables y respetando el modo de escala
                             Vector3 layerScale = (i < layerScales.Length) ? layerScales[i] : Vector3.one;
-                            Vector3 finalScale = Vector3.Scale(baseScale, layerScale);
+                            Vector3 finalScale = layerScaleMode == LayerScaleMode.RelativeToQuadrantSize
+                                ? Vector3.Scale(new Vector3(quadrantSize, 1f, quadrantSize), layerScale)
+                                : layerScale;
                             layerObj.transform.localScale = finalScale;
 
                             // Ajustar colliders de la capa
