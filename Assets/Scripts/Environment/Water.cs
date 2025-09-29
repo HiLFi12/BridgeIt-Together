@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -29,6 +30,8 @@ public class Water : MonoBehaviour
     public bool debugLogs = false;
 
     private Coroutine scaleRoutine;
+    // Seguimiento por instancia de cuadrantes tocados (para limpieza robusta)
+    private HashSet<BridgeQuadrantInstance> _currentContacts = new HashSet<BridgeQuadrantInstance>();
 
     private void Awake()
     {
@@ -83,16 +86,29 @@ public class Water : MonoBehaviour
         scaleRoutine = null;
     }
 
+    private static Dictionary<BridgeQuadrantInstance, int> _activeWaterContacts = new Dictionary<BridgeQuadrantInstance, int>();
+    private static readonly Collider[] _overlap = new Collider[256];
+
     private void OnTriggerEnter(Collider other)
     {
         if (!other || !other.gameObject) return;
         if (other.CompareTag("BridgeQuadrant"))
         {
-            BridgeQuadrantSO so = GetQuadrantSO(other.gameObject);
-            if (so != null)
+            var inst = other.GetComponent<BridgeQuadrantInstance>() ?? other.GetComponentInParent<BridgeQuadrantInstance>();
+            if (inst != null)
             {
-                so.AddWaterBlocker();
-                if (debugLogs) Debug.Log($"[Water] Añadido waterBlocker a {other.name}", this);
+                // Evitar incrementar múltiples veces por sub-colliders: solo primera vez que este water toca el cuadrante
+                if (_currentContacts.Add(inst))
+                {
+                    if (!_activeWaterContacts.ContainsKey(inst)) _activeWaterContacts[inst] = 0;
+                    _activeWaterContacts[inst]++;
+                    if (debugLogs) Debug.Log($"[Water] Contacto NUEVO con {inst.name} (countGlobal={_activeWaterContacts[inst]})", this);
+                    inst.TurnOff();
+                }
+                else if (debugLogs)
+                {
+                    Debug.Log($"[Water] Contacto duplicado ignorado con {inst.name}", this);
+                }
             }
         }
     }
@@ -102,26 +118,61 @@ public class Water : MonoBehaviour
         if (!other || !other.gameObject) return;
         if (other.CompareTag("BridgeQuadrant"))
         {
-            BridgeQuadrantSO so = GetQuadrantSO(other.gameObject);
-            if (so != null)
+            var inst = other.GetComponent<BridgeQuadrantInstance>() ?? other.GetComponentInParent<BridgeQuadrantInstance>();
+            if (inst != null && _activeWaterContacts.ContainsKey(inst))
             {
-                so.RemoveWaterBlocker();
-                if (debugLogs) Debug.Log($"[Water] Removido waterBlocker de {other.name}", this);
+                // Solo procesar salida si realmente lo teníamos registrado
+                if (_currentContacts.Remove(inst))
+                {
+                    _activeWaterContacts[inst]--;
+                    if (_activeWaterContacts[inst] <= 0)
+                    {
+                        _activeWaterContacts.Remove(inst);
+                        inst.ReevaluateHeatAfterWater();
+                        if (debugLogs) Debug.Log($"[Water] Última salida de {inst.name}. Re-evaluando calor.", this);
+                    }
+                    else if (debugLogs)
+                    {
+                        Debug.Log($"[Water] Salida parcial de {inst.name} (restanteGlobal={_activeWaterContacts[inst]})", this);
+                    }
+                }
+                else if (debugLogs)
+                {
+                    Debug.Log($"[Water] Salida ignorada (no estaba en contactos locales) de {inst.name}", this);
+                }
             }
         }
     }
 
-    private BridgeQuadrantSO GetQuadrantSO(GameObject quadrantGO)
+    private void OnDestroy()
     {
-        // Buscar el vínculo de instancia -> SO
-        var link = quadrantGO.GetComponent<BridgeQuadrantInstance>();
-        if (link != null && link.quadrantSO != null)
-            return link.quadrantSO;
-        // Si no está en el mismo GO, intentar en padres (por si el collider es hijo)
-        link = quadrantGO.GetComponentInParent<BridgeQuadrantInstance>();
-        if (link != null && link.quadrantSO != null)
-            return link.quadrantSO;
-        return null;
+        // Limpiar cualquier cuadrante que siga contado si el agua desaparece sin disparar exit (destroy inmediato / pooling)
+        if (_currentContacts.Count == 0) return;
+        foreach (var inst in _currentContacts)
+        {
+            if (inst == null) continue;
+            if (_activeWaterContacts.ContainsKey(inst))
+            {
+                _activeWaterContacts[inst]--;
+                if (_activeWaterContacts[inst] <= 0)
+                {
+                    _activeWaterContacts.Remove(inst);
+                    inst.ReevaluateHeatAfterWater();
+                    if (debugLogs) Debug.Log($"[Water] OnDestroy liberó y re-evaluó calor de {inst.name}", this);
+                }
+                else if (debugLogs)
+                {
+                    Debug.Log($"[Water] OnDestroy decrementó {inst.name} (restanteGlobal={_activeWaterContacts[inst]})", this);
+                }
+            }
+        }
+        _currentContacts.Clear();
+    }
+
+    public static bool HasWaterOn(BridgeQuadrantInstance inst)
+    {
+        if (inst == null) return false;
+        return _activeWaterContacts.ContainsKey(inst);
     }
 
 #if UNITY_EDITOR

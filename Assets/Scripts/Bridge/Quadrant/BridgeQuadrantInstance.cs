@@ -16,6 +16,8 @@ public class BridgeQuadrantInstance : MonoBehaviour, ITurnable
     {
         if (quadrantSO != null)
         {
+            // Bloquear encendido si hay agua activa sobre este cuadrante (gestión central en Water)
+            if (Water.HasWaterOn(this)) return;
             quadrantSO.TurnOn();
             // Failsafe: refrescar último calor visto para evitar apagado inmediato
             _lastHeatSeenTime = Time.time;
@@ -100,6 +102,24 @@ public class BridgeQuadrantInstance : MonoBehaviour, ITurnable
                 return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// Reevaluar calor tras la salida de agua: si hay HeatSphere cercana se re-aplica calor; de lo contrario se asegura apagado.
+    /// </summary>
+    public void ReevaluateHeatAfterWater()
+    {
+        if (quadrantSO == null) return;
+        bool hasHeat = ProbeAnyHeat();
+        if (hasHeat)
+        {
+            quadrantSO.ApplyHeat();
+            _lastHeatSeenTime = Time.time;
+        }
+        else
+        {
+            quadrantSO.RemoveHeat();
+        }
     }
 
 #if UNITY_EDITOR
