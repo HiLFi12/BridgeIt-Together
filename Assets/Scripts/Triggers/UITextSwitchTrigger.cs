@@ -25,6 +25,9 @@ public class UITextSwitchTrigger : MonoBehaviour
     [Tooltip("Si está activo, al finalizar deshabilita este componente.")]
     [SerializeField] private bool disableComponentAfterFinalize = true;
 
+    [Tooltip("Evita activar Text1 si ninguno de los 3 textos está activo actualmente.")]
+    [SerializeField] private bool preventActivatingText1WhenAllOff = true;
+
     private readonly HashSet<Transform> playersInTrigger = new HashSet<Transform>();
     private bool finalized;
 
@@ -42,7 +45,14 @@ public class UITextSwitchTrigger : MonoBehaviour
 
     private void Start()
     {
-        if (setInitialStateOnStart) SetState_Text1();
+        if (setInitialStateOnStart)
+        {
+            // Si se solicita prevenir activación cuando todos están OFF, no forzar Text1
+            if (!(preventActivatingText1WhenAllOff && !AnyTextActive()))
+            {
+                SetState_Text1();
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -50,6 +60,9 @@ public class UITextSwitchTrigger : MonoBehaviour
         if (finalized) return;
         var root = GetPlayerRoot(other);
         if (root == null) return;
+
+        // Solo ejecutar si Text1 (el que se va a desactivar) está activo
+        if (!IsText1Active()) return;
 
         playersInTrigger.Add(root);
         // Al menos un jugador dentro -> mostrar Text2
@@ -65,8 +78,11 @@ public class UITextSwitchTrigger : MonoBehaviour
         playersInTrigger.Remove(root);
         if (playersInTrigger.Count == 0)
         {
-            // Ningún jugador dentro -> volver a Text1
-            SetState_Text1();
+            // Ningún jugador dentro -> volver a Text1 solo si no está el caso "todos OFF" bloqueado
+            if (!(preventActivatingText1WhenAllOff && !AnyTextActive()))
+            {
+                SetState_Text1();
+            }
         }
     }
 
@@ -139,5 +155,17 @@ public class UITextSwitchTrigger : MonoBehaviour
             try { return (KeyCode)f.GetValue(comp); } catch { }
         }
         return fallback;
+    }
+
+    private bool IsText1Active()
+    {
+        return text1 != null && text1.activeInHierarchy;
+    }
+
+    private bool AnyTextActive()
+    {
+        return (text1 != null && text1.activeInHierarchy) ||
+               (text2 != null && text2.activeInHierarchy) ||
+               (text3 != null && text3.activeInHierarchy);
     }
 }

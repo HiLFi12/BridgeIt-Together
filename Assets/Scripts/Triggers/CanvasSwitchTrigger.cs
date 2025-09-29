@@ -5,6 +5,7 @@ using UnityEngine;
 /// Trigger que, al detectar a un jugador dentro y al presionar su tecla de interacción
 /// (se lee del componente Player/Player2), desactiva un Canvas (referencia) y activa
 /// otro Canvas (referencia).
+/// Solo funciona si el Canvas a desactivar está ACTIVO.
 /// </summary>
 [RequireComponent(typeof(Collider))]
 public class CanvasSwitchTrigger : MonoBehaviour
@@ -13,7 +14,7 @@ public class CanvasSwitchTrigger : MonoBehaviour
     [Tooltip("Canvas que se activará cuando el jugador presione su tecla de interacción dentro del trigger.")]
     [SerializeField] private GameObject canvasToActivate;
 
-    [Tooltip("Canvas que se desactivará cuando el jugador presione su tecla de interacción dentro del trigger.")]
+    [Tooltip("Canvas que se desactivará cuando el jugador presione su tecla de interacción dentro del trigger (debe estar ACTIVO).")]
     [SerializeField] private GameObject canvasToDeactivate;
 
     [Header("Opciones")]
@@ -62,6 +63,8 @@ public class CanvasSwitchTrigger : MonoBehaviour
 
     private void Update()
     {
+        // No ejecutar si el canvas a desactivar no está activo en jerarquía
+        if (!IsCanvasToDeactivateActive()) return;
         if (playersInTrigger.Count == 0) return;
 
         foreach (var root in playersInTrigger)
@@ -78,6 +81,9 @@ public class CanvasSwitchTrigger : MonoBehaviour
 
             if (Input.GetKeyDown(key))
             {
+                // Revalidar por seguridad que el canvas a desactivar sigue activo
+                if (!IsCanvasToDeactivateActive()) break;
+
                 // Desactivar el canvas referenciado
                 if (canvasToDeactivate != null)
                 {
@@ -133,5 +139,10 @@ public class CanvasSwitchTrigger : MonoBehaviour
             catch { /* ignorar y devolver default */ }
         }
         return defaultKey;
+    }
+
+    private bool IsCanvasToDeactivateActive()
+    {
+        return canvasToDeactivate != null && canvasToDeactivate.activeInHierarchy;
     }
 }

@@ -12,7 +12,7 @@ public class PaloIgnifugo : MonoBehaviour, IHitable
     [Header("Configuración")]
     [SerializeField] private float radioDeteccion = 2.0f;
     [SerializeField] private GameObject efectoFuegoPrefab; // Efecto visual de fuego
-    [SerializeField] private float tiempoEncendido = 10.0f; // Tiempo que permanece encendido
+    [SerializeField] private float tiempoEncendido = 9999f; // Tiempo que permanece encendido
     
     private bool estaEncendido = false;
     private GameObject efectoFuego = null;
