@@ -1552,6 +1552,7 @@ MonoBehaviour:
   setInitialStateOnStart: 0
   finalizeOnInteract: 1
   disableComponentAfterFinalize: 1
+  preventActivatingText1WhenAllOff: 0
 --- !u!1 &451844930 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5831696322261511193, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
@@ -1584,6 +1585,17 @@ BoxCollider:
   m_CorrespondingSourceObject: {fileID: 6644201429299394500, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
   m_PrefabInstance: {fileID: 2071332825}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &490316010 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7756339494565014635, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+  m_PrefabInstance: {fileID: 593992993}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &580002471
 GameObject:
   m_ObjectHideFlags: 0
@@ -1670,7 +1682,7 @@ PrefabInstance:
     - target: {fileID: -5907133989568294639, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
       propertyPath: buildUIImage
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 490316010}
     - target: {fileID: -4429559263743625035, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
       propertyPath: bridgeGrid
       value: 
@@ -4235,6 +4247,7 @@ MonoBehaviour:
   setInitialStateOnStart: 0
   finalizeOnInteract: 1
   disableComponentAfterFinalize: 1
+  preventActivatingText1WhenAllOff: 0
 --- !u!1 &1619547382
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,7 +18,7 @@ public class CanvasSwitchTrigger : MonoBehaviour
     [SerializeField] private GameObject canvasToDeactivate;
 
     [Header("Opciones")]
-    [Tooltip("Si está activo, solo se ejecutará una vez y luego se deshabilitará este componente.")]
+    [Tooltip("Si está activo, solo se ejecutará una vez y luego se deshabilitará este componente (script).")]
     [SerializeField] private bool activateOnlyOnce = false;
 
     // Jugadores dentro del trigger (guardamos el transform raíz del jugador)
@@ -98,7 +98,7 @@ public class CanvasSwitchTrigger : MonoBehaviour
 
                 if (activateOnlyOnce)
                 {
-                    // Opcional: deshabilitar para no repetir
+                    // Deshabilitar solo este componente (script), no el GameObject completo
                     enabled = false;
                 }
 
