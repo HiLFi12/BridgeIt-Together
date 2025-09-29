@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System; // Added for Action event
 
 public class PlayerObjectHolder : MonoBehaviour
 {
@@ -31,6 +32,9 @@ public class PlayerObjectHolder : MonoBehaviour
     // Ya no se desactivan colliders - solo se guarda referencia al rigidbody
     private Rigidbody heldRigidbody;
     private Collider[] playerColliders;
+
+    // Event fired whenever this holder picks up an object successfully
+    public event Action<GameObject> OnPickedUp;
 
     private void Awake()
     {
@@ -64,6 +68,9 @@ public class PlayerObjectHolder : MonoBehaviour
         heldObject.transform.SetParent(Anchor, true);
         ApplyPickupPositioning(objectPrefab, heldObject);
         DisablePhysicsForHeld(heldObject);
+
+        // Notify listeners
+        OnPickedUp?.Invoke(heldObject);
     }
 
     public void PickUpExistingInstance(GameObject objectInstance)
@@ -85,6 +92,9 @@ public class PlayerObjectHolder : MonoBehaviour
         heldObject.transform.SetParent(Anchor, true);
         ApplyPickupPositioning(objectInstance, heldObject);
         DisablePhysicsForHeld(heldObject);
+
+        // Notify listeners
+        OnPickedUp?.Invoke(heldObject);
     }
 
     public bool HasObjectInHand()
