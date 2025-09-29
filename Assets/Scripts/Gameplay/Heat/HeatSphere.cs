@@ -54,10 +54,11 @@ public class HeatSphere : MonoBehaviour
         if (currentCooldown > 0f)
         {
             currentCooldown -= Time.deltaTime;
-            if (currentCooldown <= 0f)
-            {
-                gameObject.SetActive(false);
-            }
+        }
+        // Nuevo: apagar automáticamente aunque el cooldown haya sido forzado a 0 desde fuera.
+        if (currentCooldown <= 0f && gameObject.activeSelf)
+        {
+            gameObject.SetActive(false);
         }
 
         DetectTurnables();
@@ -129,5 +130,11 @@ public class HeatSphere : MonoBehaviour
     {
         Gizmos.color = IsOnCooldown() ? Color.red : Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
+    }
+
+    public void CooldownOff()
+    {
+        // Solo ponemos el cooldown a 0; el Update se encargará de desactivar en el siguiente frame.
+        currentCooldown = 0f;
     }
 }
