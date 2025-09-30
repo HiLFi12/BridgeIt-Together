@@ -146,6 +146,12 @@ MonoBehaviour:
   guardGO: {fileID: 8819827193253672425}
   rightDropZoneTag: RightDropZone
   leftDropZoneTag: LeftDropZone
+  horseAnimator: {fileID: 6559308478062150648}
+  launchAnimationTrigger: HorseKick
+  carriageAnchor: {fileID: 5672321054971215173}
+  anchorShakeAngle: -73
+  anchorShakeDuration: 0.5
+  anchorShakeZOffset: 0.8
   launchAngleDeg: 15
   launchSpeed: 12
   launchGravity: 9.81
@@ -335,6 +341,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6584080886772714237, guid: 2ae6f3d289e6f7a4fa4a9a99ecaccd5e, type: 3}
   m_PrefabInstance: {fileID: 5195551557328204326}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &6559308478062150648 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 1377282160395563486, guid: 2ae6f3d289e6f7a4fa4a9a99ecaccd5e, type: 3}
+  m_PrefabInstance: {fileID: 5195551557328204326}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5983290880628803972
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -466,10 +477,15 @@ PrefabInstance:
     - {fileID: 4772919428757491465, guid: 05aa7d7166f98e042b98203945960172, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 3505165636427230601, guid: 05aa7d7166f98e042b98203945960172, type: 3}
-      insertIndex: -1
+      insertIndex: 0
       addedObject: {fileID: 1388538271641942235}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05aa7d7166f98e042b98203945960172, type: 3}
+--- !u!4 &5672321054971215173 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2139432649565009089, guid: 05aa7d7166f98e042b98203945960172, type: 3}
+  m_PrefabInstance: {fileID: 5983290880628803972}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7182171348269032461 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3505165636427230601, guid: 05aa7d7166f98e042b98203945960172, type: 3}

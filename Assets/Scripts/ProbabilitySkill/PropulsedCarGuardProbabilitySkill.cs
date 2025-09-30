@@ -9,6 +9,16 @@ public class PropulsedCarGuardProbabilitySkill : BaseProbabilitySkill
     [Header("Drop Zone Tags")]
     [SerializeField] private string rightDropZoneTag = "RightDropZone";
     [SerializeField] private string leftDropZoneTag = "LeftDropZone";
+    
+    [Header("Horse Animation")]
+    [SerializeField] private Animator horseAnimator;
+    [SerializeField] private string launchAnimationTrigger = "HorseKick";
+    
+    [Header("Anchor Settings")]
+    [SerializeField] private Transform carriageAnchor;
+    [SerializeField] private float anchorShakeAngle = 20f;
+    [SerializeField] private float anchorShakeDuration = 0.3f;
+    [SerializeField] private float anchorShakeYOffset = 0.3f;
 
     [Header("Launch Settings (Parabola)")]
     [SerializeField, Range(10f, 80f)] private float launchAngleDeg = 45f;
@@ -24,6 +34,8 @@ public class PropulsedCarGuardProbabilitySkill : BaseProbabilitySkill
         if (executed) return;
         executed = true;
         if (!guardGO) return;
+        
+        horseAnimator.SetTrigger(launchAnimationTrigger);
 
         bool toRight = Vector3.Dot(transform.forward, Vector3.right) >= 0f;
         string targetTag = toRight ? rightDropZoneTag : leftDropZoneTag;
@@ -35,6 +47,41 @@ public class PropulsedCarGuardProbabilitySkill : BaseProbabilitySkill
 
         Vector3 targetPos = dropT ? dropT.position : guardT.position;
         StartCoroutine(LaunchGuardRoutine(guardT, targetPos));
+        StartCoroutine(ShakeAnchorXandMoveY(carriageAnchor, anchorShakeAngle, anchorShakeYOffset, anchorShakeDuration));
+    }
+    
+    private IEnumerator ShakeAnchorXandMoveY(Transform anchor, float angle, float yOffset, float duration)
+    {
+        float elapsed = 0f;
+        Quaternion originalRot = anchor.localRotation;
+        Quaternion targetRot = originalRot * Quaternion.Euler(angle, 0f, 0f);
+        Vector3 originalPos = anchor.localPosition;
+        Vector3 targetPos = originalPos + new Vector3(0f, yOffset, 0f);
+
+        // Go to target
+        while (elapsed < duration * 0.5f)
+        {
+            float t = elapsed / (duration * 0.5f);
+            anchor.localRotation = Quaternion.Slerp(originalRot, targetRot, t);
+            anchor.localPosition = Vector3.Lerp(originalPos, targetPos, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        anchor.localRotation = targetRot;
+        anchor.localPosition = targetPos;
+
+        // Return to original
+        elapsed = 0f;
+        while (elapsed < duration * 0.5f)
+        {
+            float t = elapsed / (duration * 0.5f);
+            anchor.localRotation = Quaternion.Slerp(targetRot, originalRot, t);
+            anchor.localPosition = Vector3.Lerp(targetPos, originalPos, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        anchor.localRotation = originalRot;
+        anchor.localPosition = originalPos;
     }
 
     private Transform FindNearestByTag(string tag, Vector3 from)
