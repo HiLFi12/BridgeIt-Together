@@ -5272,13 +5272,13 @@ MonoBehaviour:
   layerHeights:
   - -1.81
   - -0.8
-  - -0.41
-  - 0.53
+  - -0.3
+  - 0.4
   layerScales:
   - {x: 0.011, y: 0.05, z: 0.05}
-  - {x: 80, y: 80, z: 20}
-  - {x: 40, y: 70, z: 40}
-  - {x: 1.5, y: 0.2, z: 1.3}
+  - {x: 50, y: 50, z: 50}
+  - {x: 0.005, y: 0.2, z: 0.06}
+  - {x: 1.5, y: 0.5, z: 1.3}
   layerScaleMode: 1
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
@@ -8148,6 +8148,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 782207885}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1480051488 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4265782683987362170, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
+  m_PrefabInstance: {fileID: 4116812497726793921}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1497771691
 GameObject:
   m_ObjectHideFlags: 0
@@ -12203,7 +12214,7 @@ PrefabInstance:
       value: MetalPlatePile (2)
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 4702662817741875581, guid: 44e0caeb53cdd7f45a55043634fc9a55, type: 3}
+    - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -12780,7 +12791,8 @@ PrefabInstance:
       value: MarbleSource
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 3566036177134366391, guid: 79fd56a601b36f04d841ab49bf182582, type: 3}
+    - {fileID: 0}
+    - {fileID: -6262146783713936298, guid: 79fd56a601b36f04d841ab49bf182582, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -13464,63 +13476,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1001 &2308181347344511826
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1964585418113273950, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -259.02536
-      objectReference: {fileID: 0}
-    - target: {fileID: 1964585418113273950, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 192.89728
-      objectReference: {fileID: 0}
-    - target: {fileID: 1964585418113273950, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 271.82785
-      objectReference: {fileID: 0}
-    - target: {fileID: 1964585418113273950, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1964585418113273950, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1964585418113273950, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1964585418113273950, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1964585418113273950, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1964585418113273950, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1964585418113273950, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9213080468329332838, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
-      propertyPath: m_Name
-      value: PropulsedCarGuardDropZone
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
 --- !u!4 &2471044193264256356
 Transform:
   m_ObjectHideFlags: 0
@@ -14136,7 +14091,7 @@ MonoBehaviour:
   dropKey: 111
   buildKey: 108
   interactionUIImage: {fileID: 421217928}
-  buildUIImage: {fileID: 0}
+  buildUIImage: {fileID: 1480051488}
 --- !u!114 &4116812497726793954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15087,7 +15042,6 @@ SceneRoots:
   - {fileID: 197655819}
   - {fileID: 1456740090382375352}
   - {fileID: 817843590}
-  - {fileID: 2308181347344511826}
   - {fileID: 646342129}
   - {fileID: 777630860}
   - {fileID: 955028463}

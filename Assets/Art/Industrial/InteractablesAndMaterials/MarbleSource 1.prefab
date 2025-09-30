@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 249590644412559922}
-  - component: {fileID: 3566036177134366391}
   - component: {fileID: 6631492776105328688}
+  - component: {fileID: -6262146783713936298}
   m_Layer: 3
   m_Name: MarbleSource 1
   m_TagString: Untagged
@@ -42,21 +42,6 @@ Transform:
   - {fileID: 1308208473641042287}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3566036177134366391
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1481759621614625122}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32ae3c96631a29443beee3e9a3a75322, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  paloIgnifugoPrefab: {fileID: 8074991521777721662, guid: 1c0827dd647ca194bb9cff1e527800e2, type: 3}
-  interactPriority: 2
-  tiempoRecarga: 0.5
 --- !u!65 &6631492776105328688
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -78,6 +63,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.153831, y: 3.705567, z: 3.2891169}
   m_Center: {x: 0.6517372, y: 0.49246162, z: -0.22891082}
+--- !u!114 &-6262146783713936298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1481759621614625122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 667191c1e2fb49ae8966a2910e8a217d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  materialPrefabsSO: {fileID: 11400000, guid: 7567e59779a33e64da8bee3decc6056b, type: 2}
+  interactPriority: 4
+  tiempoRecarga: 2
+  puntoSpawn: {fileID: 0}
 --- !u!1001 &219735190141230293
 PrefabInstance:
   m_ObjectHideFlags: 0
