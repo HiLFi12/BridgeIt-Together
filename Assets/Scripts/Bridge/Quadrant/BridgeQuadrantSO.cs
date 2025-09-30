@@ -68,8 +68,6 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     public bool isTurned { get; private set; } // Estado visible para otros sistemas, controlado por ITurnable/agua
     [Tooltip("Marcador interno de si hay una fuente de calor aplicando (ignora agua).")]
     public bool heatActive = false;
-    [Tooltip("Cuenta cuántas fuentes de agua lo están bloqueando; >0 fuerza isTurned=false aun con calor.")]
-    public int waterBlockers = 0;
 
     [Header("Debug Vida (Industrial)")]
     [Tooltip("Si está activo, loggea periódicamente la vida del puente como currentTemperature/maxTemperature.")]
@@ -120,7 +118,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
                 break;
         }
         heatActive = false;
-        waterBlockers = 0;
+    // Eliminado sistema de waterBlockers (gestionado ahora por BridgeQuadrantInstance)
         RecalculateTurned();
     }
 
@@ -201,9 +199,13 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
 
     private void CheckIfAllLayersCompleted()
     {
-        hasCollision = requiredLayers[requiredLayers.Length - 1].isCompleted;
-        
-        if (hasCollision && lastLayerState != LastLayerState.Complete)
+        // Opción 1: activar colisión desde la PRIMERA capa construida
+        bool firstLayerCompleted = requiredLayers.Length > 0 && requiredLayers[0].isCompleted;
+        hasCollision = firstLayerCompleted;
+
+        // Solo considerar "Complete" el estado lógico completo cuando TODAS las capas estén construidas
+        bool allLayersCompleted = requiredLayers[requiredLayers.Length - 1].isCompleted;
+        if (allLayersCompleted && lastLayerState != LastLayerState.Complete)
         {
             lastLayerState = LastLayerState.Complete;
         }
@@ -344,9 +346,8 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     /// </summary>
     public void AddWaterBlocker()
     {
-        waterBlockers++;
-        if (waterBlockers < 0) waterBlockers = 0;
-        RecalculateTurned();
+        // Deprecated: mantenido para compatibilidad si otros scripts aún llaman.
+        RemoveHeat(); // fuerza apagado si agua antigua llama este método
     }
 
     /// <summary>
@@ -354,15 +355,14 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     /// </summary>
     public void RemoveWaterBlocker()
     {
-        waterBlockers--;
-        if (waterBlockers < 0) waterBlockers = 0;
+        // Deprecated: si se usaba, al salir agua re-evaluará turned (ya gestionado fuera)
         RecalculateTurned();
     }
 
     private void RecalculateTurned()
     {
         // isTurned true solo si hay calor activo y no está bloqueado por agua.
-        bool newTurned = heatActive && waterBlockers == 0;
+        bool newTurned = heatActive; // Sin waterBlockers; agua se maneja externamente
         isTurned = newTurned;
     }
 
