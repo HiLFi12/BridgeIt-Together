@@ -2207,10 +2207,13 @@ MonoBehaviour:
   - {x: 30, y: 30, z: 30}
   - {x: 0.01, y: 0.01, z: 0.01}
   - {x: 0.2, y: 0.2, z: 0.2}
+  layerScaleMode: 0
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
   incompleteColor: {r: 1, g: 0, b: 0, a: 1}
   damagedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  showLifeInScene: 1
+  lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
   showDebugTools: 1
@@ -3860,13 +3863,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vehiculosParaVictoria: 10
   tagTriggerVictoria: PassTrigger
+  usarVictoriaPorRondas: 0
+  vehicleSpawner: {fileID: 0}
+  roundController: {fileID: 0}
   victoryCanvasPrefab: {fileID: 714906186}
   defeatCanvasPrefab: {fileID: 2072203489}
   pauseCanvas: {fileID: 132076740}
-  objetosAEliminarAlFinal: []
   nextLevelSceneName: 
   useAutoLevelProgression: 0
   desactivarPlayerControllerEnFinDeJuego: 1
+  desactivarAutoGeneratorEnFinDeJuego: 1
   activarAnimacionesFinDeJuego: 1
   vehiculosParaDerrota: 3
   tagTriggerDerrota: FallTrigger
@@ -3883,9 +3889,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnDerrotaProgreso:
-    m_PersistentCalls:
-      m_Calls: []
-  Finished:
     m_PersistentCalls:
       m_Calls: []
 --- !u!4 &1472422793
@@ -6009,6 +6012,28 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5665233298331183193, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
   m_PrefabInstance: {fileID: 4116812497726793921}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4116812497726793923 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4265782683987362170, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
+  m_PrefabInstance: {fileID: 4116812497726793921}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4116812497726793924 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7009591107654030413, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
+  m_PrefabInstance: {fileID: 4116812497726793921}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4116812497726793931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6072,6 +6097,8 @@ MonoBehaviour:
   interactKey: 112
   dropKey: 111
   buildKey: 108
+  interactionUIImage: {fileID: 4116812497726793924}
+  buildUIImage: {fileID: 4116812497726793923}
 --- !u!114 &4116812497726793954
 MonoBehaviour:
   m_ObjectHideFlags: 0
