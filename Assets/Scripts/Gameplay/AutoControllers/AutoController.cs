@@ -21,13 +21,14 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         [SerializeField] private string nombreTagVehiculo = "Vehicle";
         [SerializeField] private string bridgeQuadrantTag = "BridgeQuadrant";
 
-        // ==== Interacción con Puente (estilo TryInteract) ====
+        // ==== Interacción con Puente (OverlapSphere + One Interact Per Collider) ====
         [Header("Interacción con Puente (OverlapSphere)")]
         [SerializeField] private Transform interactionPoint;
         [SerializeField] private float interactionRadius = 1.5f;
         [SerializeField] private LayerMask bridgeLayer; // capa de colliders del puente
         [SerializeField] private bool interactAuto = true;
-        [SerializeField, Min(0f)] private float interactCooldown = 0.2f;
+        [SerializeField, Tooltip("Si está activo, cada collider sólo producirá una interacción de por vida (hasta reinicio)." )] private bool oneInteractPerCollider = true;
+        [SerializeField, Tooltip("Si está activo, sólo se interactúa la primera vez que el collider entra (no mientras permanece dentro)." )] private bool onlyOnEnter = true;
         [SerializeField] private bool debugInteract = false;
 
         // ==== Lanzamiento de IHitable (Parábola Física) ====
@@ -44,7 +45,10 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         private bool isInitialized;
         private bool isPaused;
         private Vector3 direccionMovimiento;
-        private float interactTimer;
+        // Tracking de interacción (lógica estilo BaseProbabilitySkill)
+        private readonly HashSet<Collider> previousInsideBridge = new();
+        private readonly HashSet<Collider> insideNowBridge = new();
+        private readonly HashSet<Collider> interactedLifetime = new();
 
         // Buffers
         private readonly Collider[] overlap = new Collider[8];
@@ -100,16 +104,9 @@ namespace BridgeItTogether.Gameplay.AutoControllers
                 rb.MovePosition(rb.position + dir * velocidadBase * Time.fixedDeltaTime);
             }
 
-            // Interacción automática con el puente
+            // Interacción automática con el puente (detección frame a frame con sets)
             if (interactAuto)
-            {
-                interactTimer -= Time.fixedDeltaTime;
-                if (interactTimer <= 0f)
-                {
-                    TryInteract(); // hará daño al puente
-                    interactTimer = interactCooldown;
-                }
-            }
+                RunInteractionDetection();
         }
 
         public void SetSpeed(float speed) => velocidadBase = Mathf.Max(0f, speed);
@@ -150,10 +147,11 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         }
 
         // ===================== Interact (daño al puente) =====================
-        // Similar a PlayerModel.TryInteract, pero filtra por bridgeLayer y reporta a VehicleBridgeCollision
-        public void TryInteract()
+        private void RunInteractionDetection()
         {
             if (!isInitialized) return;
+
+            insideNowBridge.Clear();
 
             int count = Physics.OverlapSphereNonAlloc(
                 interactionPoint.position,
@@ -163,9 +161,12 @@ namespace BridgeItTogether.Gameplay.AutoControllers
                 QueryTriggerInteraction.Collide
             );
 
-            if (count <= 0) return;
+            if (count <= 0)
+            {
+                previousInsideBridge.Clear();
+                return;
+            }
 
-            // Se delega el daño al sistema legacy del vehículo
             var legacy = GetComponent<VehicleBridgeCollision>();
             if (legacy == null)
             {
@@ -179,16 +180,35 @@ namespace BridgeItTogether.Gameplay.AutoControllers
                 var col = overlap[i];
                 if (col == null) continue;
 
-                // Filtrado opcional por tag del cuadrante
-                if (!string.IsNullOrEmpty(bridgeQuadrantTag) && !col.CompareTag(bridgeQuadrantTag))
-                    continue;
+                insideNowBridge.Add(col);
 
-                // Comportamiento tipo VehicleChildCollider: reportar trigger al sistema del puente
+                bool isNewEntry = !previousInsideBridge.Contains(col);
+                if (onlyOnEnter && !isNewEntry) continue; // Solo primera vez al entrar
+                if (oneInteractPerCollider && interactedLifetime.Contains(col)) continue; // ya interactuado de por vida
+                if (!string.IsNullOrEmpty(bridgeQuadrantTag) && !col.CompareTag(bridgeQuadrantTag)) continue;
+
                 VehicleBridgeCollision.HandleTriggerFromChild(gameObject, col);
+                if (oneInteractPerCollider)
+                    interactedLifetime.Add(col);
 
                 if (debugInteract)
-                    Debug.Log($"[AutoController] Bridge interact -> {col.name} (tag: {col.tag})", col);
+                    Debug.Log($"[AutoController] Bridge interact -> {col.name} (newEntry={isNewEntry}, lifetime={(oneInteractPerCollider ? "tracked" : "multi")})", col);
             }
+
+            previousInsideBridge.Clear();
+            foreach (var c in insideNowBridge)
+                previousInsideBridge.Add(c);
+        }
+
+        /// <summary>
+        /// Limpia el estado de interacción (para reutilización / pooling).
+        /// </summary>
+        public void ResetInteractionState(bool clearLifetime = false)
+        {
+            previousInsideBridge.Clear();
+            insideNowBridge.Clear();
+            if (clearLifetime)
+                interactedLifetime.Clear();
         }
 
         // ===================== IHitable: colisión y lanzamiento =====================

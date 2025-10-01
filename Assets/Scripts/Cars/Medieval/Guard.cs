@@ -8,11 +8,7 @@ public class Guard : AutoController
     [SerializeField, Min(0f)] private float feetRadius = 0.25f;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask caravanLayer;
-    
-    [Header("Tag Switching")]
-    [SerializeField] private string deadlyTag = "Vehicle";
-    [SerializeField] private string safeTag = "Material";
-    
+
     [Header("Animation (optional)")]
     [SerializeField] private Animator animator;
     [SerializeField] private string isIdleParam = "IsIdle";
@@ -26,9 +22,6 @@ public class Guard : AutoController
     public bool IsWalking { get; private set; }
     public bool IsFlying { get; private set; }
 
-    [SerializeField, Tooltip("True si su muerte debe contar (cuando no está Idle).")]
-    private bool suMuerteCuenta;
-    public bool SuMuerteCuenta => suMuerteCuenta;
 
     private readonly Collider[] hits = new Collider[8];
 
@@ -63,9 +56,7 @@ public class Guard : AutoController
     {
         base.FixedUpdate();
         UpdateState();
-        suMuerteCuenta = !IsIdle || IsWalking || IsFlying;
         UpdateAnimator();
-        
     }
 
     private void UpdateState()
