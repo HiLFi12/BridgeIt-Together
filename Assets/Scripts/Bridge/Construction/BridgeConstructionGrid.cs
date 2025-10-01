@@ -628,15 +628,29 @@ public class BridgeConstructionGrid : MonoBehaviour
 
         QuadrantInfo info = constructionGrid[x, z];
 
-        // Verificar si el cuadrante está completo (tiene la última capa)
-        bool cuadranteCompleto = info.quadrantSO.requiredLayers[info.quadrantSO.requiredLayers.Length - 1].isCompleted;
-
         // Actualizar la colisión del cuadrante principal
         if (info.quadrantCollider != null)
         {
-            // El collider principal solo se activa si el cuadrante está completo
-            info.quadrantCollider.enabled = cuadranteCompleto;
-            info.quadrantCollider.isTrigger = false; // No es trigger para soportar el auto
+            bool cuadranteCompleto = info.quadrantSO.requiredLayers[info.quadrantSO.requiredLayers.Length - 1].isCompleted;
+            bool anyLayerBuilt = info.quadrantSO.hasCollision; // primera capa construida
+
+            if (cuadranteCompleto)
+            {
+                // Collider sólido: soporta vehículo
+                info.quadrantCollider.enabled = true;
+                info.quadrantCollider.isTrigger = false;
+            }
+            else if (anyLayerBuilt)
+            {
+                // Collider como trigger: detecta impacto (VehicleBridgeCollision lo usa) pero no soporta al vehículo
+                info.quadrantCollider.enabled = true;
+                info.quadrantCollider.isTrigger = true;
+            }
+            else
+            {
+                // Nada construido aún
+                info.quadrantCollider.enabled = false;
+            }
         }
 
         // Actualizar las visuales de cada capa
