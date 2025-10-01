@@ -1,4 +1,5 @@
 using UnityEngine;
+using BridgeItTogether.Gameplay.Rondas; // subscribe to RoundController
 
 /// <summary>
 /// Configuración para un evento sorpresa que modifica el estado del puente
@@ -26,6 +27,13 @@ public class EventoSorpresa
     [Tooltip("Tiempo de duración del efecto visual del evento (en segundos)")]
     public float duracionEfectoVisual = 2f;
     
+    [Header("Caída desde el cielo")]
+    [Tooltip("Si está activo, en lugar de destruir inmediatamente, se spawnean objetos que caen y al impactar con el puente disparan el evento.")]
+    public bool usarCaidaDesdeCielo = false;
+
+    [Tooltip("Cantidad de objetos a instanciar desde el SpawnPoint.")]
+    public int cantidadObjetos = 3;
+
     [Header("Debug")]
     public bool mostrarMensajesDebug = true;
 }
@@ -38,6 +46,23 @@ public class BridgeSurpriseEvent : MonoBehaviour
     [Header("Referencias")]
     [SerializeField] private BridgeConstructionGrid bridgeGrid;
     [SerializeField] private BridgeInitialConstructor bridgeConstructor;
+    [SerializeField] private RoundController roundController; // NUEVO: para timing por ronda
+
+    [Header("Spawn de Objetos que Caen")]
+    [Tooltip("Punto de spawn desde donde caerán los objetos. Si es nulo, se usará el Transform de este GameObject.")]
+    [SerializeField] private Transform spawnPoint;
+
+    [Tooltip("Prefab del objeto que caerá. Debe tener (o se le añadirá) Rigidbody y algún Collider.")]
+    [SerializeField] private GameObject fallingObjectPrefab;
+
+    [Tooltip("Altura adicional sobre el SpawnPoint desde donde aparecerán los objetos (para garantizar la caída).")]
+    [SerializeField] private float spawnHeightOffset = 15f;
+
+    [Tooltip("Radio horizontal alrededor del SpawnPoint para distribuir los objetos.")]
+    [SerializeField] private float spawnRadius = 2f;
+
+    [Tooltip("Destruir automáticamente los proyectiles restantes cuando el evento se dispare.")]
+    [SerializeField] private bool autoCleanupProjectiles = true;
     
     [Header("Configuración de Eventos Predefinidos")]
     [SerializeField] private bool usarEventosPredefinidos = true;
@@ -65,6 +90,48 @@ public class BridgeSurpriseEvent : MonoBehaviour
     
     [Header("Debug")]
     [SerializeField] private bool mostrarDebugInfo = true;
+
+    // Estado interno para evitar múltiples ejecuciones por impactos simultáneos
+    private bool eventoDisparado;
+
+    private void Awake()
+    {
+        if (roundController == null)
+        {
+            roundController = FindFirstObjectByType<RoundController>();
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (roundController != null)
+        {
+            roundController.OnRoundCompleted += HandleRoundCompleted;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (roundController != null)
+        {
+            roundController.OnRoundCompleted -= HandleRoundCompleted;
+        }
+    }
+
+    private void HandleRoundCompleted(int completedRoundOneBased)
+    {
+        if (!usarEventosPredefinidos || eventosPredefinidos == null) return;
+        // Buscar todos los eventos cuyo despuesDeRonda coincide con la ronda completada y ejecutarlos
+        for (int i = 0; i < eventosPredefinidos.Length; i++)
+        {
+            var ev = eventosPredefinidos[i];
+            if (ev == null) continue;
+            if (ev.despuesDeRonda == completedRoundOneBased)
+            {
+                EjecutarEventoSorpresa(ev);
+            }
+        }
+    }
     
     /// <summary>
     /// Ejecuta un evento sorpresa específico
@@ -96,9 +163,19 @@ public class BridgeSurpriseEvent : MonoBehaviour
             Debug.Log($"🎭 EVENTO SORPRESA: '{evento.nombreEvento}' - Destruyendo puente hasta la capa {evento.capaObjetivo}");
         }
         
-        // Ejecutar la destrucción del puente
+        if (evento.usarCaidaDesdeCielo)
+        {
+            if (mostrarDebugInfo || evento.mostrarMensajesDebug)
+            {
+                Debug.Log($"🎭 EVENTO SORPRESA: '{evento.nombreEvento}' - Lanzando {Mathf.Max(1, evento.cantidadObjetos)} objeto(s) desde el cielo");
+            }
+            LanzarObjetosQueCaen(evento);
+            return; // La destrucción ocurrirá en el impacto del primer proyectil
+        }
+
+        // Ejecutar la destrucción del puente inmediatamente
         DestruirPuenteHastaCapa(evento);
-        
+
         if (evento.mostrarMensajesDebug || mostrarDebugInfo)
         {
             Debug.Log($"🎭 Evento sorpresa '{evento.nombreEvento}' completado");
@@ -573,6 +650,89 @@ public class BridgeSurpriseEvent : MonoBehaviour
         }
         
         return objetosEncontrados.ToArray();
+    }
+
+    // NUEVO: Spawn de objetos que caen
+    private void LanzarObjetosQueCaen(EventoSorpresa evento)
+    {
+        if (fallingObjectPrefab == null)
+        {
+            Debug.LogError("BridgeSurpriseEvent: No hay prefab asignado para objetos que caen.");
+            return;
+        }
+
+        Transform sp = spawnPoint != null ? spawnPoint : transform;
+        int count = Mathf.Max(1, evento.cantidadObjetos);
+        for (int i = 0; i < count; i++)
+        {
+            Vector2 rnd = Random.insideUnitCircle * Mathf.Max(0f, spawnRadius);
+            Vector3 pos = sp.position + new Vector3(rnd.x, Mathf.Max(0f, spawnHeightOffset), rnd.y);
+
+            GameObject go = Instantiate(fallingObjectPrefab, pos, Quaternion.identity);
+
+            // Asegurar Rigidbody
+            var rb = go.GetComponent<Rigidbody>();
+            if (rb == null) rb = go.AddComponent<Rigidbody>();
+            rb.useGravity = true;
+            rb.isKinematic = false;
+
+            // Asegurar Collider
+            var col = go.GetComponent<Collider>();
+            if (col == null) col = go.AddComponent<SphereCollider>();
+            col.isTrigger = false; // sólido por defecto
+
+            // Añadir el manejador de impacto
+            var proj = go.GetComponent<BridgeSurpriseProjectile>();
+            if (proj == null) proj = go.AddComponent<BridgeSurpriseProjectile>();
+            proj.Setup(this, evento);
+        }
+    }
+
+    // Callback desde los proyectiles
+    public void OnProjectileHitBridge(EventoSorpresa evento, Collider other)
+    {
+        if (eventoDisparado) return;
+
+        // Validar que realmente impactó algo del puente
+        bool esBridgeQuadrant = false;
+        try
+        {
+            esBridgeQuadrant = other != null && other.CompareTag("BridgeQuadrant");
+        }
+        catch { /* tag puede no existir; tolerar */ }
+
+        if (!esBridgeQuadrant)
+        {
+            // Alternativa: aceptar cualquier impacto si se desea más laxo
+            esBridgeQuadrant = other != null && other.GetComponentInParent<BridgeConstructionGrid>() != null;
+        }
+
+        if (!esBridgeQuadrant) return;
+
+        eventoDisparado = true;
+        DestruirPuenteHastaCapa(evento);
+
+        if (autoCleanupProjectiles)
+        {
+            LimpiarProyectilesRestantes();
+        }
+
+        if (mostrarDebugInfo)
+        {
+            Debug.Log("🎯 Impacto detectado: evento sorpresa ejecutado por impacto de proyectil.");
+        }
+    }
+
+    private void LimpiarProyectilesRestantes()
+    {
+        var restos = FindObjectsOfType<BridgeSurpriseProjectile>();
+        foreach (var p in restos)
+        {
+            if (p != null && p.gameObject != null)
+            {
+                Destroy(p.gameObject);
+            }
+        }
     }
 
     /// <summary>

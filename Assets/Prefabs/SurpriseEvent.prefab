@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1295175688358575006
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7506311414585723904}
+  m_Layer: 0
+  m_Name: SpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7506311414585723904
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1295175688358575006}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 13.7, y: 2.04, z: 6.71}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2658639102947607276}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7389223121089180818
 GameObject:
   m_ObjectHideFlags: 0
@@ -29,7 +60,8 @@ Transform:
   m_LocalPosition: {x: -273.1519, y: 242.69466, z: 232.18703}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7506311414585723904}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3300842741900703987
@@ -46,12 +78,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bridgeGrid: {fileID: 0}
   bridgeConstructor: {fileID: 0}
+  roundController: {fileID: 0}
+  spawnPoint: {fileID: 7506311414585723904}
+  fallingObjectPrefab: {fileID: 1295527369991058037, guid: afccda70c9bd5754ca4965538d29940a, type: 3}
+  spawnHeightOffset: 15
+  spawnRadius: 2
+  autoCleanupProjectiles: 1
   usarEventosPredefinidos: 1
   eventosPredefinidos:
   - nombreEvento: RIP Puente
+    despuesDeRonda: 1
     capaObjetivo: 0
     afectarTodosLosCuadrantes: 1
     cuadrantesEspecificos: 
     duracionEfectoVisual: 0
-    mostrarMensajesDebug: 0
+    usarCaidaDesdeCielo: 1
+    cantidadObjetos: 10
+    mostrarMensajesDebug: 1
   mostrarDebugInfo: 1

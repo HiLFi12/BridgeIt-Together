@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using BridgeItTogether.Gameplay.Carriles;
 using BridgeItTogether.Gameplay.Spawning;
+using System; // added for Action event
 
 namespace BridgeItTogether.Gameplay.Rondas
 {
@@ -21,6 +22,9 @@ namespace BridgeItTogether.Gameplay.Rondas
 
         [Header("Dependencias")]
         [SerializeField] private VehicleSpawner spawner;
+
+        // Event fired when a round is completed. Parameter is 1-based completed round index.
+        public event Action<int> OnRoundCompleted;
 
         private int rondaActual = 0;
         private int autosSpawneadosEnRonda = 0;
@@ -155,6 +159,9 @@ namespace BridgeItTogether.Gameplay.Rondas
 
             if (mostrarDebugInfo)
                 Debug.Log($"[RoundController] Completando ronda {rondaActual}: {configuracionRondas[rondaActual].nombreRonda}");
+
+            // Notify listeners: completed round is current (convert to 1-based)
+            OnRoundCompleted?.Invoke(rondaActual + 1);
 
             rondaActual++;
             if (rondaActual >= configuracionRondas.Length)
