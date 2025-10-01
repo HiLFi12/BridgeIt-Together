@@ -38,6 +38,8 @@ public class SoldierCaravanProbabilitySkill : BaseProbabilitySkill
     [Header("Debug")] 
     [SerializeField] private bool debugLogs = false;
 
+    private GameConditionManager gameManager;
+
     private bool executed;
 
     private void OnEnable()
@@ -77,6 +79,7 @@ public class SoldierCaravanProbabilitySkill : BaseProbabilitySkill
             if (debugLogs) Debug.LogWarning("[SoldierCaravanProbabilitySkill] No hay replacementPrefabs asignados.", this);
             return;
         }
+
 
         int replacementsLen = replacementPrefabs.Length;
         int spawnedCount = 0;
@@ -124,10 +127,13 @@ public class SoldierCaravanProbabilitySkill : BaseProbabilitySkill
         // Destruir caravan después de spawnear
         if (destroyCaravan)
         {
+
             if (caravanObject)
             {
                 if (debugLogs) Debug.Log($"[SoldierCaravanProbabilitySkill] Destruyendo caravan '{caravanObject.name}' (delay={destroyCaravanDelay}).", caravanObject);
                 if (destroyCaravanDelay <= 0f) Destroy(caravanObject); else Destroy(caravanObject, destroyCaravanDelay);
+                GameConditionManager gameManager = FindFirstObjectByType<GameConditionManager>();
+                gameManager.OnVehiculoPasaPuente(gameObject);
             }
             else if (destroySelfIfNoCaravan)
             {

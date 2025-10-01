@@ -342,14 +342,10 @@ public class GameConditionManager : MonoBehaviour
         // Disparar evento de progreso con la cantidad restante (para mostrar en UI)
         OnVictoriaProgreso?.Invoke(vehiculosRestantes);
 
-        // Nueva lógica: si se usan rondas, la victoria sólo se evalúa al finalizar todas las rondas.
-        // Si NO se usan rondas, se mantiene la condición antigua de vehículos restantes.
-        if (!usarVictoriaPorRondas)
+        // Verificar condición de victoria: cuando quedan 0 vehículos disponibles y pasa el último
+        if (vehiculosRestantes <= 0)
         {
-            if (vehiculosRestantes <= 0)
-            {
-                Victoria();
-            }
+            Victoria();
         }
     }
     
@@ -771,26 +767,15 @@ public class GameConditionManager : MonoBehaviour
     public void NotificarTodasLasRondasCompletadas()
     {
         if (!usarVictoriaPorRondas || !juegoActivo || juegoTerminado) return;
-
+        
         todasLasRondasCompletadas = true;
-
+        
         if (mostrarDebugInfo)
         {
-            Debug.Log("[GameConditionManager] 🎉 Todas las rondas completadas. Evaluando condición de victoria basada en caídas.");
+            Debug.Log("[GameConditionManager] 🎉 Todas las rondas completadas! Activando victoria por rondas.");
         }
-
-        // Condición solicitada: ganar sólo si han terminado las rondas y NO han caído 3 autos (no se alcanzó el umbral de derrota).
-        if (contadorDerrota < vehiculosParaDerrota)
-        {
-            VictoriaPorRondas();
-        }
-        else
-        {
-            // Si al terminar las rondas ya se alcanzó el límite de caídas, asegurar derrota (normalmente ya se habría disparado).
-            if (mostrarDebugInfo)
-                Debug.Log("[GameConditionManager] Rondas completas pero se alcanzó el límite de caídas. Derrota confirmada.");
-            Derrota();
-        }
+        
+        VictoriaPorRondas();
     }
     
     #endregion
