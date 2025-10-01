@@ -59,9 +59,10 @@ public class BaseProbabilitySkill : MonoBehaviour
             bridgeLayer,
             QueryTriggerInteraction.Collide
         );
-
+        
         for (int i = 0; i < count; i++)
         {
+            
             var col = overlap[i];
             if (!col) continue;
             if (!PassesFilters(col)) continue;

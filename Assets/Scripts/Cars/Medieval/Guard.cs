@@ -66,14 +66,6 @@ public class Guard : AutoController
         suMuerteCuenta = !IsIdle || IsWalking || IsFlying;
         UpdateAnimator();
         
-        if (IsFlying && !string.IsNullOrEmpty(deadlyTag) && tag != deadlyTag)
-        {
-            tag = deadlyTag;
-        }
-        else if (!IsFlying && !string.IsNullOrEmpty(safeTag) && tag != safeTag)
-        {
-            tag = safeTag;
-        }
     }
 
     private void UpdateState()

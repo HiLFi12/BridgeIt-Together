@@ -13,7 +13,7 @@ namespace Gameplay.Heat
         {
             // Si tu GenericObject2 no tiene este hook, omite este override.
             bool result = base.ShouldAutoStart() || isTurned;
-            Debug.Log($"FurnaceCook - ShouldAutoStart: {result} (isTurned={isTurned})");
+           // Debug.Log($"FurnaceCook - ShouldAutoStart: {result} (isTurned={isTurned})");
             return result;
         }
 

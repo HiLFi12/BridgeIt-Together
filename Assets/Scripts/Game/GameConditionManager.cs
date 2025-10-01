@@ -15,6 +15,9 @@ public class GameConditionManager : MonoBehaviour
     [SerializeField] private int vehiculosParaVictoria = 10;
     [SerializeField] private string tagTriggerVictoria = "PassTrigger";
     
+    [Header("UI")]
+    [SerializeField] private LifeStarsUI lifeStarsUI;
+    
     [Header("Configuración de Victoria por Rondas")]
     [SerializeField] private bool usarVictoriaPorRondas = false;
     [SerializeField] private VehicleSpawner vehicleSpawner; // reemplaza AutoGenerator como sistema de spawn
@@ -355,6 +358,8 @@ public class GameConditionManager : MonoBehaviour
         // Si un vehículo cae, también decrementa la cantidad de vehículos restantes (ya no cuenta al spawnear)
         contadorDerrota++;
         if (vehiculosRestantes > 0) vehiculosRestantes--;
+        
+        lifeStarsUI.LoseLife();
 
         if (mostrarDebugInfo)
         {
