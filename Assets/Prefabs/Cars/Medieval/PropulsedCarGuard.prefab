@@ -134,31 +134,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 2829330095039055415}
-  detectionRadius: 10
+  detectionRadius: 2.5
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 320
   bridgeQuadrantTag: BridgeQuadrant
-  probability: 1
+  probability: 0.3
   prefab: {fileID: 4814166678255672354}
   spawnOffset: {x: 0, y: 0.25, z: 0}
   spawnParent: {fileID: 5027463379150275807}
   ammo: 1
+  autoResetAmmoOnEnable: 1
   oneRollPerCollider: 1
-  guardGO: {fileID: 8819827193253672425}
-  rightDropZoneTag: RightDropZone
-  leftDropZoneTag: LeftDropZone
-  horseAnimator: {fileID: 6559308478062150648}
-  launchAnimationTrigger: HorseKick
-  carriageAnchor: {fileID: 5672321054971215173}
-  anchorShakeAngle: -73
-  anchorShakeDuration: 0.5
-  anchorShakeYOffset: 0.3
-  launchAngleDeg: 15
-  launchSpeed: 12
+  referenceObject: {fileID: 8819827193253672425}
+  projectilePrefab: {fileID: 3153354572346523118, guid: a9e0a90ec23c7834998ceb857f5aac2e, type: 3}
+  launchAngleDeg: 45
+  launchSpeed: 5
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
+  backwardDistance: 4
+  debugLogs: 0
+  autoResetOnEnable: 1
+  resetAmmoOnEnable: 1
+  initialAmmoOverride: 1
 --- !u!114 &2355878745967870888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,11 +342,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6584080886772714237, guid: 2ae6f3d289e6f7a4fa4a9a99ecaccd5e, type: 3}
   m_PrefabInstance: {fileID: 5195551557328204326}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &6559308478062150648 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 1377282160395563486, guid: 2ae6f3d289e6f7a4fa4a9a99ecaccd5e, type: 3}
-  m_PrefabInstance: {fileID: 5195551557328204326}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5983290880628803972
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -475,6 +469,10 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 0}
     - {fileID: 0}
+    - {fileID: 3424315092081361386, guid: 05aa7d7166f98e042b98203945960172, type: 3}
+    - {fileID: 4657012405263481933, guid: 05aa7d7166f98e042b98203945960172, type: 3}
+    - {fileID: 2421018573449546388, guid: 05aa7d7166f98e042b98203945960172, type: 3}
+    - {fileID: 6566344143884825909, guid: 05aa7d7166f98e042b98203945960172, type: 3}
     m_RemovedGameObjects:
     - {fileID: 4772919428757491465, guid: 05aa7d7166f98e042b98203945960172, type: 3}
     m_AddedGameObjects:
@@ -483,11 +481,6 @@ PrefabInstance:
       addedObject: {fileID: 1388538271641942235}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05aa7d7166f98e042b98203945960172, type: 3}
---- !u!4 &5672321054971215173 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2139432649565009089, guid: 05aa7d7166f98e042b98203945960172, type: 3}
-  m_PrefabInstance: {fileID: 5983290880628803972}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7182171348269032461 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3505165636427230601, guid: 05aa7d7166f98e042b98203945960172, type: 3}

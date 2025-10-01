@@ -20,6 +20,10 @@ public class BaseProbabilitySkill : MonoBehaviour
     [SerializeField] private Transform spawnParent; // (unused after unparent, kept for backward compat)
     [SerializeField] private int ammo = 5;
 
+    [Header("Pooling / Reset")]
+    [Tooltip("Si está activo, cada vez que el objeto se reactiva (pooling) el ammo vuelve a su valor inicial y se limpia el estado interno.")]
+    [SerializeField] private bool autoResetAmmoOnEnable = true;
+
     [Header("Behavior")]
     [SerializeField] private bool oneRollPerCollider = true;
 
@@ -29,9 +33,26 @@ public class BaseProbabilitySkill : MonoBehaviour
     private readonly HashSet<Collider> insideNow = new();
     private readonly HashSet<Collider> rolledLifetime = new();
 
+    // Pooling helpers
+    private int initialAmmo;
+    private bool initialized;
+
     private void Awake()
     {
         if (!detectionPoint) detectionPoint = transform;
+        if (!initialized)
+        {
+            initialAmmo = ammo;
+            initialized = true;
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (autoResetAmmoOnEnable && initialized)
+        {
+            ResetAmmoAndState();
+        }
     }
 
     private void OnValidate()
@@ -133,6 +154,24 @@ public class BaseProbabilitySkill : MonoBehaviour
     public void AddAmmo(int amount) => ammo += amount;
     public int GetAmmo() => ammo;
     public void SetProbability(float p) => probability = Mathf.Clamp01(p);
+    public int GetInitialAmmo() => initialAmmo;
+    public void SetInitialAmmo(int value)
+    {
+        initialAmmo = Mathf.Max(0, value);
+        ammo = initialAmmo;
+    }
+
+    /// <summary>
+    /// Restaura el ammo al valor inicial y limpia el estado de detección/rolleo.
+    /// Llamar manualmente si se gestiona un pool personalizado y se desactiva el auto-reset.
+    /// </summary>
+    public void ResetAmmoAndState()
+    {
+        ammo = initialAmmo;
+        previousInside.Clear();
+        insideNow.Clear();
+        rolledLifetime.Clear();
+    }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
