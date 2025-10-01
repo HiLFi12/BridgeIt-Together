@@ -841,6 +841,58 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5396272979297086673, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
   m_PrefabInstance: {fileID: 151860808}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &255429376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 255429378}
+  - component: {fileID: 255429377}
+  m_Layer: 0
+  m_Name: InvisibleWalls
+  m_TagString: InvisibleWall
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &255429377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 255429376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d133cbe9b961ac24bb1ed07d1162aa22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grids:
+  - {fileID: 1410363238}
+  wallHeight: 2
+  wallCenterYOffset: 230.6
+  shrinkMargin: 0.02
+  wallLayerName: InvisibleWall
+  evaluationInterval: 0.25
+  showGizmos: 1
+--- !u!4 &255429378
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 255429376}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -261.72873, y: 229.76213, z: 236.58481}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &305074369
 GameObject:
   m_ObjectHideFlags: 0
@@ -4772,3 +4824,4 @@ SceneRoots:
   - {fileID: 19710935}
   - {fileID: 1121493561}
   - {fileID: 542596403}
+  - {fileID: 255429378}

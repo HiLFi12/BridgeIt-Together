@@ -3159,6 +3159,58 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &659676725
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 659676727}
+  - component: {fileID: 659676726}
+  m_Layer: 0
+  m_Name: InvisibleWalls
+  m_TagString: InvisibleWall
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &659676726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659676725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d133cbe9b961ac24bb1ed07d1162aa22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grids:
+  - {fileID: 985317586}
+  wallHeight: 2
+  wallCenterYOffset: 230.6
+  shrinkMargin: 0.02
+  wallLayerName: InvisibleWall
+  evaluationInterval: 0.25
+  showGizmos: 1
+--- !u!4 &659676727
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659676725}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -261.72873, y: 229.76213, z: 236.58481}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &664902333
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8423,6 +8475,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vehiculosParaVictoria: 10
   tagTriggerVictoria: PassTrigger
+  lifeStarsUI: {fileID: 0}
   usarVictoriaPorRondas: 0
   vehicleSpawner: {fileID: 0}
   roundController: {fileID: 0}
@@ -9466,6 +9519,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1462101908}
     m_Modifications:
+    - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.1220863
+      objectReference: {fileID: 0}
     - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -264.04333
@@ -15301,6 +15358,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 705507995}
+  - {fileID: 659676727}
   - {fileID: 4116812497726793921}
   - {fileID: 1557511703}
   - {fileID: 354151297}
