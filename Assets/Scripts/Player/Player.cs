@@ -26,6 +26,11 @@ public class Player : MonoBehaviour, IHitable
     private PlayerBridgeInteraction bridgeInteraction;
     private PlayerAnimator playerAnimator;
 
+    [Header("Debug Bridge Hotkey")]
+    [SerializeField] private bool enableFillBridgeHotkey = false;
+    [SerializeField] private KeyCode fillBridgeKey = KeyCode.G;
+    [SerializeField] private BridgeConstructionGrid bridgeGrid; // puede asignarse manualmente, o se buscará
+
     void Start()
     {
         objectHolder = GetComponent<PlayerObjectHolder>();
@@ -34,6 +39,12 @@ public class Player : MonoBehaviour, IHitable
         interactionUIImage.gameObject.SetActive(false);
         // Inicializar BuildUI oculto
         if (buildUIImage != null) buildUIImage.gameObject.SetActive(false);
+
+        // Intentar auto-asignar grid si no se arrastró en inspector
+        if (bridgeGrid == null)
+        {
+            bridgeGrid = FindObjectOfType<BridgeConstructionGrid>();
+        }
     }
 
     void Update()
@@ -58,6 +69,20 @@ public class Player : MonoBehaviour, IHitable
 
         // Mostrar/ocultar BuildUI según condiciones
         UpdateBuildUI();
+
+        // Hotkey debug para rellenar todo el puente
+        if (enableFillBridgeHotkey && Input.GetKeyDown(fillBridgeKey))
+        {
+            if (bridgeGrid != null)
+            {
+                // Llamar a método público que llena todo (asumiendo DebugRellenarTodoPuente es público)
+                bridgeGrid.DebugRellenarTodoPuente();
+            }
+            else
+            {
+                Debug.LogWarning("[Player] Hotkey de rellenar puente presionado pero no se encontró BridgeConstructionGrid en la escena.");
+            }
+        }
     }
 
     private void TryInteract()
