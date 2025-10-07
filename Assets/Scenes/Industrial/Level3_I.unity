@@ -10229,6 +10229,10 @@ PrefabInstance:
       propertyPath: handTransform
       value: 
       objectReference: {fileID: 311887761}
+    - target: {fileID: -8894423828870255723, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: material1Rotation.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -5907133989568294639, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
       propertyPath: bridgeGrid
       value: 
@@ -16212,6 +16216,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player2
       objectReference: {fileID: 0}
+    - target: {fileID: 4655421092252101922, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
+      propertyPath: holdAnchor
+      value: 
+      objectReference: {fileID: 2109101784}
     - target: {fileID: 5646139113111178579, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
       propertyPath: handTransform
       value: 
@@ -16342,18 +16350,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   holdAnchor: {fileID: 0}
-  objectLocalPosition: {x: 0, y: 0, z: 0.3}
   objectLocalRotation: {x: 0, y: 0, z: 0}
-  paloIgnifugoPosition: {x: 0.3, y: 0, z: 0.5}
   paloIgnifugoRotation: {x: 0, y: 0, z: -45}
-  material1Position: {x: -1.054, y: 0.149, z: 0.543}
-  material1Rotation: {x: 0, y: 0, z: -90}
-  minDropForward: 1.2
-  dropUpOffset: 0.1
-  freezeAfterDrop: 1
-  settleSpeedThreshold: 0.05
-  settleStableTime: 0.3
-  settleMaxTime: 2
+  material1Rotation: {x: 0, y: 0, z: 0}
 --- !u!114 &4116812497726793939
 MonoBehaviour:
   m_ObjectHideFlags: 0
