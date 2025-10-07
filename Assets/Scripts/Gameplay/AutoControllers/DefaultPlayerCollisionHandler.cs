@@ -51,7 +51,7 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             }
 
             var holder = jugador.GetComponent<PlayerObjectHolder>();
-            if (holder != null && holder.HasObjectInHand()) holder.DropObject();
+            //if (holder != null && holder.HasObjectInHand()) holder.DropObject();
 
             Vector3 destino = CalcularPosicionAterrizaje(jugador.transform.position);
             float h = cfg.alturaVuelo * cfg.factorAlturaParabola;

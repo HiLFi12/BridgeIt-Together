@@ -223,30 +223,20 @@ public class Player : MonoBehaviour, IHitable
     
     public void OnLaunched(Vector3 targetPosition)
     {
-        var holder = GetComponent<PlayerObjectHolder>();
-        if (holder != null && holder.HasObjectInHand())
+        // Ya no soltamos el objeto al ser lanzados: el holder mantiene el objeto en la mano.
+        // Por seguridad, si hay algo en la mano, reafirmamos su estado físico (kinematic + sin gravedad).
+        if (objectHolder != null && objectHolder.HasObjectInHand())
         {
-            var obj = holder.GetHeldObject();
+            var obj = objectHolder.GetHeldObject();
             if (obj != null)
             {
-                // Dejar de ser hijo del jugador y mantener posición/rotación en mundo
-                obj.transform.SetParent(null, true);
-
-                // Reactivar física del objeto para que pueda ser impactado inmediatamente
                 var rb = obj.GetComponent<Rigidbody>();
                 if (rb != null)
                 {
-                    rb.isKinematic = false;
-                    rb.useGravity = true;
+                    rb.isKinematic = true;
+                    rb.useGravity = false;
                 }
             }
-
-            // Limpiar estado interno del holder sin usar DropObject
-            var t = typeof(PlayerObjectHolder);
-            var fObj = t.GetField("heldObject", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (fObj != null) fObj.SetValue(holder, null);
-            var fRb = t.GetField("heldRigidbody", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (fRb != null) fRb.SetValue(holder, null);
         }
     }
 

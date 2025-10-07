@@ -576,15 +576,7 @@ public class VehiclePlayerCollision : MonoBehaviour
         {
             DesactivarColisionesConJugador(jugador);
         }
-        
-        // Hacer que el jugador suelte cualquier objeto que esté sosteniendo
-        PlayerObjectHolder objectHolder = jugador.GetComponent<PlayerObjectHolder>();
-        if (objectHolder != null && objectHolder.HasObjectInHand())
-        {
-            Debug.Log($"📦 {jugador.name} soltando objeto sostenido");
-            objectHolder.DropObject();
-        }
-        
+                
         // Calcular la posición de aterrizaje segura con parábola direccional
         Vector3 posicionAterrizajeSegura = CalcularPosicionAterrizaje(jugador.transform.position);
         Debug.Log($"🎯 Aterrizaje direccional calculado: {posicionAterrizajeSegura}");

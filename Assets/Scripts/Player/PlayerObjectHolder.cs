@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// PlayerObjectHolder minimal: al agarrar un objeto lo hace hijo del holder
@@ -19,6 +20,8 @@ public class PlayerObjectHolder : MonoBehaviour
 
     private GameObject heldObject;
     private Rigidbody heldRigidbody;
+    // Guardar estado original de colliders del objeto agarrado
+    private readonly Dictionary<Collider, bool> heldColliderEnabledState = new Dictionary<Collider, bool>();
 
     private Transform Anchor => holdAnchor != null ? holdAnchor : transform;
 
@@ -33,9 +36,16 @@ public class PlayerObjectHolder : MonoBehaviour
             return;
         }
 
-        // Si ya había un objeto, simplemente lo desparentamos
+        // Si ya había un objeto, restaurar su estado antes de soltarlo/reemplazarlo
         if (heldObject != null && heldObject != objectInstance)
         {
+            EnableCollisionForHeld();
+            if (heldRigidbody != null)
+            {
+                heldRigidbody.isKinematic = false;
+                heldRigidbody.useGravity = true;
+                heldRigidbody = null;
+            }
             heldObject.transform.SetParent(null, true);
         }
 
@@ -52,6 +62,9 @@ public class PlayerObjectHolder : MonoBehaviour
             heldRigidbody.angularVelocity = Vector3.zero;
         }
 
+        // Desactivar colisión mientras está en el holder
+        DisableCollisionForHeld();
+
         ApplyPickupPositioning(heldObject);
     }
 
@@ -62,6 +75,8 @@ public class PlayerObjectHolder : MonoBehaviour
     public void DropObject()
     {
         if (heldObject == null) return;
+        // Reactivar colisiones antes de soltar
+        EnableCollisionForHeld();
         heldObject.transform.SetParent(null, true);
         // Restaurar física
         if (heldRigidbody != null)
@@ -75,6 +90,8 @@ public class PlayerObjectHolder : MonoBehaviour
     public void UseHeldObject()
     {
         if (heldObject == null) return;
+        // Reactivar colisiones antes de destruir
+        EnableCollisionForHeld();
         // No dejar kinematic perdido
         if (heldRigidbody != null)
         {
@@ -110,4 +127,41 @@ public class PlayerObjectHolder : MonoBehaviour
     }
 
     public GameObject GetHeldObjectLegacy() => heldObject; // alias por si algún script antiguo usa un nombre alterno
+
+    // --- Colisión mientras está agarrado ---
+    private void DisableCollisionForHeld()
+    {
+        heldColliderEnabledState.Clear();
+        if (heldObject == null) return;
+        var cols = heldObject.GetComponentsInChildren<Collider>(true);
+        for (int i = 0; i < cols.Length; i++)
+        {
+            var c = cols[i];
+            if (c == null) continue;
+            heldColliderEnabledState[c] = c.enabled;
+            c.enabled = false; // Desactivar todo (incluye triggers) mientras está en mano
+        }
+        Physics.SyncTransforms();
+    }
+
+    private void EnableCollisionForHeld()
+    {
+        if (heldObject == null)
+        {
+            heldColliderEnabledState.Clear();
+            return;
+        }
+        var cols = heldObject.GetComponentsInChildren<Collider>(true);
+        for (int i = 0; i < cols.Length; i++)
+        {
+            var c = cols[i];
+            if (c == null) continue;
+            if (heldColliderEnabledState.TryGetValue(c, out bool wasEnabled))
+                c.enabled = wasEnabled;
+            else
+                c.enabled = true; // por defecto habilitar
+        }
+        heldColliderEnabledState.Clear();
+        Physics.SyncTransforms();
+    }
 }
