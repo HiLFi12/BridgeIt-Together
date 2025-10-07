@@ -234,19 +234,49 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             var targetT = (hitable as Component)?.transform;
             if (targetT == null) return;
 
-            // Si el objetivo es hijo del vehículo, liberarlo para el lanzamiento
+            if (IsObjectBeingHeld(targetT))
+            {
+                var holder = FindPlayerHoldingObject(targetT);
+                if (holder != null)
+                {
+                    TryLaunchHitable(holder.GetComponent<Collider>());
+                }
+                return;
+            }
+
             if (targetT != transform && targetT.IsChildOf(transform))
                 targetT.SetParent(null, true);
 
-            if (activeLaunches.ContainsKey(targetT)) return; // ya se está lanzando
+            if (activeLaunches.ContainsKey(targetT)) return;
 
             if (!TryGetRandomPointInNearestSafeZone(targetT.position, out var destino)) return;
 
-            // Notificar al objeto que será lanzado hacia destino
             hitable.OnLaunched(destino);
 
             var routine = StartCoroutine(LaunchRoutine(targetT, destino));
             activeLaunches[targetT] = routine;
+        }
+
+        private bool IsObjectBeingHeld(Transform obj)
+        {
+            var holders = FindObjectsOfType<PlayerObjectHolder>();
+            foreach (var holder in holders)
+            {
+                if (holder.HasObjectInHand() && holder.GetHeldObject() == obj.gameObject)
+                    return true;
+            }
+            return false;
+        }
+
+        private PlayerObjectHolder FindPlayerHoldingObject(Transform obj)
+        {
+            var holders = FindObjectsOfType<PlayerObjectHolder>();
+            foreach (var holder in holders)
+            {
+                if (holder.HasObjectInHand() && holder.GetHeldObject() == obj.gameObject)
+                    return holder;
+            }
+            return null;
         }
 
         private IEnumerator LaunchRoutine(Transform target, Vector3 destino)
