@@ -222,6 +222,37 @@ MonoBehaviour:
   resetCoalWhenHeatEnds: 1
   reloadDelay: 0
   autoAcceptCoalOnTrigger: 0
+--- !u!1 &7222709542027270583
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6095405892930611666}
+  m_Layer: 0
+  m_Name: SpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6095405892930611666
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7222709542027270583}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.72, y: 0, z: 0.03}
+  m_LocalScale: {x: 0.6666667, y: 0.6666667, z: 0.6666667}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2659040544581919185}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7365677886697753464
 GameObject:
   m_ObjectHideFlags: 0
@@ -259,6 +290,7 @@ Transform:
   - {fileID: 257807861821201948}
   - {fileID: 7706952830628347488}
   - {fileID: 360147558181995681}
+  - {fileID: 6095405892930611666}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &2812501365257972867
@@ -294,9 +326,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d96b31a903b3d0418177283864b165d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactPriority: 3
+  interactPriority: 4
   furnace: {fileID: 4000171977197734064}
   furnaceCook: {fileID: 476138415681873736}
+  delayColocacion: 0
 --- !u!1 &8910669598436633134
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,6 +380,8 @@ MonoBehaviour:
   tiempoCoccion: 1.5
   slotVisualTipo1: {fileID: 7706952830628347488}
   slotVisualTipo2: {fileID: 360147558181995681}
+  resultadoSpawnPoint: {fileID: 6095405892930611666}
+  usarRotacionSpawnPoint: 1
   tiempoMantenerE: 1.5
   heatSphere: {fileID: 7569543140812505582}
 --- !u!1001 &3403261381809183182

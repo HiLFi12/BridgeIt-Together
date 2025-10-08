@@ -13,6 +13,10 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
     [SerializeField] private float tiempoCoccion = 1.5f; 
     [SerializeField] private Transform slotVisualTipo1;
     [SerializeField] private Transform slotVisualTipo2; 
+
+    [Header("Spawn del resultado")]
+    [SerializeField] private Transform resultadoSpawnPoint;
+    [SerializeField] private bool usarRotacionSpawnPoint = true;
     
     private bool slotTipo1Ocupado = false;
     private bool slotTipo2Ocupado = false;
@@ -222,8 +226,15 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
         GameObject materialTipo3Prefab = materialPrefabsSO.GetMaterialPrefab(3, era);
         if (materialTipo3Prefab != null)
         {
-            Vector3 spawnPosition = transform.position + transform.forward * 1.0f;
-            Instantiate(materialTipo3Prefab, spawnPosition, Quaternion.identity);
+            Vector3 spawnPosition = resultadoSpawnPoint != null
+                ? resultadoSpawnPoint.position
+                : transform.position + transform.forward * 1.0f;
+
+            Quaternion spawnRotation = (resultadoSpawnPoint != null && usarRotacionSpawnPoint)
+                ? resultadoSpawnPoint.rotation
+                : Quaternion.identity;
+
+            Instantiate(materialTipo3Prefab, spawnPosition, spawnRotation);
             Debug.Log("Material tipo 3 creado con éxito.");
         }
         else

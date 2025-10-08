@@ -3921,13 +3921,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2812501365257972867, guid: edbc07a3a523ade43995c2df0d9f629a, type: 3}
+      propertyPath: m_ProvidesContacts
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4000171977197734064, guid: edbc07a3a523ade43995c2df0d9f629a, type: 3}
       propertyPath: reloadDelay
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 4000171977197734064, guid: edbc07a3a523ade43995c2df0d9f629a, type: 3}
+      propertyPath: interactPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000171977197734064, guid: edbc07a3a523ade43995c2df0d9f629a, type: 3}
+      propertyPath: autoAcceptCoalOnTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7365677886697753464, guid: edbc07a3a523ade43995c2df0d9f629a, type: 3}
       propertyPath: m_Name
       value: Furnace
+      objectReference: {fileID: 0}
+    - target: {fileID: 7486524007603785303, guid: edbc07a3a523ade43995c2df0d9f629a, type: 3}
+      propertyPath: delayColocacion
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7486524007603785303, guid: edbc07a3a523ade43995c2df0d9f629a, type: 3}
+      propertyPath: interactPriority
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5054,6 +5074,8 @@ MonoBehaviour:
   tiempoCoccion: 1.5
   slotVisualTipo1: {fileID: 1465523182}
   slotVisualTipo2: {fileID: 1811396928}
+  resultadoSpawnPoint: {fileID: 0}
+  usarRotacionSpawnPoint: 1
   tiempoMantenerE: 1.5
   heatSphere: {fileID: 0}
 --- !u!65 &955028460
