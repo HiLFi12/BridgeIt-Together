@@ -87,23 +87,13 @@ public class Player : MonoBehaviour, IHitable
 
     private void TryInteract()
     {
-        int elements = Physics.OverlapSphereNonAlloc(
-            interactionPoint.position,
-            interactionRadius,
-            interactables,
-            interactionLayer,
-            QueryTriggerInteraction.Collide);
+        int elements = Physics.OverlapSphereNonAlloc(interactionPoint.position, interactionRadius, interactables, interactionLayer, QueryTriggerInteraction.Collide);
 
         if (elements == 0) 
         {
             HideInteractionUI();
             return;
         }
-
-        IInteractable mejorInteractuable = null;
-        Collider mejorCollider = null;
-        InteractPriority mejorPrioridad = InteractPriority.VeryLow;
-        float distanciaMasCercana = float.MaxValue;
 
         bool paloEncendido = false;
         var holder = GetComponent<PlayerObjectHolder>();
@@ -113,6 +103,9 @@ public class Player : MonoBehaviour, IHitable
             paloEncendido = palo != null && palo.EstaEncendido();
         }
 
+        var candidatos = new List<IInteractable>();
+        InteractPriority mejorPrioridad = InteractPriority.VeryLow;
+
         for (int i = 0; i < elements; i++)
         {
             var col = interactables[i];
@@ -121,30 +114,33 @@ public class Player : MonoBehaviour, IHitable
             var candidato = col.GetComponentInParent<IInteractable>();
             if (candidato == null) continue;
 
-            float distancia = Vector3.Distance(interactionPoint.position, col.transform.position);
             var torch = col.GetComponentInParent<TorchInteractable>();
             var prioridadEfectiva = candidato.InteractPriority;
             if (paloEncendido && torch != null)
             {
                 prioridadEfectiva = InteractPriority.VeryHigh;
             }
-            if (prioridadEfectiva > mejorPrioridad ||
-                (prioridadEfectiva == mejorPrioridad && distancia < distanciaMasCercana))
+
+            if (prioridadEfectiva > mejorPrioridad)
             {
-                mejorInteractuable = candidato;
-                mejorCollider = col;
                 mejorPrioridad = prioridadEfectiva;
-                distanciaMasCercana = distancia;
+                candidatos.Clear();
+                candidatos.Add(candidato);
+            }
+            else if (prioridadEfectiva == mejorPrioridad)
+            {
+                candidatos.Add(candidato);
             }
         }
 
-        if (mejorInteractuable != null)
+        if (candidatos.Count > 0)
         {
             ShowInteractionUI();
 
             if (Input.GetKeyDown(interactKey))
             {
-                mejorInteractuable.Interact(this.gameObject);
+                var seleccionado = candidatos[UnityEngine.Random.Range(0, candidatos.Count)];
+                seleccionado.Interact(this.gameObject);
             }
         }
         else
