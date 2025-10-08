@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class FurnaceManager : MonoBehaviour, IInteractable
@@ -5,6 +6,7 @@ public class FurnaceManager : MonoBehaviour, IInteractable
     [SerializeField] private InteractPriority interactPriority = InteractPriority.High;
     [SerializeField] private Furnace furnace;
     [SerializeField] private Gameplay.Heat.FurnaceCook furnaceCook;
+    [SerializeField] private float delayColocacion = 0.1f; // Delay antes de colocar
 
     public InteractPriority InteractPriority => interactPriority;
 
@@ -16,57 +18,63 @@ public class FurnaceManager : MonoBehaviour, IInteractable
 
     public void Interact(GameObject player)
     {
-        Debug.Log("FurnaceManager.Interact llamado");
-
         var holder = player.GetComponent<PlayerObjectHolder>();
-        if (holder == null)
+        if (holder == null || !holder.HasObjectInHand()) return;
+
+        GameObject heldObj = holder.GetHeldObject();
+        
+        // 1. Detectar el tipo INMEDIATAMENTE
+        int itemType = DeterminarTipoItem(heldObj);
+        
+        if (itemType == 0)
         {
-            Debug.LogError("PlayerObjectHolder no encontrado");
+            Debug.Log("Objeto no válido para el horno");
             return;
         }
 
-        var heldObj = holder.GetHeldObject();
-        if (heldObj == null)
-        {
-            Debug.LogWarning("No hay objeto en mano");
-            return;
-        }
+        // 2. Iniciar corutina para colocar después del delay
+        StartCoroutine(ColocarConDelay(player, heldObj, itemType));
+    }
 
-        Debug.Log($"Objeto detectado: {heldObj.name}");
+    private IEnumerator ColocarConDelay(GameObject player, GameObject heldObj, int itemType)
+    {
+        Debug.Log($"Tipo detectado: {(itemType == 1 ? "Carbón" : "Material")} - Esperando {delayColocacion}s...");
+        
+        // Esperar el delay configurado
+        yield return new WaitForSeconds(delayColocacion);
 
-        var coalItem = heldObj.GetComponent<CoalItem>();
-        var material1 = heldObj.GetComponent<MaterialTipo1>();
-        var material2 = heldObj.GetComponent<MaterialBaseInteractable>();
+        // 3. Ejecutar la colocación según el tipo
+        switch (itemType)
+        {
+            case 1: // Carbón
+                Debug.Log("Colocando carbón en el horno");
+                furnace?.Interact(player);
+                break;
 
-        if (coalItem != null)
-        {
-            Debug.Log("Intentando agregar carbón");
-            if (furnace != null)
-            {
-                furnace.Interact(player);
-                Debug.Log("Carbón agregado exitosamente");
-            }
-            else
-            {
-                Debug.LogError("Furnace es null");
-            }
+            case 2: // Material para cocinar
+                Debug.Log("Colocando material en el horno");
+                furnaceCook?.Interact(player);
+                break;
         }
-        else if (material1 != null || material2 != null)
-        {
-            Debug.Log($"Intentando cocinar material (Tipo1: {material1 != null}, Tipo2: {material2 != null})");
-            if (furnaceCook != null)
-            {
-                furnaceCook.Interact(player);
-                Debug.Log("Material enviado a cocinar");
-            }
-            else
-            {
-                Debug.LogError("FurnaceCook es null");
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"Objeto no válido: {heldObj.name}");
-        }
+    }
+
+    private int DeterminarTipoItem(GameObject objeto)
+    {
+        if (objeto == null) return 0;
+
+        // Tipo 1: Carbón
+        if (objeto.GetComponent<CoalItem>() != null)
+            return 1;
+
+        // Tipo 2: Material para cocinar
+        if (objeto.GetComponent<MaterialTipo1>() != null)
+            return 2;
+
+        BridgeMaterialInfo materialInfo = objeto.GetComponent<BridgeMaterialInfo>();
+        if (materialInfo != null && 
+            (materialInfo.layerIndex == 0 || materialInfo.layerIndex == 1))
+            return 2;
+
+        return 0;
     }
 }

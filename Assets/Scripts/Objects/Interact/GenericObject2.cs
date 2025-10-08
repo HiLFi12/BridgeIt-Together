@@ -45,7 +45,7 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
         ActualizarVisualesSlots();
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         // Progreso de interacción mantenida solo aplica a la era medieval
         if (era == BridgeQuadrantSO.EraType.Medieval && esperandoHold && jugadorInteractuando != null)

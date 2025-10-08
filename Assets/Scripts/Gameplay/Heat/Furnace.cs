@@ -161,12 +161,7 @@ public class Furnace : MonoBehaviour, IInteractable
     // Método para cuando el carbón se agote (opcional)
     public void TurnOff()
     {
-        // Apagar visual y efecto de calor para liberar turnables dentro del rango
-        if (heatSphere != null && heatSphere.gameObject.activeSelf)
-        {
-            heatSphere.gameObject.SetActive(false); // Esto ejecuta OnDisable() en HeatSphere y llama TurnOff() a los ITurnable
-        }
-        HandleHeatSphereJustTurnedOff();
+        
     }
 
     private void Update()

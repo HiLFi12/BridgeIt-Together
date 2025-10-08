@@ -2,41 +2,22 @@ using UnityEngine;
 
 namespace Gameplay.Heat
 {
-    public class FurnaceCook : GenericObject2, ITurnable
+    public class FurnaceCook : GenericObject2
     {
-        public bool isTurned { get; private set; }
+        [SerializeField] private GameObject heatSphere;
 
-        // Permite que la base dispare la mezcla automáticamente cuando haya calor.
-        // Mantiene el comportamiento por defecto (Prehistórica/Medieval) y lo amplía.
-        protected override bool ShouldAutoStart()
-        {
-            // Si tu GenericObject2 no tiene este hook, omite este override.
-            bool result = base.ShouldAutoStart() || isTurned;
-           // Debug.Log($"FurnaceCook - ShouldAutoStart: {result} (isTurned={isTurned})");
-            return result;
-        }
-
-        // Exige calor y, además, que las condiciones de la base estén OK (slots llenos, etc.)
         protected override bool CanStartProcess()
         {
-            bool result = isTurned && base.CanStartProcess();
-            Debug.Log($"FurnaceCook - CanStartProcess: {result} (isTurned={isTurned})");
-            return result;
+            // Verificar que haya calor activo
+            bool hasHeat = heatSphere != null && heatSphere.activeInHierarchy;
+            return hasHeat && base.CanStartProcess();
         }
 
-        public void TurnOn()
+        protected override bool ShouldAutoStart()
         {
-            isTurned = true;
-        }
-
-        public void TurnOff()
-        {
-            isTurned = false;
-        }
-
-        private void OnDisable()
-        {
-            isTurned = false;
+            // Permitir auto-inicio si hay calor
+            bool hasHeat = heatSphere != null && heatSphere.activeInHierarchy;
+            return hasHeat;
         }
     }
 }
