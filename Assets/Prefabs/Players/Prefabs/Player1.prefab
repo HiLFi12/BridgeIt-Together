@@ -212,6 +212,7 @@ GameObject:
   - component: {fileID: 124070237574347097}
   - component: {fileID: -2954852217391606205}
   - component: {fileID: -1449180220025965351}
+  - component: {fileID: 5548372270085276198}
   m_Layer: 14
   m_Name: Player1
   m_TagString: Player
@@ -362,7 +363,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionPoint: {fileID: 8100890160145977295}
-  interactionRadius: 2
+  interactionRadius: 1.5
   interactionLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -388,8 +389,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   holdAnchor: {fileID: 8100890160145977295}
   objectLocalRotation: {x: 0, y: 0, z: 0}
-  paloIgnifugoRotation: {x: 12.897, y: -0.09, z: -90.529}
-  material1Rotation: {x: 0, y: 0, z: -90}
+  paloIgnifugoRotation: {x: 0, y: 0, z: 90}
+  material1Rotation: {x: 0, y: 0, z: 90}
 --- !u!114 &-4429559263743625035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -403,11 +404,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bridgeGrid: {fileID: 0}
-  buildPoint: {fileID: 0}
+  buildPoint: {fileID: 8100890160145977295}
   interactionRange: 3
   bridgeLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
 --- !u!114 &124070237574347097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,7 +416,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7187154040181281835}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11def3558dc4a0d45b4c5f45ee46a14f, type: 3}
   m_Name: 
@@ -424,13 +425,13 @@ MonoBehaviour:
   groundCheckPoint: {fileID: 0}
   walkableSurfaceLayer:
     serializedVersion: 2
-    m_Bits: 0
-  safeRepositionDistance: 0.3
+    m_Bits: 128
+  safeRepositionDistance: 2
   showDebugSphere: 1
-  raycastDistance: 2
+  raycastDistance: 8.41
   anyGroundLayer:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 128
   useRaycastFallback: 1
   fallVelocityThreshold: -3
   fallCheckInterval: 0.1
@@ -476,6 +477,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5548372270085276198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7187154040181281835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b5c9e0f3d6a7b8c9e0f1d2a3b4c5e6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7920946911183014188
 GameObject:
   m_ObjectHideFlags: 0
