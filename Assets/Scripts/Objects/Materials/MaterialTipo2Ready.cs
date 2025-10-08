@@ -13,17 +13,17 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
     protected override void Awake()
     {
         base.Awake();
-    // Activar gating en la base y setear estado inicial
-    useReadyState = true;
-    isReady = startReady; // usar campo heredado
-    AutoVincularMeshesSiFaltan();
-    AplicarEstadoVisual();
+        // Activar gating en la base y setear estado inicial
+        useReadyState = true;
+        isReady = startReady; // usar campo heredado
+        AutoVincularMeshesSiFaltan();
+        AplicarEstadoVisual();
     }
 
     protected override void PostEnsure()
     {
-    base.PostEnsure();
-    if (!isReady) puedeConstruirse = false;
+        base.PostEnsure();
+        if (!isReady) puedeConstruirse = false;
     }
 
 #if UNITY_EDITOR

@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-[DisallowMultipleComponent]
-[RequireComponent(typeof(Collider))]
 public class Furnace : MonoBehaviour, IInteractable
 {
     [SerializeField] private InteractPriority interactPriority = InteractPriority.High;

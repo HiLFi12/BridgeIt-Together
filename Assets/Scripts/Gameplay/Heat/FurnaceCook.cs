@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace Gameplay.Heat
 {
-    [RequireComponent(typeof(Collider))]
     public class FurnaceCook : GenericObject2, ITurnable
     {
         public bool isTurned { get; private set; }
