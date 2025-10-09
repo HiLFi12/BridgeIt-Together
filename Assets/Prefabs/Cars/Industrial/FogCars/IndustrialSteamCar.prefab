@@ -1,36 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1580792246052737409
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4007159402672774976}
-  m_Layer: 0
-  m_Name: DmgDealer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4007159402672774976
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1580792246052737409}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -7.46, z: -2.21}
-  m_LocalScale: {x: 0.54603034, y: 3.9252632, z: 0.95007366}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7470908911745804188}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2948579226618137670
 GameObject:
   m_ObjectHideFlags: 0
@@ -65,8 +34,8 @@ Transform:
   m_LocalScale: {x: 2, y: 0.25476, z: 1.05255}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4321923077414656969}
   - {fileID: 3159909934665784232}
-  - {fileID: 4007159402672774976}
   - {fileID: 8407545163346415659}
   - {fileID: 1495764639211940229}
   - {fileID: 5321527989781004840}
@@ -155,15 +124,6 @@ MonoBehaviour:
   direccionInicial: {x: 1, y: 0, z: 0}
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
-  bridgeQuadrantTag: BridgeQuadrant
-  interactionPoint: {fileID: 7470908911745804188}
-  interactionRadius: 1.5
-  bridgeLayer:
-    serializedVersion: 2
-    m_Bits: 320
-  interactAuto: 1
-  interactCooldown: 0.2
-  debugInteract: 0
   safeZoneTag: SafeZone
   launchAngleDeg: 45
   launchSpeed: 12
@@ -193,6 +153,7 @@ MonoBehaviour:
   spawnOffset: {x: 0, y: 0.25, z: 0}
   spawnParent: {fileID: 5321527989781004840}
   ammo: 1
+  autoResetAmmoOnEnable: 1
   oneRollPerCollider: 1
 --- !u!1 &5412072648001714427
 GameObject:
@@ -225,6 +186,58 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7470908911745804188}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6964751643876288217
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4321923077414656969}
+  - component: {fileID: 3531244930486116057}
+  m_Layer: 0
+  m_Name: DMGDealer
+  m_TagString: Vehicle
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4321923077414656969
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964751643876288217}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.31, z: -2.89}
+  m_LocalScale: {x: 0.844005, y: 5.555817, z: 1.3447342}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7470908911745804188}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3531244930486116057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964751643876288217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50591d1da50494347ac7fb29e4cad991, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionPoint: {fileID: 4321923077414656969}
+  detectionRadius: 1.5
+  bridgeLayer:
+    serializedVersion: 2
+    m_Bits: 320
+  bridgeQuadrantTag: BridgeQuadrant
+  vehicleTag: Vehicle
+  debugMode: 1
 --- !u!1 &7411909121647403840
 GameObject:
   m_ObjectHideFlags: 0

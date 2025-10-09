@@ -31,7 +31,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7470908911745804188}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1580792246052737409
+--- !u!1 &1845454070485095858
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -39,29 +39,50 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4007159402672774976}
+  - component: {fileID: 1621703573811675354}
+  - component: {fileID: 1410878681420253418}
   m_Layer: 0
-  m_Name: DmgDealer
-  m_TagString: Untagged
+  m_Name: DMGDealer
+  m_TagString: Vehicle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4007159402672774976
+--- !u!4 &1621703573811675354
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1580792246052737409}
+  m_GameObject: {fileID: 1845454070485095858}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.199, z: -1.708}
-  m_LocalScale: {x: 0.54603034, y: 3.9252632, z: 0.95007366}
+  m_LocalPosition: {x: 0, y: -0.77, z: -2.6}
+  m_LocalScale: {x: 1.68801, y: 1.4153999, z: 1.4153999}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7470908911745804188}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1410878681420253418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845454070485095858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50591d1da50494347ac7fb29e4cad991, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionPoint: {fileID: 1621703573811675354}
+  detectionRadius: 1.5
+  bridgeLayer:
+    serializedVersion: 2
+    m_Bits: 320
+  bridgeQuadrantTag: BridgeQuadrant
+  vehicleTag: Vehicle
+  debugMode: 1
 --- !u!1 &2948579226618137670
 GameObject:
   m_ObjectHideFlags: 0
@@ -96,9 +117,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1621703573811675354}
   - {fileID: 8062447488874386193}
   - {fileID: 4139061278670522994}
-  - {fileID: 4007159402672774976}
   - {fileID: 7114825977379872215}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -168,15 +189,6 @@ MonoBehaviour:
   direccionInicial: {x: 1, y: 0, z: 0}
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
-  bridgeQuadrantTag: BridgeQuadrant
-  interactionPoint: {fileID: 4007159402672774976}
-  interactionRadius: 0.8
-  bridgeLayer:
-    serializedVersion: 2
-    m_Bits: 320
-  interactAuto: 1
-  interactCooldown: 0.2
-  debugInteract: 0
   safeZoneTag: SafeZone
   launchAngleDeg: 45
   launchSpeed: 12
@@ -223,6 +235,7 @@ MonoBehaviour:
   spawnOffset: {x: 0, y: 0.25, z: 0}
   spawnParent: {fileID: 7114825977379872215}
   ammo: 1
+  autoResetAmmoOnEnable: 1
   oneRollPerCollider: 1
 --- !u!1 &3997679832619814133
 GameObject:

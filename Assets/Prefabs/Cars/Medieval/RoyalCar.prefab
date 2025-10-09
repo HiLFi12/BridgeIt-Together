@@ -33,10 +33,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4905251158842020762}
+  - {fileID: 5242597575706875192}
   - {fileID: 6820142271937426092}
-  - {fileID: 3773219057115324559}
-  - {fileID: 8009165512387740073}
-  - {fileID: 7432736541053862999}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &3520341992789812808
@@ -105,36 +104,12 @@ MonoBehaviour:
   direccionInicial: {x: 1, y: 0, z: 0}
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
-  bridgeQuadrantTag: BridgeQuadrant
-  interactionPoint: {fileID: 3773219057115324559}
-  interactionRadius: 0.5
-  bridgeLayer:
-    serializedVersion: 2
-    m_Bits: 320
-  interactAuto: 1
-  interactCooldown: 0.2
-  debugInteract: 0
   safeZoneTag: SafeZone
   launchAngleDeg: 45
   launchSpeed: 12
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
-  extraDetectionEnabled: 1
-  extraPoint1: {fileID: 8009165512387740073}
-  extraRadius1: 0.5
-  extraBridgeLayer1:
-    serializedVersion: 2
-    m_Bits: 320
-  extraCooldown1: 0.2
-  extraPoint2: {fileID: 7432736541053862999}
-  extraRadius2: 0.5
-  extraBridgeLayer2:
-    serializedVersion: 2
-    m_Bits: 320
-  extraCooldown2: 0.2
-  extraBridgeQuadrantTag: BridgeQuadrant
-  debugExtra: 0
 --- !u!114 &-5734301260147293198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,7 +127,7 @@ MonoBehaviour:
   debugMode: 1
   collisionCooldown: 1
   bridgeGrid: {fileID: 0}
---- !u!1 &1376618849064548578
+--- !u!1 &6349472892928355490
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -160,30 +135,51 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8009165512387740073}
+  - component: {fileID: 4905251158842020762}
+  - component: {fileID: 3327800646878511637}
   m_Layer: 0
-  m_Name: DmgDealerGuard1
-  m_TagString: Untagged
+  m_Name: DMGDealer (1)
+  m_TagString: Vehicle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8009165512387740073
+--- !u!4 &4905251158842020762
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1376618849064548578}
+  m_GameObject: {fileID: 6349472892928355490}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.22, z: -5.2}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -0.97, z: 3.52}
+  m_LocalScale: {x: 1.68801, y: 1.4153999, z: 1.4153999}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7406070707420810659}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &4849435719716598064
+--- !u!114 &3327800646878511637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6349472892928355490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50591d1da50494347ac7fb29e4cad991, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionPoint: {fileID: 4905251158842020762}
+  detectionRadius: 1
+  bridgeLayer:
+    serializedVersion: 2
+    m_Bits: 320
+  bridgeQuadrantTag: BridgeQuadrant
+  vehicleTag: Vehicle
+  debugMode: 1
+--- !u!1 &7791531667431694414
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -191,60 +187,50 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3773219057115324559}
+  - component: {fileID: 5242597575706875192}
+  - component: {fileID: 2033007771412699475}
   m_Layer: 0
-  m_Name: DmgDealerRoyalCar
-  m_TagString: Untagged
+  m_Name: DMGDealer
+  m_TagString: Vehicle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3773219057115324559
+--- !u!4 &5242597575706875192
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4849435719716598064}
+  m_GameObject: {fileID: 7791531667431694414}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.22, z: -3.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -0.97, z: -4.99}
+  m_LocalScale: {x: 1.68801, y: 1.4153999, z: 1.4153999}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7406070707420810659}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &7029169957726519679
-GameObject:
+--- !u!114 &2033007771412699475
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7432736541053862999}
-  m_Layer: 0
-  m_Name: DmgDealerGuard2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7432736541053862999
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7029169957726519679}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.22, z: 4}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7406070707420810659}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_GameObject: {fileID: 7791531667431694414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50591d1da50494347ac7fb29e4cad991, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionPoint: {fileID: 5242597575706875192}
+  detectionRadius: 1
+  bridgeLayer:
+    serializedVersion: 2
+    m_Bits: 320
+  bridgeQuadrantTag: BridgeQuadrant
+  vehicleTag: Vehicle
+  debugMode: 1
 --- !u!1001 &6976024914321765022
 PrefabInstance:
   m_ObjectHideFlags: 0
