@@ -143,8 +143,14 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
                     Debug.Log("Ya hay un material tipo 1 en la mezcladora.");
                 }
                 break;
-                
             case 2:
+                // Verificar si el material requiere estar 'listo'
+                var tipo2Ready = heldObject.GetComponent<MaterialTipo2Ready>();
+                if (tipo2Ready != null && !tipo2Ready.IsReady)
+                {
+                    Debug.Log("Este material tipo 2 debe estar listo para poder mezclarse.");
+                    break;
+                }
                 if (!slotTipo2Ocupado)
                 {
                     slotTipo2Ocupado = true;
@@ -158,7 +164,6 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
                     Debug.Log("Ya hay un material tipo 2 en la mezcladora.");
                 }
                 break;
-                
             default:
                 Debug.Log("Este material no se puede usar en la mezcladora.");
                 break;
