@@ -90,59 +90,57 @@ public class Furnace : MonoBehaviour, IInteractable
             TryAddCoal(holder.gameObject);
         }
     }
-
+    
     public bool TryAddCoal(GameObject interactor)
     {
         if (reloadTimer > 0f) return false;
         var holder = interactor.GetComponent<PlayerObjectHolder>();
-        if (holder == null || !holder.HasObjectInHand()) 
+        if (holder == null || !holder.HasObjectInHand())
         {
             Debug.Log("[Furnace] No holder or no object in hand");
             return false;
         }
 
         GameObject held = holder.GetHeldObject();
-        if (held == null) 
+        if (held == null)
         {
             Debug.Log("[Furnace] Held object is null");
             return false;
         }
 
-        Debug.Log($"[Furnace] Checking object: {held.name}");
-
-        // Aceptar carbón incluso si el componente está en un hijo
         CoalItem coalComponent = held.GetComponent<CoalItem>();
         if (coalComponent == null)
         {
             coalComponent = held.GetComponentInChildren<CoalItem>();
         }
-        if (coalComponent == null) 
+        if (coalComponent == null)
         {
             Debug.Log($"[Furnace] Object {held.name} does not have CoalItem component");
             return false;
         }
 
-        Debug.Log($"[Furnace] Valid coal found: {held.name}");
-
+        // If furnace is not full, add coal and turn on
         if (currentCoal < maxCoal)
         {
-            Debug.Log($"[Furnace] Before: currentCoal = {currentCoal}, held object = {held.name}");
-        
             currentCoal++;
             holder.UseHeldObject();
-        
-            Debug.Log($"[Furnace] After: currentCoal = {currentCoal}, holder has object = {holder.HasObjectInHand()}");
-
             if (currentCoal >= maxCoal)
             {
                 TurnOn();
             }
-
+            return true;
+        }
+        // If furnace is full and heat is active, allow reload and reset cooldown
+        else if (heatSphere != null && heatSphere.gameObject.activeSelf)
+        {
+            holder.UseHeldObject();
+            heatSphere.ResetCooldown();
+            Debug.Log("[Furnace] Coal added while active, cooldown reset.");
             return true;
         }
         else
         {
-            Debug.Log("[Furnace] Coal storage is full.");
+            Debug.Log("[Furnace] Coal storage is full and heat is not active.");
             return false;
         }
     }
