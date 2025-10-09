@@ -3149,7 +3149,7 @@ MonoBehaviour:
   gridWidth: 6
   gridLength: 4
   quadrantSize: 1.8
-  defaultQuadrantSO: {fileID: 11400000, guid: 77890f5d67c601246b7fb7adfcc8ff49, type: 2}
+  defaultQuadrantSO: {fileID: 11400000, guid: 329b42766e8f76045bc3452562883149, type: 2}
   quadrantPrefab: {fileID: 1437374063}
   quadrantParent: {fileID: 1196880118}
   layerHeights:
@@ -3158,11 +3158,11 @@ MonoBehaviour:
   - -0.41
   - 0.53
   layerScales:
-  - {x: 0.011, y: 0.05, z: 0.05}
-  - {x: 80, y: 80, z: 20}
-  - {x: 40, y: 70, z: 40}
-  - {x: 1.5, y: 0.2, z: 1.3}
-  layerScaleMode: 1
+  - {x: 4.5, y: 40, z: 3}
+  - {x: 4.5, y: 20, z: 3}
+  - {x: 4.5, y: 20, z: 3}
+  - {x: 1, y: 0.2, z: 1.3}
+  layerScaleMode: 0
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
   incompleteColor: {r: 1, g: 0, b: 0, a: 1}
@@ -5606,6 +5606,10 @@ PrefabInstance:
       propertyPath: bridgeGrid
       value: 
       objectReference: {fileID: 985317586}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: constructAllQuadrants
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
       value: 4
