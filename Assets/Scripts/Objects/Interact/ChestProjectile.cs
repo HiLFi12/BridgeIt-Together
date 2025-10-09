@@ -1,76 +1,91 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 public class ChestProjectile : MonoBehaviour
 {
     [SerializeField] private string bridgeQuadrantTag = "BridgeQuadrant";
     [SerializeField] private GameObject shaderPrefab;
+    [SerializeField] private float detectionRadius = 1.5f;
+    [SerializeField] private LayerMask bridgeLayer;
 
-    [Header("Interacción con Puente (OverlapSphere)")]
-    [SerializeField] private Transform interactionPoint;
-    [SerializeField] private float interactionRadius = 1.5f;
-    [SerializeField] private LayerMask bridgeLayer; // capa de colliders del puente
+    private readonly Collider[] overlap = new Collider[16];
+    private readonly HashSet<string> damagedQuadrants = new();
 
-    [Header("Auto detección")]
-    [SerializeField] private bool autoCheckInFixedUpdate = true;
-
-    // Buffers
-    private readonly Collider[] overlap = new Collider[8];
-    private readonly Dictionary<Transform, Coroutine> activeLaunches = new();
-
-    private bool consumed; // evita múltiples triggers/destrucciones
-
-    private void Awake()
+    private void OnCollisionEnter(Collision collision)
     {
-        if (interactionPoint == null) interactionPoint = transform;
-    }
-
-    private void FixedUpdate()
-    {
-        if (autoCheckInFixedUpdate && !consumed)
-            ChestInteractLayer();
-    }
-
-    public void ChestInteractLayer()
-    {
-        if (consumed) return;
-
         int count = Physics.OverlapSphereNonAlloc(
-            interactionPoint.position,
-            interactionRadius,
+            transform.position,
+            detectionRadius,
             overlap,
             bridgeLayer,
             QueryTriggerInteraction.Collide
         );
 
-        if (count <= 0) return;
-
         for (int i = 0; i < count; i++)
         {
             var col = overlap[i];
             if (col == null) continue;
-
-            // Filtrado opcional por tag del cuadrante
             if (!string.IsNullOrEmpty(bridgeQuadrantTag) && !col.CompareTag(bridgeQuadrantTag))
                 continue;
 
-            // Comportamiento tipo VehicleChildCollider: reportar trigger al sistema del puente
-            VehicleBridgeCollision.HandleTriggerFromChild(gameObject, col);
-
-            if (shaderPrefab != null)
-                Instantiate(shaderPrefab, transform.position, transform.rotation);
-
-            consumed = true;
-            Destroy(gameObject);
-            return; // salir para no procesar múltiples colliders en el mismo frame
+            if (TryGetQuadrantInfo(col, out BridgeConstructionGrid grid, out int x, out int z))
+            {
+                string key = $"{grid.GetInstanceID()}_{x}_{z}";
+                if (damagedQuadrants.Contains(key)) continue;
+                ApplyDamageToQuadrant(grid, x, z);
+                damagedQuadrants.Add(key);
+            }
         }
+
+        if (shaderPrefab != null)
+            Instantiate(shaderPrefab, transform.position, transform.rotation);
+
+        Destroy(gameObject);
     }
 
-    private void OnDrawGizmosSelected()
+    private bool TryGetQuadrantInfo(Component collider, out BridgeConstructionGrid grid, out int x, out int z)
     {
-        var p = interactionPoint != null ? interactionPoint : transform;
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(p.position, interactionRadius);
+        grid = null;
+        x = z = -1;
+
+        BridgeQuadrantInfo info = collider.GetComponent<BridgeQuadrantInfo>();
+        if (info == null)
+            info = collider.GetComponentInParent<BridgeQuadrantInfo>();
+
+        if (info != null && info.grid != null)
+        {
+            grid = info.grid;
+            x = info.x;
+            z = info.z;
+            return true;
+        }
+
+        if (!collider.CompareTag(bridgeQuadrantTag))
+            return false;
+
+        grid = collider.GetComponentInParent<BridgeConstructionGrid>();
+        if (grid == null) return false;
+
+        Vector3 worldPoint = (collider is Collider col)
+            ? col.bounds.center
+            : collider.transform.position;
+
+        Vector3 localPos = grid.transform.InverseTransformPoint(worldPoint);
+        x = Mathf.FloorToInt(localPos.x / grid.quadrantSize);
+        z = Mathf.FloorToInt(localPos.z / grid.quadrantSize);
+
+        return true;
+    }
+
+    private void ApplyDamageToQuadrant(BridgeConstructionGrid grid, int x, int z)
+    {
+        if (grid == null) return;
+        if (x < 0 || x >= grid.gridWidth || z < 0 || z >= grid.gridLength)
+        {
+            Debug.LogWarning($"Cuadrante [{x},{z}] fuera de límites");
+            return;
+        }
+        grid.OnVehicleImpact(x, z);
+        Debug.Log($"Daño aplicado al cuadrante [{x},{z}] en {grid.name}");
     }
 }
