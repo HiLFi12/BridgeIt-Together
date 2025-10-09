@@ -71,4 +71,14 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
         if (collision.collider && collision.collider.GetComponent<Arrow>() != null)
             Activar();
     }
+
+    public bool IsReady => isReady;
+    public void ActivateMaterial()
+    {
+        if (!isReady)
+        {
+            SetReady(true);
+            AplicarEstadoVisual();
+        }
+    }
 }

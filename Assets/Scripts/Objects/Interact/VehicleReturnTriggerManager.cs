@@ -195,7 +195,7 @@ public class VehicleReturnTriggerManager : MonoBehaviour
         {
             if (triggerComponent != null)
             {
-                Destroy(triggerComponent);
+//                Destroy(triggerComponent);
             }
         }
         triggerComponents.Clear();
