@@ -270,7 +270,10 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
     // Nuevo punto de extensión: por defecto sólo auto-arranca en Prehistórica; derivadas pueden habilitar otras eras
     protected virtual bool ShouldAutoStart()
     {
-        return era == BridgeQuadrantSO.EraType.Prehistoric;
+        return era == BridgeQuadrantSO.EraType.Prehistoric
+            || era == BridgeQuadrantSO.EraType.Medieval
+            || era == BridgeQuadrantSO.EraType.Contemporary
+            || era == BridgeQuadrantSO.EraType.Futuristic;
     }
 
     private void ResetearHold()
