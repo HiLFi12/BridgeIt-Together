@@ -14,11 +14,5 @@ public class VehicleChildCollider : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (debugMode) Debug.Log($"Trigger detectado en objeto hijo {gameObject.name} con: {other.gameObject.name}");
-        
-        // Reportar al sistema de triggers con el puente
-        if (reportarABridgeCollision)
-        {
-            VehicleBridgeCollision.HandleTriggerFromChild(gameObject, other);
-        }
     }
 }

@@ -1,9 +1,8 @@
-// File: Assets/Scripts/Gameplay/AutoControllers/AutoController.cs
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using BridgeItTogether.Gameplay.Abstractions; // Para IHitable
-using BridgeItTogether.Gameplay.SafeZones;   // Para SafeZoneArea
+using BridgeItTogether.Gameplay.Abstractions;
+using BridgeItTogether.Gameplay.SafeZones;
 
 namespace BridgeItTogether.Gameplay.AutoControllers
 {
@@ -19,17 +18,6 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         [Header("Tags")]
         [SerializeField] private bool asegurarTagVehiculo = true;
         [SerializeField] private string nombreTagVehiculo = "Vehicle";
-        [SerializeField] private string bridgeQuadrantTag = "BridgeQuadrant";
-
-        // ==== Interacción con Puente (OverlapSphere + One Interact Per Collider) ====
-        [Header("Interacción con Puente (OverlapSphere)")]
-        [SerializeField] private Transform interactionPoint;
-        [SerializeField] private float interactionRadius = 1.5f;
-        [SerializeField] private LayerMask bridgeLayer; // capa de colliders del puente
-        [SerializeField] private bool interactAuto = true;
-        [SerializeField, Tooltip("Si está activo, cada collider sólo producirá una interacción de por vida (hasta reinicio)." )] private bool oneInteractPerCollider = true;
-        [SerializeField, Tooltip("Si está activo, sólo se interactúa la primera vez que el collider entra (no mientras permanece dentro)." )] private bool onlyOnEnter = true;
-        [SerializeField] private bool debugInteract = false;
 
         // ==== Lanzamiento de IHitable (Parábola Física) ====
         [Header("Lanzamiento IHitable (Parábola Física)")]
@@ -45,19 +33,11 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         private bool isInitialized;
         private bool isPaused;
         private Vector3 direccionMovimiento;
-        // Tracking de interacción (lógica estilo BaseProbabilitySkill)
-        private readonly HashSet<Collider> previousInsideBridge = new();
-        private readonly HashSet<Collider> insideNowBridge = new();
-        private readonly HashSet<Collider> interactedLifetime = new();
-
-        // Buffers
-        private readonly Collider[] overlap = new Collider[8];
         private readonly Dictionary<Transform, Coroutine> activeLaunches = new();
 
         private void Awake()
         {
             direccionMovimiento = direccionInicial.sqrMagnitude > 0.0001f ? direccionInicial.normalized : Vector3.right;
-            if (interactionPoint == null) interactionPoint = transform;
         }
 
         public void Initialize(Vector3 direction)
@@ -97,16 +77,11 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         {
             if (!isInitialized || isPaused) return;
 
-            // Movimiento hacia la dirección
             if (rb != null && velocidadBase > 0f)
             {
                 Vector3 dir = direccionMovimiento.sqrMagnitude > 0.0001f ? direccionMovimiento.normalized : Vector3.right;
                 rb.MovePosition(rb.position + dir * velocidadBase * Time.fixedDeltaTime);
             }
-
-            // Interacción automática con el puente (detección frame a frame con sets)
-            if (interactAuto)
-                RunInteractionDetection();
         }
 
         public void SetSpeed(float speed) => velocidadBase = Mathf.Max(0f, speed);
@@ -144,71 +119,6 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             Vector3 look = new Vector3(direccionMovimiento.x, 0f, direccionMovimiento.z);
             if (look.sqrMagnitude > 0.0001f)
                 transform.rotation = Quaternion.LookRotation(look, Vector3.up);
-        }
-
-        // ===================== Interact (daño al puente) =====================
-        private void RunInteractionDetection()
-        {
-            if (!isInitialized) return;
-
-            insideNowBridge.Clear();
-
-            int count = Physics.OverlapSphereNonAlloc(
-                interactionPoint.position,
-                interactionRadius,
-                overlap,
-                bridgeLayer,
-                QueryTriggerInteraction.Collide
-            );
-
-            if (count <= 0)
-            {
-                previousInsideBridge.Clear();
-                return;
-            }
-
-            var legacy = GetComponent<VehicleBridgeCollision>();
-            if (legacy == null)
-            {
-                if (debugInteract)
-                    Debug.LogWarning("[AutoController] VehicleBridgeCollision no encontrado en el vehículo.", this);
-                return;
-            }
-
-            for (int i = 0; i < count; i++)
-            {
-                var col = overlap[i];
-                if (col == null) continue;
-
-                insideNowBridge.Add(col);
-
-                bool isNewEntry = !previousInsideBridge.Contains(col);
-                if (onlyOnEnter && !isNewEntry) continue; // Solo primera vez al entrar
-                if (oneInteractPerCollider && interactedLifetime.Contains(col)) continue; // ya interactuado de por vida
-                if (!string.IsNullOrEmpty(bridgeQuadrantTag) && !col.CompareTag(bridgeQuadrantTag)) continue;
-
-                VehicleBridgeCollision.HandleTriggerFromChild(gameObject, col);
-                if (oneInteractPerCollider)
-                    interactedLifetime.Add(col);
-
-                if (debugInteract)
-                    Debug.Log($"[AutoController] Bridge interact -> {col.name} (newEntry={isNewEntry}, lifetime={(oneInteractPerCollider ? "tracked" : "multi")})", col);
-            }
-
-            previousInsideBridge.Clear();
-            foreach (var c in insideNowBridge)
-                previousInsideBridge.Add(c);
-        }
-
-        /// <summary>
-        /// Limpia el estado de interacción (para reutilización / pooling).
-        /// </summary>
-        public void ResetInteractionState(bool clearLifetime = false)
-        {
-            previousInsideBridge.Clear();
-            insideNowBridge.Clear();
-            if (clearLifetime)
-                interactedLifetime.Clear();
         }
 
         // ===================== IHitable: colisión y lanzamiento =====================
@@ -306,7 +216,6 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             float tan = Mathf.Tan(angleRad);
             float g = Mathf.Max(0.01f, launchGravity);
 
-            // Tiempo total horizontal: x(t) = v * cos(a) * t
             float totalTime = distance / (v * cos);
 
             Rigidbody trb = target.GetComponent<Rigidbody>();
@@ -334,7 +243,7 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             }
 
             if (target != null)
-                target.position = destino; // snap final
+                target.position = destino;
 
             if (hadRB && kinematicDuringLaunch && trb != null)
                 trb.isKinematic = prevKinematic;
@@ -394,13 +303,6 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             }
 
             return false;
-        }
-
-        protected virtual void OnDrawGizmosSelected()
-        {
-            if (interactionPoint == null) interactionPoint = transform;
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(interactionPoint.position, interactionRadius);
         }
     }
 }
