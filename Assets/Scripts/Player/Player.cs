@@ -16,6 +16,15 @@ public class Player : MonoBehaviour, IHitable
     [SerializeField] private KeyCode dropKey = KeyCode.Q;
     [SerializeField] private KeyCode buildKey = KeyCode.F;
     
+    [Header("Dash Settings")]
+    [SerializeField] private KeyCode dashKey = KeyCode.LeftShift;
+    [SerializeField] private float dashDistance = 5f;
+    [SerializeField] private float dashDuration = 0.2f;
+    [SerializeField] private float dashCooldown = 1f;
+    [SerializeField] private AnimationCurve dashCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    [SerializeField] private bool requireMovementForDash = true;
+    [SerializeField] private bool dashOnlyWhenGrounded = true;
+    
     [Header("Interaction UI")]
     [SerializeField] private Image interactionUIImage;
 
@@ -25,6 +34,15 @@ public class Player : MonoBehaviour, IHitable
     private PlayerObjectHolder objectHolder;
     private PlayerBridgeInteraction bridgeInteraction;
     private PlayerAnimator playerAnimator;
+    private CharacterController characterController;
+    private PlayerController playerController;
+
+    // Dash state
+    private bool isDashing = false;
+    private bool canDash = true;
+    private float dashCooldownTimer = 0f;
+    private Vector3 dashDirection;
+    private float dashTimer = 0f;
 
     [Header("Debug Bridge Hotkey")]
     [SerializeField] private bool enableFillBridgeHotkey = false;
@@ -36,6 +54,9 @@ public class Player : MonoBehaviour, IHitable
         objectHolder = GetComponent<PlayerObjectHolder>();
         bridgeInteraction = GetComponent<PlayerBridgeInteraction>();
         playerAnimator = GetComponent<PlayerAnimator>();
+        characterController = GetComponent<CharacterController>();
+        playerController = GetComponent<PlayerController>();
+        
         interactionUIImage.gameObject.SetActive(false);
         // Inicializar BuildUI oculto
         if (buildUIImage != null) buildUIImage.gameObject.SetActive(false);
@@ -49,6 +70,29 @@ public class Player : MonoBehaviour, IHitable
 
     void Update()
     {
+        // Actualizar cooldown del dash
+        if (!canDash)
+        {
+            dashCooldownTimer -= Time.deltaTime;
+            if (dashCooldownTimer <= 0f)
+            {
+                canDash = true;
+            }
+        }
+
+        // Ejecutar dash si está activo
+        if (isDashing)
+        {
+            ExecuteDash();
+            return; // No procesar otras acciones durante el dash
+        }
+
+        // Detectar input de dash
+        if (Input.GetKeyDown(dashKey) && canDash)
+        {
+            TryStartDash();
+        }
+
         TryInteract();
 
         if (Input.GetKeyDown(dropKey))
@@ -84,6 +128,113 @@ public class Player : MonoBehaviour, IHitable
             }
         }
     }
+
+    private void TryStartDash()
+    {
+        // Verificar si tiene CharacterController
+        if (characterController == null)
+        {
+            Debug.LogWarning("[Player] No se puede hacer dash sin CharacterController");
+            return;
+        }
+
+        // Verificar si está en el suelo (si es requerido)
+        if (dashOnlyWhenGrounded && !characterController.isGrounded)
+        {
+            return;
+        }
+
+        // Determinar dirección del dash
+        Vector3 direction = Vector3.zero;
+        
+        if (requireMovementForDash && playerController != null)
+        {
+            // Usar el input de movimiento actual
+            Vector2 movementInput = playerController.MovementInput;
+            
+            if (movementInput.magnitude < 0.1f)
+            {
+                // No hay input de movimiento suficiente
+                return;
+            }
+            
+            direction = new Vector3(movementInput.x, 0f, movementInput.y).normalized;
+        }
+        else
+        {
+            // Usar la dirección hacia donde mira el jugador
+            direction = transform.forward;
+        }
+
+        // Iniciar el dash
+        StartDash(direction);
+    }
+
+    private void StartDash(Vector3 direction)
+    {
+        isDashing = true;
+        dashDirection = direction;
+        dashTimer = 0f;
+        
+        // Iniciar cooldown
+        canDash = false;
+        dashCooldownTimer = dashCooldown;
+        
+        Debug.Log($"[Player] Dash iniciado en dirección: {direction}");
+    }
+
+    private void ExecuteDash()
+    {
+        dashTimer += Time.deltaTime;
+        
+        // Calcular progreso del dash (0 a 1)
+        float progress = Mathf.Clamp01(dashTimer / dashDuration);
+        
+        // Aplicar la curva de animación
+        float curveValue = dashCurve.Evaluate(progress);
+        
+        // Calcular la velocidad instantánea del dash usando derivada de la curva
+        float speed = dashDistance / dashDuration * GetCurveDerivative(progress);
+        
+        // Calcular el movimiento de este frame
+        Vector3 movement = dashDirection * speed * Time.deltaTime;
+        
+        // Aplicar el movimiento usando CharacterController (respeta colisiones)
+        if (characterController != null)
+        {
+            characterController.Move(movement);
+        }
+        
+        // Verificar si el dash ha terminado
+        if (progress >= 1f)
+        {
+            EndDash();
+        }
+    }
+
+    private void EndDash()
+    {
+        isDashing = false;
+        dashTimer = 0f;
+        
+        Debug.Log("[Player] Dash completado");
+    }
+
+    // Calcula la derivada aproximada de la curva para velocidad suave
+    private float GetCurveDerivative(float progress)
+    {
+        float epsilon = 0.01f;
+        float nextProgress = Mathf.Min(progress + epsilon, 1f);
+        
+        float currentValue = dashCurve.Evaluate(progress);
+        float nextValue = dashCurve.Evaluate(nextProgress);
+        
+        return (nextValue - currentValue) / epsilon;
+    }
+
+    // Propiedades públicas para verificar estado del dash
+    public bool IsDashing => isDashing;
+    public bool CanDash => canDash && !isDashing;
 
     private void TryInteract()
     {
@@ -219,6 +370,12 @@ public class Player : MonoBehaviour, IHitable
     
     public void OnLaunched(Vector3 targetPosition)
     {
+        // Cancelar dash si está activo durante un lanzamiento
+        if (isDashing)
+        {
+            EndDash();
+        }
+        
         // Ya no soltamos el objeto al ser lanzados: el holder mantiene el objeto en la mano.
         // Por seguridad, si hay algo en la mano, reafirmamos su estado físico (kinematic + sin gravedad).
         if (objectHolder != null && objectHolder.HasObjectInHand())
@@ -240,5 +397,12 @@ public class Player : MonoBehaviour, IHitable
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(interactionPoint.position, interactionRadius);
+        
+        // Visualizar dirección y distancia del dash
+        if (isDashing && Application.isPlaying)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(transform.position, transform.position + dashDirection * dashDistance);
+        }
     }
 }
