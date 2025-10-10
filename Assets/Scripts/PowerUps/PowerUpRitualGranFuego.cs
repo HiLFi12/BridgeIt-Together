@@ -36,6 +36,10 @@ public class PowerUpRitualGranFuego : PowerUpBase
     private bool isDead = false;
     public System.Action OnDie;
 
+    [Header("Lifetime Options")]
+    [SerializeField, Tooltip("Si está activado, el power-up no expirará por tiempo (TTL) y permanecerá en el mapa hasta ser consumido.")]
+    private bool infiniteLifetime = false;
+
     protected override void Start()
     {
         base.Start();
@@ -102,6 +106,12 @@ public class PowerUpRitualGranFuego : PowerUpBase
     // Usar el TTL heredado del PowerUpBase para disparar la muerte si no se activó a tiempo
     protected override IEnumerator LifeTimer()
     {
+        // Si está en modo infinito, no expira por tiempo: solo se destruye al consumirse
+        if (infiniteLifetime)
+        {
+            yield break;
+        }
+
         yield return new WaitForSeconds(timeToLive);
         if (!isActive)
         {
