@@ -27,6 +27,8 @@ public class PowerUpRitualGranFuego : PowerUpBase
     // Efectos visuales de las antorchas
     private GameObject leftTorchFireEffect;
     private GameObject rightTorchFireEffect;
+    [SerializeField] private Transform leftFireSpawnPoint; // Nuevo: punto de spawn del fuego izquierda
+    [SerializeField]private Transform rightFireSpawnPoint; // Nuevo: punto de spawn del fuego derecha
 
     [Header("Lifetime / Despawn")]
     [SerializeField, Tooltip("Efecto visual al morir (opcional)")]
@@ -41,6 +43,9 @@ public class PowerUpRitualGranFuego : PowerUpBase
         base.Start();
         // Configurar los componentes TorchInteractable en los colliders
         SetupTorchInteractables();
+        // Buscar puntos de spawn del fuego
+        leftFireSpawnPoint = leftTorchCollider != null ? leftTorchCollider.transform.Find("FireSpawnPoint") : null;
+        rightFireSpawnPoint = rightTorchCollider != null ? rightTorchCollider.transform.Find("FireSpawnPoint") : null;
     }
 
     private void SetupTorchInteractables()
@@ -118,7 +123,6 @@ public class PowerUpRitualGranFuego : PowerUpBase
 
         leftTorchLit = true;
         leftTorchTimer = 0f;
-        
         // Activar efecto visual
         if (torchFireEffectPrefab != null && leftTorchCollider != null)
         {
@@ -126,7 +130,9 @@ public class PowerUpRitualGranFuego : PowerUpBase
             {
                 Destroy(leftTorchFireEffect);
             }
-            leftTorchFireEffect = Instantiate(torchFireEffectPrefab, leftTorchCollider.transform);
+            // Instanciar en el punto de spawn si existe, si no en el centro del collider
+            Transform spawnPoint = leftFireSpawnPoint != null ? leftFireSpawnPoint : leftTorchCollider.transform;
+            leftTorchFireEffect = Instantiate(torchFireEffectPrefab, spawnPoint.position, spawnPoint.rotation, spawnPoint);
         }
     }
 
@@ -139,7 +145,6 @@ public class PowerUpRitualGranFuego : PowerUpBase
 
         rightTorchLit = true;
         rightTorchTimer = 0f;
-        
         // Activar efecto visual
         if (torchFireEffectPrefab != null && rightTorchCollider != null)
         {
@@ -147,7 +152,9 @@ public class PowerUpRitualGranFuego : PowerUpBase
             {
                 Destroy(rightTorchFireEffect);
             }
-            rightTorchFireEffect = Instantiate(torchFireEffectPrefab, rightTorchCollider.transform);
+            // Instanciar en el punto de spawn si existe, si no en el centro del collider
+            Transform spawnPoint = rightFireSpawnPoint != null ? rightFireSpawnPoint : rightTorchCollider.transform;
+            rightTorchFireEffect = Instantiate(torchFireEffectPrefab, spawnPoint.position, spawnPoint.rotation, spawnPoint);
         }
     }
 
@@ -275,10 +282,12 @@ public class PowerUpRitualGranFuego : PowerUpBase
         {
             Debug.LogWarning("PowerUpRitualGranFuego: Asigna los colliders de las antorchas en el inspector.");
         }
-        
         if (bridgeGrid == null)
         {
             bridgeGrid = FindObjectOfType<BridgeConstructionGrid>();
         }
+        // Actualizar puntos de spawn en el editor
+        leftFireSpawnPoint = leftTorchCollider != null ? leftTorchCollider.transform.Find("FireSpawnPoint") : null;
+        rightFireSpawnPoint = rightTorchCollider != null ? rightTorchCollider.transform.Find("FireSpawnPoint") : null;
     }
-} 
+}
