@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using BridgeItTogether.Gameplay.Spawning;
 using BridgeItTogether.Gameplay.Rondas;
+using BridgeItTogether.Gameplay.AutoControllers;
 
 /// <summary>
 /// Maneja las condiciones de victoria y derrota del juego basadas en triggers con tags
@@ -40,7 +41,7 @@ public class GameConditionManager : MonoBehaviour
     private PlayerController[] playerControllers;
     private PlayerAnimator[] playerAnimators;
     
-    [Header("Configuración de Derrota")]
+    [Header("Configuración de DerrotaDerrota")]
     [SerializeField] private int vehiculosParaDerrota = 3;
     [SerializeField] private string tagTriggerDerrota = "FallTrigger";
     
@@ -356,11 +357,24 @@ public class GameConditionManager : MonoBehaviour
     {
         if (!juegoActivo || juegoTerminado || juegoEnPausa) return;
         // Si un vehículo cae, también decrementa la cantidad de vehículos restantes (ya no cuenta al spawnear)
-        contadorDerrota++;
+        
+        // Verificar si es un auto presidencial
+        if (vehiculo.GetComponent<PresidentialCarController>() != null)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                contadorDerrota++;
+                lifeStarsUI.LoseLife();
+            }
+        }
+        else
+        {
+            contadorDerrota++;
+            lifeStarsUI.LoseLife();
+        }
+
         if (vehiculosRestantes > 0) vehiculosRestantes--;
         
-        lifeStarsUI.LoseLife();
-
         if (mostrarDebugInfo)
         {
             Debug.Log($"💥 Vehículo cayó! Progreso de derrota: {contadorDerrota}/{vehiculosParaDerrota} - Vehículo: {vehiculo.name} | Vehículos restantes: {vehiculosRestantes}/{vehiculosParaVictoria}");
@@ -1451,7 +1465,6 @@ public class GameConditionManager : MonoBehaviour
         Victoria();
     }
     
-    // ...existing code...
     /// <summary>
     /// Test - Simular derrota para probar detención de autos
     /// </summary>

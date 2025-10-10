@@ -134,7 +134,7 @@ public class SimpleVehicleDamage : MonoBehaviour
     }
 
 
-    private void ApplyDamageToQuadrant(BridgeConstructionGrid grid, int x, int z)
+    public virtual void ApplyDamageToQuadrant(BridgeConstructionGrid grid, int x, int z)
     {
         if (grid == null) return;
 
