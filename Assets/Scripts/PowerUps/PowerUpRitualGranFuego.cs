@@ -43,9 +43,7 @@ public class PowerUpRitualGranFuego : PowerUpBase
         base.Start();
         // Configurar los componentes TorchInteractable en los colliders
         SetupTorchInteractables();
-        // Buscar puntos de spawn del fuego
-        leftFireSpawnPoint = leftTorchCollider != null ? leftTorchCollider.transform.Find("FireSpawnPoint") : null;
-        rightFireSpawnPoint = rightTorchCollider != null ? rightTorchCollider.transform.Find("FireSpawnPoint") : null;
+        // Ya no se asignan los puntos de spawn por código, se asignan solo por inspector
     }
 
     private void SetupTorchInteractables()
@@ -286,8 +284,6 @@ public class PowerUpRitualGranFuego : PowerUpBase
         {
             bridgeGrid = FindObjectOfType<BridgeConstructionGrid>();
         }
-        // Actualizar puntos de spawn en el editor
-        leftFireSpawnPoint = leftTorchCollider != null ? leftTorchCollider.transform.Find("FireSpawnPoint") : null;
-        rightFireSpawnPoint = rightTorchCollider != null ? rightTorchCollider.transform.Find("FireSpawnPoint") : null;
+        // Ya no se asignan los puntos de spawn por código, se asignan solo por inspector
     }
 }
