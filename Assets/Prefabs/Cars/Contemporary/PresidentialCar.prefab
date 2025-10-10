@@ -1636,7 +1636,30 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 50872bf94bc2d1849a55562c4899104b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3375938372581950457}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 50872bf94bc2d1849a55562c4899104b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5101426642414995565}
   m_SourcePrefab: {fileID: 100100000, guid: 50872bf94bc2d1849a55562c4899104b, type: 3}
+--- !u!1 &3303928095567541328 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -96392906182340073, guid: 50872bf94bc2d1849a55562c4899104b, type: 3}
+  m_PrefabInstance: {fileID: 6012413463247070791}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3824290426287608093 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1845638217075591334, guid: 50872bf94bc2d1849a55562c4899104b, type: 3}
+  m_PrefabInstance: {fileID: 6012413463247070791}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4290614278340908693 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1658678416848408366, guid: 50872bf94bc2d1849a55562c4899104b, type: 3}
+  m_PrefabInstance: {fileID: 6012413463247070791}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5585564243506669771 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2230279233451101836, guid: 50872bf94bc2d1849a55562c4899104b, type: 3}
+  m_PrefabInstance: {fileID: 6012413463247070791}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6123447771168194988 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 50872bf94bc2d1849a55562c4899104b, type: 3}
@@ -1719,3 +1742,22 @@ MonoBehaviour:
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
+--- !u!114 &5101426642414995565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6895305567281290006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1483412f114c4d8c519dc8c4745963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ruedas:
+  - {fileID: 4290614278340908693}
+  - {fileID: 5585564243506669771}
+  - {fileID: 3824290426287608093}
+  - {fileID: 3303928095567541328}
+  velocidadRotacion: 360
+  ejeRotacion: {x: 1, y: 0, z: 0}
