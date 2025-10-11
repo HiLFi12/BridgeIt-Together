@@ -145,10 +145,10 @@ public class FutureMixerManager : MonoBehaviour, IInteractable
         }
 
         // 2. Iniciar corutina para colocar después del delay
-        StartCoroutine(ColocarConDelay(player, heldObj, itemType));
+        StartCoroutine(ColocarConDelay(player, itemType));
     }
 
-    private IEnumerator ColocarConDelay(GameObject player, GameObject heldObj, int itemType)
+    private IEnumerator ColocarConDelay(GameObject player, int itemType)
     {
         Debug.Log($"Tipo detectado: {(itemType == 1 ? "Material Tipo 4 (Batería)" : "Material para mezclar")} - Esperando {delayColocacion}s...");
         

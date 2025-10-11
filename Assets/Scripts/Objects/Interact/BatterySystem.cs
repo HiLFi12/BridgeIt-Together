@@ -55,7 +55,20 @@ public class BatterySystem : MonoBehaviour, IInteractable
             return;
         }
         
-        // Verificar si ya está al máximo de cargas
+        // Si ya está cargada (isCharged = true), permitir recargar y resetear el cooldown
+        if (isCharged)
+        {
+            // Resetear el cooldown
+            tiempoRestanteCooldown = cooldownTime;
+            
+            // Consumir el objeto de la mano del jugador
+            playerObjectHolder.UseHeldObject();
+            
+            Debug.Log("Batería recargada. Cooldown reiniciado.");
+            return;
+        }
+        
+        // Si no está cargada, verificar si ya está al máximo de cargas (antes de activar isCharged)
         if (cargasActuales >= maxCargas)
         {
             Debug.Log("La batería ya está completamente cargada.");
@@ -125,4 +138,3 @@ public class BatterySystem : MonoBehaviour, IInteractable
         return false;
     }
 }
-
