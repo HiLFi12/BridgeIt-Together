@@ -12,6 +12,14 @@
             </PendingDiffInfo>
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/Assets/Scripts/Objects/Interact/FloatingObject.cs">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/Assets/Scripts/Objects/Interact/FloatingObject.cs" />
+              <option name="updatedContent" value="using UnityEngine;&#10;&#10;public class FloatingObject : MonoBehaviour&#10;{&#10;    [Header(&quot;Altura máxima de flotación&quot;)]&#10;    [SerializeField] private float amplitude = 0.5f;&#10;    [Header(&quot;Velocidad de flotación&quot;)]&#10;    [SerializeField] private float frequency = 1f;&#10;    [Header(&quot;Desfase inicial&quot;)]&#10;    [SerializeField] private float phaseOffset = 0f;&#10;    [Header(&quot;Suavizado del movimiento&quot;)]&#10;    [SerializeField] private float smooth = 5f;&#10;&#10;    private Vector3 initialPosition;&#10;    private float timeOffset;&#10;&#10;    void Start()&#10;    {&#10;        initialPosition = transform.localPosition;&#10;        timeOffset = Random.Range(0f, 100f) + phaseOffset;&#10;    }&#10;&#10;    void Update()&#10;    {&#10;        float targetY = initialPosition.y + Mathf.Sin((Time.time + timeOffset) * frequency) * amplitude;&#10;        Vector3 targetPosition = new Vector3(initialPosition.x, targetY, initialPosition.z);&#10;        transform.localPosition = Vector3.Lerp(transform.localPosition, targetPosition, Time.deltaTime * smooth);&#10;    }&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
