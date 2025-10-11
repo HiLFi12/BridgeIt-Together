@@ -8,7 +8,7 @@ public class PlasterBucketSpawner : MonoBehaviour, IInteractable
 
     public InteractPriority InteractPriority => interactPriority;
 
-    public void Interact(GameObject interactor)
+    public virtual void Interact(GameObject interactor)
     {
         if (prefabMaterialTipo2 == null)
         {
