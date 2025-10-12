@@ -1,5 +1,12 @@
 using System.Collections;
 using UnityEngine;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class BatteryVisualEmission
+{
+    public List<Renderer> renderers;
+}
 
 public class PowerUpConstructorHolografico : PowerUpBase
 {
@@ -12,9 +19,20 @@ public class PowerUpConstructorHolografico : PowerUpBase
 
     [Header("Visuales de baterías")]
     [SerializeField] private GameObject[] batteryVisuals; // Visuales para cada batería
+    
+    [Header("Emisión de visuales de baterías")]
+    [SerializeField] private List<BatteryVisualEmission> batteryEmissionVisuals; // Visuales con renderers para cada batería
+    [SerializeField] private Color colorEmisionCargado = Color.green;
+    [SerializeField] private Color colorEmisionDescargado = Color.red;
+    [SerializeField] private float intensidadEmisionCargado = 2f;
+    [SerializeField] private float intensidadEmisionDescargado = 0.5f;
+    [SerializeField] private float velocidadCambioColor = 2f;
 
     private bool isActivating = false;
     private float activationTimer = 0f;
+    private Material[][] materialesInstanciados; // Materiales instanciados por visual
+    private Color[][] coloresEmisionActuales; // Color actual por material
+    private float[] intensidadesEmisionActuales; // Intensidad actual por visual
 
     protected override void Start()
     {
@@ -23,6 +41,46 @@ public class PowerUpConstructorHolografico : PowerUpBase
         if (bridgeGrid == null)
         {
             bridgeGrid = FindObjectOfType<BridgeConstructionGrid>();
+        }
+    }
+
+    private void Awake()
+    {
+        int n = batteryEmissionVisuals != null ? batteryEmissionVisuals.Count : 0;
+        materialesInstanciados = new Material[n][];
+        coloresEmisionActuales = new Color[n][];
+        intensidadesEmisionActuales = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            var visual = batteryEmissionVisuals[i];
+            List<Material> mats = new List<Material>();
+            if (visual != null && visual.renderers != null)
+            {
+                foreach (var rend in visual.renderers)
+                {
+                    if (rend != null)
+                    {
+                        var origMats = rend.materials;
+                        Material[] instMats = new Material[origMats.Length];
+                        for (int j = 0; j < origMats.Length; j++)
+                        {
+                            instMats[j] = new Material(origMats[j]);
+                        }
+                        rend.materials = instMats;
+                        mats.AddRange(instMats);
+                    }
+                }
+            }
+            materialesInstanciados[i] = mats.ToArray();
+            coloresEmisionActuales[i] = new Color[mats.Count];
+            for (int j = 0; j < mats.Count; j++)
+            {
+                if (mats[j] != null && mats[j].HasProperty("_EmissionColor"))
+                    coloresEmisionActuales[i][j] = mats[j].GetColor("_EmissionColor");
+                else
+                    coloresEmisionActuales[i][j] = Color.black;
+            }
+            intensidadesEmisionActuales[i] = intensidadEmisionDescargado;
         }
     }
 
@@ -37,6 +95,31 @@ public class PowerUpConstructorHolografico : PowerUpBase
                 if (batteryVisuals[i] != null && batterySystems[i] != null)
                 {
                     batteryVisuals[i].SetActive(batterySystems[i].IsCharged);
+                }
+            }
+        }
+        // Emisión: cambiar color/intensidad según estado de cada batería, usando materiales instanciados
+        if (batterySystems != null && materialesInstanciados != null)
+        {
+            int count = Mathf.Min(batterySystems.Length, materialesInstanciados.Length);
+            for (int i = 0; i < count; i++)
+            {
+                bool isCharged = batterySystems[i] != null && batterySystems[i].IsCharged;
+                Color objetivo = isCharged ? colorEmisionCargado : colorEmisionDescargado;
+                float intensidadObjetivo = isCharged ? intensidadEmisionCargado : intensidadEmisionDescargado;
+                intensidadesEmisionActuales[i] = Mathf.Lerp(intensidadesEmisionActuales[i], intensidadObjetivo, Time.deltaTime * velocidadCambioColor);
+                for (int j = 0; j < materialesInstanciados[i].Length; j++)
+                {
+                    coloresEmisionActuales[i][j] = Color.Lerp(coloresEmisionActuales[i][j], objetivo, Time.deltaTime * velocidadCambioColor);
+                    var mat = materialesInstanciados[i][j];
+                    if (mat != null && mat.HasProperty("_EmissionColor"))
+                    {
+                        mat.SetColor("_EmissionColor", coloresEmisionActuales[i][j] * intensidadesEmisionActuales[i]);
+                        if (coloresEmisionActuales[i][j].maxColorComponent > 0.01f)
+                            mat.EnableKeyword("_EMISSION");
+                        else
+                            mat.DisableKeyword("_EMISSION");
+                    }
                 }
             }
         }
