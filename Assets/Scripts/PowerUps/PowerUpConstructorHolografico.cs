@@ -28,11 +28,26 @@ public class PowerUpConstructorHolografico : PowerUpBase
     [SerializeField] private float intensidadEmisionDescargado = 0.5f;
     [SerializeField] private float velocidadCambioColor = 2f;
 
+    [Header("Emisión progresiva del powerup")]
+    [SerializeField] private MeshRenderer meshRendererEmisionPowerup;
+    [SerializeField] private Color colorEmisionPowerup = Color.cyan;
+    [SerializeField] private float emisionInicial = 0.2f;
+    [SerializeField] private float emisionFinal = 3f;
+    
+    [Header("Instanciación de GameObject")]
+    [SerializeField] private GameObject prefabAInstanciar; // Prefab del shader/objeto a instanciar
+    [SerializeField] private Transform puntoInstanciacion; // Punto donde se instanciará (opcional, si es null usa la posición del powerup)
+    [SerializeField] private float delayInstanciacion = 2f; // Segundos después de activarse antes de instanciar
+
     private bool isActivating = false;
     private float activationTimer = 0f;
     private Material[][] materialesInstanciados; // Materiales instanciados por visual
     private Color[][] coloresEmisionActuales; // Color actual por material
     private float[] intensidadesEmisionActuales; // Intensidad actual por visual
+    private Material materialEmisionInstanciado;
+    private float emisionActual;
+    private bool estaAumentandoEmision = false;
+    private float tiempoAumentoEmision = 0f;
 
     protected override void Start()
     {
@@ -41,6 +56,20 @@ public class PowerUpConstructorHolografico : PowerUpBase
         if (bridgeGrid == null)
         {
             bridgeGrid = FindObjectOfType<BridgeConstructionGrid>();
+        }
+        
+        // Inicializar material de emisión del MeshRenderer
+        if (meshRendererEmisionPowerup != null)
+        {
+            materialEmisionInstanciado = new Material(meshRendererEmisionPowerup.material);
+            meshRendererEmisionPowerup.material = materialEmisionInstanciado;
+            emisionActual = emisionInicial;
+            
+            if (materialEmisionInstanciado.HasProperty("_EmissionColor"))
+            {
+                materialEmisionInstanciado.SetColor("_EmissionColor", colorEmisionPowerup * emisionActual);
+                materialEmisionInstanciado.EnableKeyword("_EMISSION");
+            }
         }
     }
 
@@ -123,6 +152,32 @@ public class PowerUpConstructorHolografico : PowerUpBase
                 }
             }
         }
+        // Emisión progresiva del powerup
+        if (estaAumentandoEmision && materialEmisionInstanciado != null)
+        {
+            tiempoAumentoEmision += Time.deltaTime;
+            float t = Mathf.Clamp01(tiempoAumentoEmision / activationDelay);
+            emisionActual = Mathf.Lerp(emisionInicial, emisionFinal, t);
+            
+            if (materialEmisionInstanciado.HasProperty("_EmissionColor"))
+            {
+                materialEmisionInstanciado.SetColor("_EmissionColor", colorEmisionPowerup * emisionActual);
+                
+                if (emisionActual > 0.01f)
+                {
+                    materialEmisionInstanciado.EnableKeyword("_EMISSION");
+                }
+                else
+                {
+                    materialEmisionInstanciado.DisableKeyword("_EMISSION");
+                }
+            }
+            
+            if (t >= 1f)
+            {
+                estaAumentandoEmision = false;
+            }
+        }
 
         if (!isAvailable || isActivating) return;
         if (batterySystems == null || batterySystems.Length == 0) return;
@@ -143,6 +198,14 @@ public class PowerUpConstructorHolografico : PowerUpBase
             // Iniciar cuenta regresiva para activar el powerup
             isActivating = true;
             activationTimer = activationDelay;
+            
+            // Iniciar aumento progresivo de emisión AQUÍ
+            if (materialEmisionInstanciado != null)
+            {
+                estaAumentandoEmision = true;
+                tiempoAumentoEmision = 0f;
+                Debug.Log("[PowerUpConstructorHolografico] Iniciando aumento progresivo de emisión.");
+            }
         }
     }
 
@@ -153,7 +216,8 @@ public class PowerUpConstructorHolografico : PowerUpBase
         if (activationTimer <= 0f)
         {
             isActivating = false;
-            TryActivate(null); // Activar el powerup
+            TryActivate(null);
+            // NO restaurar emisión aquí, se hace después del efecto
         }
     }
 
@@ -172,15 +236,34 @@ public class PowerUpConstructorHolografico : PowerUpBase
         if (bridgeGrid != null)
         {
             ConstructBridgeAutomatically();
-            yield return new WaitForSeconds(duration);
+            Debug.Log("[PowerUpConstructorHolografico] Puente construido automáticamente.");
         }
         else
         {
             Debug.LogError("PowerUpConstructorHolografico: BridgeConstructionGrid no está asignado.");
-            yield return new WaitForSeconds(1f);
         }
 
-        Despawn();
+        // Esperar X segundos antes de instanciar el GameObject
+        Debug.Log($"[PowerUpConstructorHolografico] Esperando {delayInstanciacion} segundos antes de instanciar...");
+        yield return new WaitForSeconds(delayInstanciacion);
+        
+        // Instanciar el GameObject si está asignado
+        if (prefabAInstanciar != null)
+        {
+            Vector3 posicionInstancia = puntoInstanciacion != null ? puntoInstanciacion.position : transform.position;
+            Quaternion rotacionInstancia = puntoInstanciacion != null ? puntoInstanciacion.rotation : transform.rotation;
+            
+            GameObject instancia = Instantiate(prefabAInstanciar, posicionInstancia, rotacionInstancia);
+            Debug.Log($"[PowerUpConstructorHolografico] GameObject instanciado: {instancia.name} en {posicionInstancia}");
+        }
+        else
+        {
+            Debug.LogWarning("[PowerUpConstructorHolografico] No hay prefab asignado para instanciar.");
+        }
+
+        // Destruir este PowerUpConstructorHolografico inmediatamente después de instanciar
+        Debug.Log("[PowerUpConstructorHolografico] Destruyendo PowerUpConstructorHolografico.");
+        Destroy(gameObject);
     }
 
     private void ConstructBridgeAutomatically()
