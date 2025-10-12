@@ -5,6 +5,7 @@ public class Teleporter : MonoBehaviour
 {
     [Header("Configuración de Teleporter")]
     [SerializeField] private Transform destinoTeleport;
+    [SerializeField] private Teleporter teleporterDestino; // Referencia al otro teleportador
     [SerializeField] private float cooldownTime = 3f;
     [SerializeField] private BatterySystem batterySystem;
     
@@ -19,6 +20,17 @@ public class Teleporter : MonoBehaviour
     [SerializeField] private float intensidadEmisionDescargado = 1f;
     [SerializeField] private float velocidadCambioColor = 2f;
     
+    [Header("Emisión de Cooldown")]
+    [SerializeField] private Renderer materialCooldown;
+    [SerializeField] private Renderer materialCooldownDestino; // Renderer del material del otro teleportador
+    [SerializeField] private Color colorEmisionCooldown = Color.cyan;
+    [SerializeField] private float intensidadMaximaCooldown = 5f;
+    [SerializeField] private float intensidadMinimaCooldown = 0f;
+    [SerializeField] private float tiempoEfectoDuplicacion = 0.1f; // Tiempo que dura el efecto de duplicación
+    
+    [Header("Cooldown de Reutilización")]
+    [SerializeField] private float tiempoEntreUsos = 2f; // Tiempo que debe esperar antes de poder usarse de nuevo
+    
     private float cooldownActual;
     private bool cooldownActivo = false;
     private HashSet<GameObject> objetosDentro = new HashSet<GameObject>();
@@ -28,6 +40,14 @@ public class Teleporter : MonoBehaviour
     private float intensidadEmisionActual;
     private float intensidadEmisionObjetivo;
     private Material[][] materialesInstanciados;
+    private Material materialCooldownInstanciado;
+    private Material materialCooldownDestinoInstanciado;
+    
+    private bool esperandoTeletransporte = false;
+    private float tiempoEsperaTeletransporte = 0f;
+    
+    // Sistema de cooldown individual para cada teleportador
+    private float cooldownReutilizacion = 0f;
 
     private void Start()
     {
@@ -67,6 +87,34 @@ public class Teleporter : MonoBehaviour
                 }
             }
         }
+        
+        // Crear instancia propia del material de cooldown
+        if (materialCooldown != null)
+        {
+            materialCooldownInstanciado = new Material(materialCooldown.material);
+            materialCooldown.material = materialCooldownInstanciado;
+            
+            // Iniciar con emisión mínima
+            if (materialCooldownInstanciado.HasProperty("_EmissionColor"))
+            {
+                materialCooldownInstanciado.SetColor("_EmissionColor", colorEmisionCooldown * intensidadMinimaCooldown);
+                materialCooldownInstanciado.DisableKeyword("_EMISSION");
+            }
+        }
+        
+        // Crear instancia del material de cooldown destino
+        if (materialCooldownDestino != null)
+        {
+            materialCooldownDestinoInstanciado = new Material(materialCooldownDestino.material);
+            materialCooldownDestino.material = materialCooldownDestinoInstanciado;
+            
+            // Iniciar con emisión mínima
+            if (materialCooldownDestinoInstanciado.HasProperty("_EmissionColor"))
+            {
+                materialCooldownDestinoInstanciado.SetColor("_EmissionColor", colorEmisionCooldown * intensidadMinimaCooldown);
+                materialCooldownDestinoInstanciado.DisableKeyword("_EMISSION");
+            }
+        }
     }
     
     private void Update()
@@ -74,9 +122,50 @@ public class Teleporter : MonoBehaviour
         // Actualizar visual según el estado de la batería
         ActualizarVisual();
         
+        // Actualizar emisión del material de cooldown
+        ActualizarEmisionCooldown();
+        
+        // Actualizar cooldown de reutilización
+        if (cooldownReutilizacion > 0f)
+        {
+            cooldownReutilizacion -= Time.deltaTime;
+            
+            if (cooldownReutilizacion <= 0f)
+            {
+                cooldownReutilizacion = 0f;
+                Debug.Log($"[Teleporter] {gameObject.name} - Cooldown de reutilización completado.");
+            }
+        }
+        
+        // Si estamos esperando para teletransportar (efecto de duplicación activo)
+        if (esperandoTeletransporte)
+        {
+            tiempoEsperaTeletransporte -= Time.deltaTime;
+            
+            if (tiempoEsperaTeletransporte <= 0f)
+            {
+                // Ejecutar la teletransportación después del efecto
+                EjecutarTeletransportacion();
+                esperandoTeletransporte = false;
+            }
+            return;
+        }
+        
         // Si hay objetos dentro, verificar batería y activar el cooldown
         if (objetosDentro.Count > 0)
         {
+            // Verificar si está en cooldown de reutilización
+            if (cooldownReutilizacion > 0f)
+            {
+                // No hacer nada si está en cooldown de reutilización
+                if (cooldownActivo)
+                {
+                    Debug.Log($"[Teleporter] {gameObject.name} en cooldown de reutilización, pausando proceso.");
+                    cooldownActivo = false;
+                }
+                return;
+            }
+            
             // Solo funcionar si la batería está cargada
             if (!TieneBateria())
             {
@@ -98,10 +187,10 @@ public class Teleporter : MonoBehaviour
             // Decrementar el cooldown
             cooldownActual -= Time.deltaTime;
             
-            // Cuando el cooldown llega a 0, teletransportar
+            // Cuando el cooldown llega a 0, activar efecto de duplicación
             if (cooldownActual <= 0f)
             {
-                TeletransportarTodos();
+                IniciarEfectoDuplicacion();
             }
         }
         else
@@ -243,12 +332,28 @@ public class Teleporter : MonoBehaviour
         // Limpiar la lista y resetear el cooldown
         objetosDentro.Clear();
         ResetearCooldown();
+        
+        // Activar cooldown de reutilización en este teleportador
+        cooldownReutilizacion = tiempoEntreUsos;
+        Debug.Log($"[Teleporter] {gameObject.name} - Cooldown de reutilización iniciado por {tiempoEntreUsos} segundos.");
+        
+        // Activar cooldown de reutilización en el teleportador destino
+        if (teleporterDestino != null)
+        {
+            teleporterDestino.ActivarCooldownReutilizacion(tiempoEntreUsos);
+            Debug.Log($"[Teleporter] Cooldown de reutilización activado en teleportador destino: {teleporterDestino.gameObject.name}");
+        }
+        else
+        {
+            Debug.LogWarning($"[Teleporter] {gameObject.name} - No se pudo activar cooldown en teleportador destino: referencia no asignada.");
+        }
     }
-
+    
     private void ResetearCooldown()
     {
         cooldownActual = cooldownTime;
         cooldownActivo = false;
+        esperandoTeletransporte = false;
     }
     
     // Método público para obtener el tiempo restante (útil para UI o debug)
@@ -329,5 +434,88 @@ public class Teleporter : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void ActualizarEmisionCooldown()
+    {
+        // Calcular el progreso del cooldown (0 = inicio, 1 = listo para teletransportar)
+        float progreso = cooldownActivo ? (cooldownTime - cooldownActual) / cooldownTime : 0f;
+        
+        // La intensidad es inversamente proporcional al cooldown (más progreso = más brillo)
+        float intensidadActual = Mathf.Lerp(intensidadMinimaCooldown, intensidadMaximaCooldown, progreso);
+        
+        // Si estamos en efecto de duplicación, duplicar la intensidad
+        if (esperandoTeletransporte)
+        {
+            intensidadActual *= 2f;
+        }
+        
+        Color colorEmision = colorEmisionCooldown * intensidadActual;
+        
+        // Aplicar el color de emisión al material propio
+        if (materialCooldownInstanciado != null && materialCooldownInstanciado.HasProperty("_EmissionColor"))
+        {
+            materialCooldownInstanciado.SetColor("_EmissionColor", colorEmision);
+            
+            if (intensidadActual > 0.01f)
+            {
+                materialCooldownInstanciado.EnableKeyword("_EMISSION");
+            }
+            else
+            {
+                materialCooldownInstanciado.DisableKeyword("_EMISSION");
+            }
+        }
+        
+        // Aplicar el color de emisión al material de destino
+        if (materialCooldownDestinoInstanciado != null && materialCooldownDestinoInstanciado.HasProperty("_EmissionColor"))
+        {
+            materialCooldownDestinoInstanciado.SetColor("_EmissionColor", colorEmision);
+            
+            if (intensidadActual > 0.01f)
+            {
+                materialCooldownDestinoInstanciado.EnableKeyword("_EMISSION");
+            }
+            else
+            {
+                materialCooldownDestinoInstanciado.DisableKeyword("_EMISSION");
+            }
+        }
+    }
+
+    private void IniciarEfectoDuplicacion()
+    {
+        Debug.Log("[Teleporter] Iniciando efecto de duplicación de emisión.");
+        
+        // Iniciar el timer para esperar antes de teletransportar
+        tiempoEsperaTeletransporte = tiempoEfectoDuplicacion;
+        esperandoTeletransporte = true;
+    }
+
+    private void EjecutarTeletransportacion()
+    {
+        Debug.Log("[Teleporter] Ejecutando teletransportación.");
+        
+        // Teletransportar todos los objetos dentro al destino
+        TeletransportarTodos();
+    }
+    
+    // Método público para activar el cooldown de reutilización desde otro teleportador
+    public void ActivarCooldownReutilizacion(float tiempo)
+    {
+        cooldownReutilizacion = tiempo;
+        Debug.Log($"[Teleporter] {gameObject.name} - Cooldown de reutilización activado externamente por {tiempo} segundos.");
+    }
+    
+    // Método público para verificar si está en cooldown de reutilización
+    public bool EstaEnCooldownReutilizacion()
+    {
+        return cooldownReutilizacion > 0f;
+    }
+    
+    // Método público para obtener el tiempo restante de cooldown de reutilización
+    public float GetCooldownReutilizacionRestante()
+    {
+        return cooldownReutilizacion;
     }
 }
