@@ -24,6 +24,8 @@ public class Player : MonoBehaviour, IHitable
     [SerializeField] private AnimationCurve dashCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
     [SerializeField] private bool requireMovementForDash = true;
     [SerializeField] private bool dashOnlyWhenGrounded = true;
+    [SerializeField] private GameObject dashEffectPrefab;
+    [SerializeField] private Transform dashSpawn;
     
     [Header("Interaction UI")]
     [SerializeField] private Image interactionUIImage;
@@ -179,6 +181,12 @@ public class Player : MonoBehaviour, IHitable
         // Iniciar cooldown
         canDash = false;
         dashCooldownTimer = dashCooldown;
+        
+        // Instanciar efecto visual de dash si el prefab está asignado
+        if (dashEffectPrefab != null)
+        {
+            Instantiate(dashEffectPrefab, dashSpawn.transform.position, Quaternion.identity);
+        }
         
         Debug.Log($"[Player] Dash iniciado en dirección: {direction}");
     }
