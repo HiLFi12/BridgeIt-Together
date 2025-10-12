@@ -124,6 +124,13 @@ public class Teleporter : MonoBehaviour
         // Agregar el objeto a la lista de objetos dentro
         GameObject obj = other.gameObject;
         
+        // Verificar si el objeto es un hijo de un jugador (objeto en la mano)
+        if (EsObjetoEnManoDeJugador(obj))
+        {
+            Debug.Log($"[Teleporter] '{obj.name}' es un objeto en la mano de un jugador, no se agregará a la lista.");
+            return;
+        }
+        
         if (!objetosDentro.Contains(obj))
         {
             objetosDentro.Add(obj);
@@ -139,6 +146,25 @@ public class Teleporter : MonoBehaviour
         {
             objetosDentro.Remove(obj);
         }
+    }
+    
+    private bool EsObjetoEnManoDeJugador(GameObject obj)
+    {
+        if (obj == null) return false;
+        
+        // Recorrer los padres del objeto para ver si alguno tiene PlayerObjectHolder
+        Transform parent = obj.transform.parent;
+        while (parent != null)
+        {
+            PlayerObjectHolder holder = parent.GetComponent<PlayerObjectHolder>();
+            if (holder != null && holder.HasObjectInHand() && holder.GetHeldObject() == obj)
+            {
+                return true;
+            }
+            parent = parent.parent;
+        }
+        
+        return false;
     }
 
     private void TeletransportarTodos()
