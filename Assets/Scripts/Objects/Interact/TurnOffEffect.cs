@@ -3,21 +3,67 @@ using UnityEngine;
 
 public class TurnOffEffect : MonoBehaviour
 {
-    [SerializeField] private float detectionRadius = 5f;
+    [Header("Effect Settings")]
+    [SerializeField] private float startRadius = 5f;
+    [SerializeField] private float maxRadius = 10f;
+    [SerializeField] private float expansionSpeed = 5f;
+    
+    [Header("Visual")]
+    [SerializeField] private GameObject visualObject;
 
     private readonly Collider[] overlap = new Collider[32];
     private readonly HashSet<BridgeQuadrantInstance> affectedQuadrants = new HashSet<BridgeQuadrantInstance>();
+    
+    private float currentRadius;
+    private bool isExpanding = true;
+
+    private void Start()
+    {
+        currentRadius = startRadius;
+        if (visualObject != null)
+        {
+            visualObject.transform.localScale = Vector3.one * startRadius;
+        }
+    }
 
     private void Update()
     {
+        UpdateVisual();
         ApplyEffect();
+    }
+
+    private void UpdateVisual()
+    {
+        if (isExpanding)
+        {
+            currentRadius += expansionSpeed * Time.deltaTime;
+            if (currentRadius >= maxRadius)
+            {
+                currentRadius = maxRadius;
+                isExpanding = false;
+            }
+        }
+        else
+        {
+            currentRadius -= expansionSpeed * Time.deltaTime;
+            if (currentRadius <= 0f)
+            {
+                currentRadius = 0f;
+                Destroy(gameObject);
+            }
+        }
+
+        if (visualObject != null)
+        {
+            visualObject.transform.localScale = Vector3.one * currentRadius;
+        }
     }
 
     public void ApplyEffect()
     {
         int count = Physics.OverlapSphereNonAlloc(
             transform.position,
-            detectionRadius,
+            currentRadius,
             overlap
         );
 
@@ -50,6 +96,7 @@ public class TurnOffEffect : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        float radiusToShow = Application.isPlaying ? currentRadius : startRadius;
+        Gizmos.DrawWireSphere(transform.position, radiusToShow);
     }
 }
