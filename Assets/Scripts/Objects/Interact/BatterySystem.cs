@@ -31,7 +31,7 @@ public class BatterySystem : MonoBehaviour, IInteractable
             // Cuando el cooldown llega a 0, descargar la batería
             if (tiempoRestanteCooldown <= 0f)
             {
-                DescargarBateria();
+                TurnOffBattery();
             }
         }
     }
@@ -113,7 +113,7 @@ public class BatterySystem : MonoBehaviour, IInteractable
         }
     }
 
-    private void DescargarBateria()
+    private void TurnOffBattery()
     {
         isCharged = false;
         cargasActuales = 0;
@@ -124,7 +124,7 @@ public class BatterySystem : MonoBehaviour, IInteractable
     // Método público para descargar manualmente (útil para otras mecánicas)
     public void ForzarDescarga()
     {
-        DescargarBateria();
+        TurnOffBattery();
     }
 
     // Método público para verificar y consumir carga (útil para máquinas que requieren batería)
@@ -132,10 +132,9 @@ public class BatterySystem : MonoBehaviour, IInteractable
     {
         if (isCharged)
         {
-            DescargarBateria();
+            TurnOffBattery();
             return true;
         }
         return false;
     }
 }
-
