@@ -3,98 +3,115 @@ using UnityEngine;
 
 public class PowerUpConstructorHolografico : PowerUpBase
 {
-    [Header("Referencias Específicas")]
-    public GameObject[] batterySlots;
-    private bool[] batteryInserted;
-    public GameObject[] activationButtons;
-    private bool[] buttonsPressed;
-    public float batteryLife = 5f;
-    private float[] batteryTimers;
-    public float buttonHoldTime = 1f;
-    private float[] buttonTimers;
-    public float effectDuration = 15f;
-    public TechUpgradeManager techUpgradeManager;
+    [Header("Referencias de baterías")]
+    [SerializeField] private BatterySystem[] batterySystems; // Array de referencias a BatterySystem
 
-    private void Awake()
-    {
-        batteryInserted = new bool[batterySlots.Length];
-        batteryTimers = new float[batterySlots.Length];
-        buttonsPressed = new bool[activationButtons.Length];
-        buttonTimers = new float[activationButtons.Length];
-    }
+    [Header("Configuración")]
+    [SerializeField] private float activationDelay = 2f; // Segundos de espera tras cargar todas las baterías
+    [SerializeField] private BridgeConstructionGrid bridgeGrid; // Referencia al sistema de puentes
 
-    public void InsertBattery(int slotIndex)
-    {
-        batteryInserted[slotIndex] = true;
-        batteryTimers[slotIndex] = 0f;
-        // Feedback visual/sonoro de inserción
-    }
+    [Header("Visuales de baterías")]
+    [SerializeField] private GameObject[] batteryVisuals; // Visuales para cada batería
 
-    public void PressButton(int buttonIndex)
-    {
-        if (!batteryInserted[buttonIndex]) return;
-        buttonsPressed[buttonIndex] = true;
-    }
+    private bool isActivating = false;
+    private float activationTimer = 0f;
 
-    public void ReleaseButton(int buttonIndex)
+    protected override void Start()
     {
-        buttonsPressed[buttonIndex] = false;
-        buttonTimers[buttonIndex] = 0f;
+        base.Start();
+        // Opcional: buscar BridgeConstructionGrid si no está asignado
+        if (bridgeGrid == null)
+        {
+            bridgeGrid = FindObjectOfType<BridgeConstructionGrid>();
+        }
     }
 
     private void Update()
     {
-        for (int i = 0; i < batteryInserted.Length; i++)
+        // Visuales: activar/desactivar según estado de cada batería
+        if (batterySystems != null && batteryVisuals != null)
         {
-            if (batteryInserted[i])
+            int count = Mathf.Min(batterySystems.Length, batteryVisuals.Length);
+            for (int i = 0; i < count; i++)
             {
-                batteryTimers[i] += Time.deltaTime;
-                if (batteryTimers[i] > batteryLife)
+                if (batteryVisuals[i] != null && batterySystems[i] != null)
                 {
-                    batteryInserted[i] = false;
-                    // Feedback visual/sonoro de batería agotada
+                    batteryVisuals[i].SetActive(batterySystems[i].IsCharged);
                 }
             }
         }
-        for (int i = 0; i < buttonsPressed.Length; i++)
+
+        if (!isAvailable || isActivating) return;
+        if (batterySystems == null || batterySystems.Length == 0) return;
+
+        // Verificar si todas las baterías están cargadas
+        bool allCharged = true;
+        foreach (var battery in batterySystems)
         {
-            if (buttonsPressed[i] && batteryInserted[i])
+            if (battery == null || !battery.IsCharged)
             {
-                buttonTimers[i] += Time.deltaTime;
-            }
-            else
-            {
-                buttonTimers[i] = 0f;
-            }
-        }
-        bool allReady = true;
-        for (int i = 0; i < buttonTimers.Length; i++)
-        {
-            if (!(buttonsPressed[i] && batteryInserted[i] && buttonTimers[i] >= buttonHoldTime))
-            {
-                allReady = false;
+                allCharged = false;
                 break;
             }
         }
-        if (allReady && !isActive)
+
+        if (allCharged)
         {
-            TryActivate(null);
+            // Iniciar cuenta regresiva para activar el powerup
+            isActivating = true;
+            activationTimer = activationDelay;
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (!isActivating) return;
+        activationTimer -= Time.deltaTime;
+        if (activationTimer <= 0f)
+        {
+            isActivating = false;
+            TryActivate(null); // Activar el powerup
         }
     }
 
     protected override IEnumerator EffectCoroutine(GameObject activator)
     {
-        // Activar mejora tecnológica
-        if (techUpgradeManager != null)
+        // Descargar todas las baterías
+        foreach (var battery in batterySystems)
         {
-            techUpgradeManager.ActivarMejoraFuturista();
+            if (battery != null)
+            {
+                battery.ForzarDescarga();
+            }
         }
-        // Feedback visual/sonoro de activación
-        yield return new WaitForSeconds(effectDuration);
-        if (techUpgradeManager != null)
+
+        // Construir automáticamente todos los cuadrantes hasta la capa 3
+        if (bridgeGrid != null)
         {
-            techUpgradeManager.DesactivarMejoraFuturista();
+            ConstructBridgeAutomatically();
+            yield return new WaitForSeconds(duration);
         }
+        else
+        {
+            Debug.LogError("PowerUpConstructorHolografico: BridgeConstructionGrid no está asignado.");
+            yield return new WaitForSeconds(1f);
+        }
+
         Despawn();
     }
-} 
+
+    private void ConstructBridgeAutomatically()
+    {
+        if (bridgeGrid == null) return;
+        for (int x = 0; x < bridgeGrid.gridWidth; x++)
+        {
+            for (int z = 0; z < bridgeGrid.gridLength; z++)
+            {
+                for (int layerIndex = 0; layerIndex <= 2; layerIndex++)
+                {
+                    bridgeGrid.TryBuildLayer(x, z, layerIndex, null);
+                }
+            }
+        }
+    }
+}

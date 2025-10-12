@@ -9,7 +9,6 @@ public class BatterySlotInteractable : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
-        powerUp.InsertBattery(slotIndex);
-        // Feedback visual/sonoro de inserción
+       
     }
 } 
