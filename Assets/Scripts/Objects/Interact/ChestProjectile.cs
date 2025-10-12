@@ -7,6 +7,7 @@ public class ChestProjectile : MonoBehaviour
     [SerializeField] private GameObject shaderPrefab;
     [SerializeField] private float detectionRadius = 1.5f;
     [SerializeField] private LayerMask bridgeLayer;
+    [SerializeField] private float medievalDamageAmount = 10f;
 
     private readonly Collider[] overlap = new Collider[16];
     private readonly HashSet<string> damagedQuadrants = new();
@@ -28,6 +29,27 @@ public class ChestProjectile : MonoBehaviour
             if (!string.IsNullOrEmpty(bridgeQuadrantTag) && !col.CompareTag(bridgeQuadrantTag))
                 continue;
 
+            // Buscar BridgeQuadrantInstance (solo para medieval)
+            BridgeQuadrantInstance quadrantInstance = col.GetComponent<BridgeQuadrantInstance>();
+            if (quadrantInstance != null && quadrantInstance.quadrantSO != null)
+            {
+                string key = $"{quadrantInstance.GetInstanceID()}";
+                
+                if (!damagedQuadrants.Contains(key))
+                {
+                    // SOLO afecta a cuadrantes medievales
+                    if (quadrantInstance.quadrantSO.era == BridgeQuadrantSO.EraType.Medieval)
+                    {
+                        // Daño directo a batteryLife para medieval
+                        quadrantInstance.quadrantSO.batteryLife -= medievalDamageAmount;
+                    }
+                    
+                    damagedQuadrants.Add(key);
+                }
+                continue;
+            }
+
+            // Si no es BridgeQuadrantInstance, usar método antiguo con BridgeConstructionGrid
             if (TryGetQuadrantInfo(col, out BridgeConstructionGrid grid, out int x, out int z))
             {
                 string key = $"{grid.GetInstanceID()}_{x}_{z}";
