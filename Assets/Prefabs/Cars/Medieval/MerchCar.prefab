@@ -147,7 +147,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 320
   bridgeQuadrantTag: BridgeQuadrant
-  probability: 0.3
+  probability: 0.1
   prefab: {fileID: 5183471729256431963, guid: 6f931f44856f16d49a65d0fc915ee0fb, type: 3}
   spawnOffset: {x: 0, y: 0, z: 0}
   spawnParent: {fileID: 3245718561286657689}
@@ -351,12 +351,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bridgeQuadrantTag: BridgeQuadrant
   shaderPrefab: {fileID: 0}
-  interactionPoint: {fileID: 0}
-  interactionRadius: 1.5
+  detectionRadius: 1.5
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 0
-  autoCheckInFixedUpdate: 1
 --- !u!4 &8724069432829763031 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7627049233474902318, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}
