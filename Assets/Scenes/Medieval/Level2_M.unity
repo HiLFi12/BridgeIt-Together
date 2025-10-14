@@ -3457,37 +3457,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1256263041
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1256263042}
-  m_Layer: 0
-  m_Name: Hand2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1256263042
+--- !u!4 &1293464897 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 2887139358489492750, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
+  m_PrefabInstance: {fileID: 1702547635}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1256263041}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.13, y: 0, z: 1.02}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1702547637}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1327583587
 GameObject:
   m_ObjectHideFlags: 0
@@ -4191,11 +4165,11 @@ PrefabInstance:
       objectReference: {fileID: 484574707}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaEntreRondas
-      value: 0
+      value: 160
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.size
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[0].nombreRonda
@@ -4254,20 +4228,24 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[0].tiempoEntreAutos
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].tiempoEntreAutos
-      value: 10
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[2].tiempoEntreAutos
-      value: 10
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[3].tiempoEntreAutos
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[4].tiempoEntreAutos
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].sobrescribirTipoCarril
@@ -4383,7 +4361,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[4].tiposVehiculoPorAuto.Array.data[0]'
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[4].tiposVehiculoPorAuto.Array.data[1]'
@@ -4679,7 +4657,7 @@ PrefabInstance:
     - target: {fileID: 4655421092252101922, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
       propertyPath: holdAnchor
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1293464897}
     - target: {fileID: 4655421092252101922, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
       propertyPath: material1Rotation.z
       value: 0
@@ -4687,7 +4665,7 @@ PrefabInstance:
     - target: {fileID: 5646139113111178579, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
       propertyPath: handTransform
       value: 
-      objectReference: {fileID: 1256263042}
+      objectReference: {fileID: 0}
     - target: {fileID: 5665233298331183193, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
       propertyPath: m_LocalPosition.x
       value: -249.16
@@ -4747,7 +4725,7 @@ PrefabInstance:
     - target: {fileID: 8432070980479371870, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
       propertyPath: interactionPoint
       value: 
-      objectReference: {fileID: 1256263042}
+      objectReference: {fileID: 0}
     - target: {fileID: 8432070980479371870, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
       propertyPath: interactionRadius
       value: 0.7
@@ -4765,9 +4743,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5665233298331183193, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1909221349}
-    - targetCorrespondingSourceObject: {fileID: 5665233298331183193, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1256263042}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
 --- !u!4 &1702547637 stripped
@@ -4804,7 +4779,7 @@ Transform:
   m_GameObject: {fileID: 1725292590}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 12.619995, y: 35.72, z: -31.990005}
+  m_LocalPosition: {x: 12.619995, y: 35.72, z: -32.05}
   m_LocalScale: {x: 1, y: 3.3374999, z: 10.264489}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5178,7 +5153,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 4
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
