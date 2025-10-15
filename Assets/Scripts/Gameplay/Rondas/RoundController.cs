@@ -35,6 +35,10 @@ namespace BridgeItTogether.Gameplay.Rondas
         private float timeoutRonda = 60f;
         private PosicionCarril ultimoCarrilUsado = PosicionCarril.Inferior;
 
+        // Timer para UI
+        private float tiempoRestanteEntreRondas = 0f;
+        private bool mostrandoTimerEntreRondas = false;
+
         private void Reset()
         {
             spawner = GetComponent<VehicleSpawner>();
@@ -74,7 +78,20 @@ namespace BridgeItTogether.Gameplay.Rondas
                 if (esperandoInicioDeRonda)
                 {
                     if (tiempoEsperaEntreRondas > 0)
-                        yield return new WaitForSeconds(tiempoEsperaEntreRondas);
+                    {
+                        mostrandoTimerEntreRondas = true;
+                        tiempoRestanteEntreRondas = tiempoEsperaEntreRondas;
+                        
+                        // Countdown timer
+                        while (tiempoRestanteEntreRondas > 0)
+                        {
+                            tiempoRestanteEntreRondas -= Time.deltaTime;
+                            yield return null;
+                        }
+                        
+                        mostrandoTimerEntreRondas = false;
+                        tiempoRestanteEntreRondas = 0f;
+                    }
                     esperandoInicioDeRonda = false;
                 }
 
@@ -180,6 +197,9 @@ namespace BridgeItTogether.Gameplay.Rondas
         public bool IsUsandoSistemaRondas() => usarSistemaRondas;
         public int GetRondaActual() => rondaActual;
         public int GetTotalRondas() => configuracionRondas?.Length ?? 0;
+        public float GetTiempoRestanteEntreRondas() => tiempoRestanteEntreRondas;
+        public bool IsMostrandoTimerEntreRondas() => mostrandoTimerEntreRondas;
+        public bool IsEsperandoInicioDeRonda() => esperandoInicioDeRonda;
         public int GetTotalVehiclesForLevel()
         {
             if (configuracionRondas == null) return 0;
