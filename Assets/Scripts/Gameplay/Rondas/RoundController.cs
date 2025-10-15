@@ -35,6 +35,10 @@ namespace BridgeItTogether.Gameplay.Rondas
         private float timeoutRonda = 60f;
         private PosicionCarril ultimoCarrilUsado = PosicionCarril.Inferior;
 
+        // Timer para UI
+        private int tiempoRestanteEntreRondas = 0;
+        private bool mostrandoTimerEntreRondas = false;
+
         private void Reset()
         {
             spawner = GetComponent<VehicleSpawner>();
@@ -74,7 +78,22 @@ namespace BridgeItTogether.Gameplay.Rondas
                 if (esperandoInicioDeRonda)
                 {
                     if (tiempoEsperaEntreRondas > 0)
-                        yield return new WaitForSeconds(tiempoEsperaEntreRondas);
+                    {
+                        mostrandoTimerEntreRondas = true;
+                        tiempoRestanteEntreRondas = Mathf.CeilToInt(tiempoEsperaEntreRondas);
+                        
+                        // Countdown timer
+                        float tiempoTranscurrido = 0f;
+                        while (tiempoTranscurrido < tiempoEsperaEntreRondas)
+                        {
+                            tiempoTranscurrido += Time.deltaTime;
+                            tiempoRestanteEntreRondas = Mathf.CeilToInt(tiempoEsperaEntreRondas - tiempoTranscurrido);
+                            yield return null;
+                        }
+                        
+                        mostrandoTimerEntreRondas = false;
+                        tiempoRestanteEntreRondas = 0;
+                    }
                     esperandoInicioDeRonda = false;
                 }
 
@@ -180,6 +199,9 @@ namespace BridgeItTogether.Gameplay.Rondas
         public bool IsUsandoSistemaRondas() => usarSistemaRondas;
         public int GetRondaActual() => rondaActual;
         public int GetTotalRondas() => configuracionRondas?.Length ?? 0;
+        public int GetTiempoRestanteEntreRondas() => tiempoRestanteEntreRondas;
+        public bool IsMostrandoTimerEntreRondas() => mostrandoTimerEntreRondas;
+        public bool IsEsperandoInicioDeRonda() => esperandoInicioDeRonda;
         public int GetTotalVehiclesForLevel()
         {
             if (configuracionRondas == null) return 0;

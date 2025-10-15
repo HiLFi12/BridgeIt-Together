@@ -602,6 +602,47 @@ public class GameConditionManager : MonoBehaviour
     }
     
     /// <summary>
+    /// Obtiene el RoundController actual
+    /// </summary>
+    public RoundController GetRoundController() => roundController;
+    
+    /// <summary>
+    /// Obtiene la ronda actual (0-based)
+    /// </summary>
+    public int GetRondaActual()
+    {
+        if (roundController == null) return 0;
+        return roundController.GetRondaActual();
+    }
+    
+    /// <summary>
+    /// Obtiene el total de rondas
+    /// </summary>
+    public int GetTotalRondas()
+    {
+        if (roundController == null) return 0;
+        return roundController.GetTotalRondas();
+    }
+    
+    /// <summary>
+    /// Obtiene el tiempo restante entre rondas
+    /// </summary>
+    public int GetTiempoRestanteEntreRondas()
+    {
+        if (roundController == null) return 0;
+        return roundController.GetTiempoRestanteEntreRondas();
+    }
+    
+    /// <summary>
+    /// Obtiene si se está mostrando el timer entre rondas
+    /// </summary>
+    public bool IsMostrandoTimerEntreRondas()
+    {
+        if (roundController == null) return false;
+        return roundController.IsMostrandoTimerEntreRondas();
+    }
+    
+    /// <summary>
     /// Configura los valores de condiciones de juego
     /// </summary>
     public void ConfigurarCondiciones(int nuevosVehiculosVictoria, int nuevosVehiculosDerrota)

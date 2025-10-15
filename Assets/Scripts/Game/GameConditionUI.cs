@@ -12,12 +12,15 @@ public class GameConditionUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textoDerrota;
     [SerializeField] private TextMeshProUGUI textoEstadoJuego;
     [SerializeField] private Button botonReiniciar;
+    [SerializeField] private TextMeshProUGUI textoRondas;
+    [SerializeField] private TextMeshProUGUI textoTimerRondas;
     
     [Header("Configuración")]
     [SerializeField] private bool actualizarAutomaticamente = true;
     [SerializeField] private Color colorVictoria = Color.green;
     [SerializeField] private Color colorDerrota = Color.red;
     [SerializeField] private Color colorNormal = Color.white;
+    [SerializeField] private Color colorTimer = Color.yellow;
     
     [Header("Mensajes")]
     [SerializeField] private string formatoVictoria = "Vehicles remaining: {0}/{1}";
@@ -25,6 +28,8 @@ public class GameConditionUI : MonoBehaviour
     [SerializeField] private string mensajeVictoria = "¡VICTORIA! ¡Bien hecho!";
     [SerializeField] private string mensajeDerrota = "DERROTA - Demasiados vehículos cayeron";
     [SerializeField] private string mensajeJuegoActivo = "";
+    [SerializeField] private string formatoRondas = "Ronda {0}/{1}";
+    [SerializeField] private string formatoTimer = "Próxima ronda en: {0:F1}s";
     
     // Referencias
     private GameConditionManager gameManager;
@@ -131,6 +136,8 @@ public class GameConditionUI : MonoBehaviour
         ActualizarTextoVictoria();
         ActualizarTextoDerrota();
         ActualizarEstadoJuegoActual();
+        ActualizarTextoRondas();
+        ActualizarTextoTimer();
     }
       private void ActualizarTextoVictoria()
     {
@@ -197,6 +204,58 @@ public class GameConditionUI : MonoBehaviour
         {
             textoEstadoJuego.text = mensaje;
             textoEstadoJuego.color = color;
+        }
+    }
+    
+    private void ActualizarTextoRondas()
+    {
+        if (textoRondas == null || gameManager == null) return;
+        
+        // Verificar si hay un RoundController activo
+        var roundController = gameManager.GetRoundController();
+        if (roundController == null || !roundController.IsUsandoSistemaRondas())
+        {
+            textoRondas.text = "";
+            return;
+        }
+        
+        int rondaActual = gameManager.GetRondaActual() + 1; // +1 para mostrar 1-based
+        int totalRondas = gameManager.GetTotalRondas();
+        
+        if (totalRondas > 0)
+        {
+            string texto = string.Format(formatoRondas, rondaActual, totalRondas);
+            textoRondas.text = texto;
+            textoRondas.color = colorNormal;
+        }
+        else
+        {
+            textoRondas.text = "";
+        }
+    }
+    
+    private void ActualizarTextoTimer()
+    {
+        if (textoTimerRondas == null || gameManager == null) return;
+        
+        // Verificar si se está mostrando el timer entre rondas
+        if (!gameManager.IsMostrandoTimerEntreRondas())
+        {
+            textoTimerRondas.text = "";
+            return;
+        }
+        
+        int tiempoRestante = gameManager.GetTiempoRestanteEntreRondas();
+        
+        if (tiempoRestante > 0)
+        {
+            string texto = string.Format(formatoTimer, tiempoRestante);
+            textoTimerRondas.text = texto;
+            textoTimerRondas.color = colorTimer;
+        }
+        else
+        {
+            textoTimerRondas.text = "";
         }
     }
     
