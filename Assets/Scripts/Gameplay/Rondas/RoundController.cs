@@ -36,7 +36,7 @@ namespace BridgeItTogether.Gameplay.Rondas
         private PosicionCarril ultimoCarrilUsado = PosicionCarril.Inferior;
 
         // Timer para UI
-        private float tiempoRestanteEntreRondas = 0f;
+        private int tiempoRestanteEntreRondas = 0;
         private bool mostrandoTimerEntreRondas = false;
 
         private void Reset()
@@ -80,17 +80,19 @@ namespace BridgeItTogether.Gameplay.Rondas
                     if (tiempoEsperaEntreRondas > 0)
                     {
                         mostrandoTimerEntreRondas = true;
-                        tiempoRestanteEntreRondas = tiempoEsperaEntreRondas;
+                        tiempoRestanteEntreRondas = Mathf.CeilToInt(tiempoEsperaEntreRondas);
                         
                         // Countdown timer
-                        while (tiempoRestanteEntreRondas > 0)
+                        float tiempoTranscurrido = 0f;
+                        while (tiempoTranscurrido < tiempoEsperaEntreRondas)
                         {
-                            tiempoRestanteEntreRondas -= Time.deltaTime;
+                            tiempoTranscurrido += Time.deltaTime;
+                            tiempoRestanteEntreRondas = Mathf.CeilToInt(tiempoEsperaEntreRondas - tiempoTranscurrido);
                             yield return null;
                         }
                         
                         mostrandoTimerEntreRondas = false;
-                        tiempoRestanteEntreRondas = 0f;
+                        tiempoRestanteEntreRondas = 0;
                     }
                     esperandoInicioDeRonda = false;
                 }
@@ -197,7 +199,7 @@ namespace BridgeItTogether.Gameplay.Rondas
         public bool IsUsandoSistemaRondas() => usarSistemaRondas;
         public int GetRondaActual() => rondaActual;
         public int GetTotalRondas() => configuracionRondas?.Length ?? 0;
-        public float GetTiempoRestanteEntreRondas() => tiempoRestanteEntreRondas;
+        public int GetTiempoRestanteEntreRondas() => tiempoRestanteEntreRondas;
         public bool IsMostrandoTimerEntreRondas() => mostrandoTimerEntreRondas;
         public bool IsEsperandoInicioDeRonda() => esperandoInicioDeRonda;
         public int GetTotalVehiclesForLevel()

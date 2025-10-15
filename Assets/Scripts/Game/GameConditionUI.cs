@@ -245,7 +245,7 @@ public class GameConditionUI : MonoBehaviour
             return;
         }
         
-        float tiempoRestante = gameManager.GetTiempoRestanteEntreRondas();
+        int tiempoRestante = gameManager.GetTiempoRestanteEntreRondas();
         
         if (tiempoRestante > 0)
         {

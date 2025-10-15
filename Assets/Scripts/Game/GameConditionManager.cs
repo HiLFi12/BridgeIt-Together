@@ -627,9 +627,9 @@ public class GameConditionManager : MonoBehaviour
     /// <summary>
     /// Obtiene el tiempo restante entre rondas
     /// </summary>
-    public float GetTiempoRestanteEntreRondas()
+    public int GetTiempoRestanteEntreRondas()
     {
-        if (roundController == null) return 0f;
+        if (roundController == null) return 0;
         return roundController.GetTiempoRestanteEntreRondas();
     }
     
