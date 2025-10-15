@@ -710,11 +710,11 @@ PrefabInstance:
       objectReference: {fileID: 1674052816}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaEntreRondas
-      value: 20
+      value: 160
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.size
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[0].nombreRonda
@@ -769,12 +769,16 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[0].tiempoEntreAutos
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].tiempoEntreAutos
-      value: 10
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[2].tiempoEntreAutos
-      value: 10
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[3].tiempoEntreAutos
@@ -1173,7 +1177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5416675929637556784, guid: 3a11afef08372e04394d5b33181b28f4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -218.14
+      value: -221.18
       objectReference: {fileID: 0}
     - target: {fileID: 5416675929637556784, guid: 3a11afef08372e04394d5b33181b28f4, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1181,7 +1185,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5416675929637556784, guid: 3a11afef08372e04394d5b33181b28f4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 235.90034
+      value: 237.58035
       objectReference: {fileID: 0}
     - target: {fileID: 5416675929637556784, guid: 3a11afef08372e04394d5b33181b28f4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6628,7 +6632,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  additionalProtectedTags:
+  - InvisibleWall
 --- !u!114 &710183364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7374,7 +7379,7 @@ Transform:
   m_GameObject: {fileID: 775282877}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.949991, y: 38.37622, z: -27.301147}
+  m_LocalPosition: {x: -4.949991, y: 36.13, z: -27.301147}
   m_LocalScale: {x: 1, y: 3.3375, z: 10.675483}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10755,7 +10760,7 @@ Transform:
   m_GameObject: {fileID: 1075952411}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 29.909998, y: 38.37622, z: -27.301147}
+  m_LocalPosition: {x: 29.909998, y: 36.13, z: -27.301147}
   m_LocalScale: {x: 1, y: 3.3375, z: 10.675483}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -16236,7 +16241,7 @@ Transform:
   m_GameObject: {fileID: 1587663243}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.0199738, y: 38.37622, z: -48.689255}
+  m_LocalPosition: {x: -5.0199738, y: 36.13, z: -48.689255}
   m_LocalScale: {x: 1, y: 3.3375, z: 17.446941}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17875,7 +17880,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4373037390321808356, guid: 3823c093a60541449829c36b4e53ff80, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -213.27
+      value: -221.18
       objectReference: {fileID: 0}
     - target: {fileID: 4373037390321808356, guid: 3823c093a60541449829c36b4e53ff80, type: 3}
       propertyPath: m_LocalPosition.y
@@ -18842,7 +18847,7 @@ PrefabInstance:
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19907,7 +19912,7 @@ Transform:
   m_GameObject: {fileID: 2011058958}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 29.840012, y: 38.37622, z: -48.689255}
+  m_LocalPosition: {x: 29.840012, y: 36.130005, z: -48.689255}
   m_LocalScale: {x: 1, y: 3.3375, z: 17.446941}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21549,7 +21554,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  additionalProtectedTags:
+  - InvisibleWall
 --- !u!114 &2142262896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21636,6 +21642,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: 20.54
       objectReference: {fileID: 0}
+    - target: {fileID: 19713107625836913, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 36.13
+      objectReference: {fileID: 0}
     - target: {fileID: 166189021200613936, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_Name
       value: SafeWall
@@ -21704,13 +21714,25 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: 20.470022
       objectReference: {fileID: 0}
+    - target: {fileID: 6361555702575111901, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 36.13
+      objectReference: {fileID: 0}
     - target: {fileID: 7511072028943821834, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.3500023
       objectReference: {fileID: 0}
+    - target: {fileID: 7511072028943821834, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 36.13
+      objectReference: {fileID: 0}
     - target: {fileID: 9024051469694973598, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.39
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024051469694973598, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 36.13
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

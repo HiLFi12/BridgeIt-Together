@@ -3222,7 +3222,7 @@ PrefabInstance:
       objectReference: {fileID: 1399994230}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaEntreRondas
-      value: 20
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[0].nombreRonda
@@ -8418,7 +8418,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  additionalProtectedTags:
+  - InvisibleWall
 --- !u!1001 &1852308368
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9380,7 +9381,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  additionalProtectedTags:
+  - InvisibleWall
 --- !u!114 &2047612260
 MonoBehaviour:
   m_ObjectHideFlags: 0

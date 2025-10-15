@@ -6,7 +6,12 @@ using UnityEngine;
 public class PlayerBridgeInteraction : MonoBehaviour
 {
     [Header("Referencias")]
-    public BridgeConstructionGrid bridgeGrid;
+    // ...existing code...
+    // Reemplazo de un solo grid por múltiples
+    [SerializeField] private BridgeConstructionGrid[] bridgeGrids;
+    [SerializeField, Tooltip("Si está activo, busca automáticamente todos los BridgeConstructionGrid en la escena si la lista está vacía.")]
+    private bool autoFindBridgeGrids = true;
+
     public Transform buildPoint;
     
     [Header("Configuración")]
@@ -15,6 +20,9 @@ public class PlayerBridgeInteraction : MonoBehaviour
     
     // Referencias internas
     private PlayerObjectHolder objectHolder;
+
+    // Selección dinámica de objetivo
+    private BridgeConstructionGrid currentTargetGrid;
     
     // Cache para la construcción
     private int targetX = -1;
@@ -25,15 +33,18 @@ public class PlayerBridgeInteraction : MonoBehaviour
     {
         objectHolder = GetComponent<PlayerObjectHolder>();
         
-        if (bridgeGrid == null)
+        if ((bridgeGrids == null || bridgeGrids.Length == 0) && autoFindBridgeGrids)
         {
-            // Intentar encontrar la rejilla de puente en la escena
-            bridgeGrid = Object.FindFirstObjectByType<BridgeConstructionGrid>();
-            
-            if (bridgeGrid == null)
-            {
-                Debug.LogError($"¡No se ha encontrado BridgeConstructionGrid! El jugador {gameObject.name} no podrá interactuar con el puente.");
-            }
+#if UNITY_2023_1_OR_NEWER
+            bridgeGrids = Object.FindObjectsByType<BridgeConstructionGrid>(FindObjectsSortMode.None);
+#else
+            bridgeGrids = Object.FindObjectsOfType<BridgeConstructionGrid>();
+#endif
+        }
+
+        if (bridgeGrids == null || bridgeGrids.Length == 0)
+        {
+            Debug.LogError($"¡No se ha encontrado BridgeConstructionGrid! El jugador {gameObject.name} no podrá interactuar con el puente.");
         }
         
         if (buildPoint == null)
@@ -45,9 +56,9 @@ public class PlayerBridgeInteraction : MonoBehaviour
     // Esta función debe ser llamada desde el sistema de interacción del jugador
     public void TryBuildBridge()
     {
-        if (bridgeGrid == null)
+        if (bridgeGrids == null || bridgeGrids.Length == 0)
         {
-            Debug.LogWarning($"No hay una rejilla de puente asignada al jugador {gameObject.name}.");
+            Debug.LogWarning($"No hay grids de puente disponibles para el jugador {gameObject.name}.");
             return;
         }
         
@@ -63,194 +74,129 @@ public class PlayerBridgeInteraction : MonoBehaviour
             return;
         }
         
-        // Encontrar cuadrante más cercano
+        // Encontrar cuadrante y grid objetivo
         Vector3 buildPos = buildPoint != null ? buildPoint.position : transform.position + transform.forward;
-        bool foundTarget = FindTargetQuadrant(buildPos);
-        
-        if (foundTarget)
+        if (!FindTargetQuadrantAllGrids(buildPos, out currentTargetGrid, out targetX, out targetZ))
         {
-            Debug.Log($"Cuadrante objetivo encontrado en [{targetX},{targetZ}], intentando construir");            // Intentar construir
-            GameObject objectInHand = objectHolder.GetHeldObject();
-              if (objectInHand != null)
+            Debug.Log($"No se encontró un cuadrante objetivo dentro del rango {interactionRange}.");
+            return;
+        }
+
+        Debug.Log($"Cuadrante objetivo [{targetX},{targetZ}] en grid '{currentTargetGrid.name}', intentando construir");
+
+        GameObject objectInHand = objectHolder.GetHeldObject();
+        if (objectInHand == null)
+        {
+            Debug.LogWarning("GetHeldObject devolvió null a pesar de que HasObjectInHand es true.");
+            return;
+        }
+
+        BridgeMaterialInfo materialInfo = objectInHand.GetComponent<BridgeMaterialInfo>();
+        
+        // Reparación con adoquín si corresponde
+        if (materialInfo != null && materialInfo.materialType == BridgeQuadrantSO.MaterialType.Adoquin)
+        {
+            BridgeQuadrantSO targetQuadrant = currentTargetGrid.GetQuadrantSO(targetX, targetZ);
+            if (targetQuadrant != null && targetQuadrant.IsDamaged())
             {
-                BridgeMaterialInfo materialInfo = objectInHand.GetComponent<BridgeMaterialInfo>();
-                
-                if (materialInfo != null && materialInfo.materialType == BridgeQuadrantSO.MaterialType.Adoquin)
+                bool repairSuccess = TryRepairQuadrant(targetQuadrant, objectInHand);
+                if (repairSuccess)
                 {
-                    BridgeQuadrantSO targetQuadrant = bridgeGrid.GetQuadrantSO(targetX, targetZ);
-                    //BridgeQuadrantSO targetQuadrant = bridgeGrid.GetQuadrantSO(targetX, targetZ);
-                      if (targetQuadrant != null && targetQuadrant.IsDamaged())
-                    {
-                        bool repairSuccess = TryRepairQuadrant(targetQuadrant, objectInHand);
-                        
-                        if (repairSuccess)
-                        {
-                            objectHolder.UseHeldObject();
-                            Debug.Log("Cuadrante reparado exitosamente con adoquín.");
-                        }
-                        else
-                        {
-                            Debug.LogWarning("No se pudo reparar el cuadrante con este material.");
-                        }
-                        
-                        return; // Salir temprano, ya manejamos la reparación
-                    }                }
-                
-                // Si llegamos aquí, proceder con construcción normal
-                // Si el material tiene información, usar su layerIndex
-                int materialLayerIndex = 0; // Por defecto, capa base
-                
-                if (materialInfo != null)
-                {
-                    materialLayerIndex = materialInfo.layerIndex;
-                    Debug.Log($"Usando layerIndex {materialLayerIndex} del material {objectInHand.name}");
+                    objectHolder.UseHeldObject();
+                    Debug.Log("Cuadrante reparado exitosamente con adoquín.");
                 }
                 else
                 {
-                    // Verificar si el tag del objeto indica su tipo
-                    if (objectInHand.tag.StartsWith("BridgeLayer"))
-                    {
-                        string layerStr = objectInHand.tag.Substring(11); // Obtener el número después de "BridgeLayer"
-                        if (int.TryParse(layerStr, out int layer))
-                        {
-                            materialLayerIndex = layer;
-                            Debug.Log($"Usando layerIndex {materialLayerIndex} del tag {objectInHand.tag}");
-                        }
-                    }
+                    Debug.LogWarning("No se pudo reparar el cuadrante con este material.");
                 }
-                
-                // CRÍTICO: Siempre obtener el índice de capa correcto basado en el estado del cuadrante
-                int correctLayerIndex = GetNextCorrectLayerIndex(targetX, targetZ);
-                
-                // Si recibimos -1, significa que no hay más capas para construir en este cuadrante
-                if (correctLayerIndex == -1)
-                {
-                    Debug.LogWarning($"El cuadrante [{targetX},{targetZ}] ya tiene todas sus capas completas. No se puede construir más.");
-                    return;
-                }
-                
-                // Si el material no coincide con la capa que se espera construir, mostrar error
-                if (materialLayerIndex != correctLayerIndex)
-                {
-                    Debug.LogError($"ERROR DE TIPO: El material es para la capa {materialLayerIndex}, pero la siguiente capa a construir es {correctLayerIndex}");
-                    return;
-                }
-                
-                // Forzar que siempre usemos el índice correcto, que debe coincidir con el tipo de material
-                Debug.Log($"Índice de capa determinado automaticamente: {correctLayerIndex}, Material correcto: {materialLayerIndex == correctLayerIndex}");
-                
-                // Intentar construir usando el índice correcto
-                bool success;
-                if (MotivationBuffManager.Active)
-                {
-                    // Construcción motivada: intentar completar todas las capas restantes en esta columna (mismo X) para cada Z del puente
-                    success = false;
-                    int gridLengthLocal = bridgeGrid.gridLength;
-                    for (int zIter = 0; zIter < gridLengthLocal; zIter++)
-                    {
-                        // Para cada cuadrante en la columna X = targetX
-                        for (int layer = correctLayerIndex; layer <= 3; layer++)
-                        {
-                            // Obtener objeto en mano (solo se consume una vez al final si al menos una construcción tuvo éxito)
-                            bool layerBuilt = bridgeGrid.TryBuildLayer(targetX, zIter, layer, objectInHand);
-                            success = success || layerBuilt;
-                            if (!MotivationBuffManager.Active) break; // por si se acaba el buff en medio (poco probable)
-                        }
-                    }
-                }
-                else
-                {
-                    success = bridgeGrid.TryBuildLayer(targetX, targetZ, correctLayerIndex, objectInHand);
-                }
-                
-                if (success)
-                {
-                    objectHolder.UseHeldObject(); // consumir material una vez
-                    currentLayerIndex = GetNextCorrectLayerIndex(targetX, targetZ);
-                    Debug.Log(MotivationBuffManager.Active ? "Construcción motivada de columna completa." : $"Construcción exitosa. Siguiente capa a construir: {currentLayerIndex}");
-                }
-                else
-                {
-                    Debug.LogWarning($"No se pudo construir en el cuadrante [{targetX},{targetZ}] con capa {correctLayerIndex}");
-                }
+                return; // reparación ya manejada
             }
-            else
+        }
+
+        // Construcción normal
+        int materialLayerIndex = 0; // default
+        if (materialInfo != null)
+        {
+            materialLayerIndex = materialInfo.layerIndex;
+            Debug.Log($"Usando layerIndex {materialLayerIndex} del material {objectInHand.name}");
+        }
+        else if (objectInHand.tag.StartsWith("BridgeLayer"))
+        {
+            string layerStr = objectInHand.tag.Substring(11);
+            if (int.TryParse(layerStr, out int layer))
+                materialLayerIndex = layer;
+        }
+
+        int correctLayerIndex = GetNextCorrectLayerIndex(currentTargetGrid, targetX, targetZ);
+        if (correctLayerIndex == -1)
+        {
+            Debug.LogWarning($"El cuadrante [{targetX},{targetZ}] ya tiene todas sus capas completas.");
+            return;
+        }
+        if (materialLayerIndex != correctLayerIndex)
+        {
+            Debug.LogError($"ERROR DE TIPO: Material para capa {materialLayerIndex}, siguiente capa es {correctLayerIndex}");
+            return;
+        }
+
+        bool success;
+        if (MotivationBuffManager.Active)
+        {
+            success = false;
+            int gridLengthLocal = currentTargetGrid.gridLength;
+            for (int zIter = 0; zIter < gridLengthLocal; zIter++)
             {
-                Debug.LogWarning("GetHeldObject devolvió null a pesar de que HasObjectInHand es true.");
+                for (int layer = correctLayerIndex; layer <= 3; layer++)
+                {
+                    bool layerBuilt = currentTargetGrid.TryBuildLayer(targetX, zIter, layer, objectInHand);
+                    success = success || layerBuilt;
+                    if (!MotivationBuffManager.Active) break;
+                }
             }
         }
         else
         {
-            Debug.Log($"No se encontró un cuadrante objetivo dentro del rango {interactionRange}.");
+            success = currentTargetGrid.TryBuildLayer(targetX, targetZ, correctLayerIndex, objectInHand);
+        }
+
+        if (success)
+        {
+            objectHolder.UseHeldObject();
+            currentLayerIndex = GetNextCorrectLayerIndex(currentTargetGrid, targetX, targetZ);
+            Debug.Log(MotivationBuffManager.Active ? "Construcción motivada de columna completa." : $"Construcción exitosa. Siguiente capa: {currentLayerIndex}");
+        }
+        else
+        {
+            Debug.LogWarning($"No se pudo construir en [{targetX},{targetZ}] capa {correctLayerIndex}");
         }
     }
     
     /// <summary>
     /// Intenta reparar un cuadrante dañado usando MaterialTipo4 (adoquín)
     /// </summary>
-    /// <param name="quadrant">El cuadrante a reparar</param>
-    /// <param name="materialObject">El objeto material que se está usando</param>
-    /// <returns>True si la reparación fue exitosa</returns>
     private bool TryRepairQuadrant(BridgeQuadrantSO quadrant, GameObject materialObject)
     {
-        if (quadrant == null)
-        {
-            Debug.LogError("Cuadrante nulo - no se puede reparar.");
-            return false;
-        }
-        
-        if (materialObject == null)
-        {
-            Debug.LogError("Material nulo - no se puede reparar.");
-            return false;
-        }
-        
-        // Verificar si el cuadrante realmente está dañado
-        if (!quadrant.IsDamaged())
-        {
-            Debug.Log("Este cuadrante no está dañado - no necesita reparación.");
-            return false;
-        }
-        
-        // Verificar que el material sea del tipo correcto (adoquín/MaterialTipo4)
+        if (quadrant == null || materialObject == null) return false;
+        if (!quadrant.IsDamaged()) return false;
+
         BridgeMaterialInfo materialInfo = materialObject.GetComponent<BridgeMaterialInfo>();
-        if (materialInfo == null || materialInfo.materialType != BridgeQuadrantSO.MaterialType.Adoquin)
-        {
-            Debug.LogWarning("Este material no puede reparar cuadrantes de puente. Se necesita adoquín.");
-            return false;
-        }
-        
-        // Intentar reparar usando TryAddLayer del ScriptableObject
-        // La reparación cuenta como agregar MaterialTipo4 a la última capa dañada
-        bool reparacionExitosa = quadrant.TryAddLayer(BridgeQuadrantSO.MaterialType.Adoquin, 1);
-        
-        if (reparacionExitosa)
-        {
-            Debug.Log("Cuadrante reparado exitosamente con adoquín.");
-            return true;
-        }
-        else
-        {
-            Debug.LogWarning("No se pudo reparar el cuadrante. Puede que no necesite este tipo de material.");
-            return false;
-        }
+        if (materialInfo == null || materialInfo.materialType != BridgeQuadrantSO.MaterialType.Adoquin) return false;
+
+        return quadrant.TryAddLayer(BridgeQuadrantSO.MaterialType.Adoquin, 1);
     }
 
-    // Método mejorado para obtener el siguiente índice de capa correcto basado en el estado del cuadrante
-    private int GetNextCorrectLayerIndex(int x, int z)
+    // Obtiene el siguiente índice de capa correcto usando el grid seleccionado
+    private int GetNextCorrectLayerIndex(BridgeConstructionGrid grid, int x, int z)
     {
-        if (!bridgeGrid.IsValidQuadrant(x, z))
-            return 0;
-        
-        // Busca la primera capa no completada
-        BridgeQuadrantSO quadrantSO = GetQuadrantSO(x, z);
+        if (grid == null || !grid.IsValidQuadrant(x, z)) return 0;
+
+        BridgeQuadrantSO quadrantSO = GetQuadrantSO(grid, x, z);
         if (quadrantSO == null)
         {
             Debug.LogError("No se pudo obtener el ScriptableObject del cuadrante.");
             return 0;
         }
-            
-        // CRÍTICO: Primero verificar si el cuadrante está vacío (ninguna capa completada)
+
         bool cuadranteVacio = true;
         for (int i = 0; i < quadrantSO.requiredLayers.Length; i++)
         {
@@ -260,194 +206,164 @@ public class PlayerBridgeInteraction : MonoBehaviour
                 break;
             }
         }
-        
-        // Si el cuadrante está vacío, siempre empezar con la capa 0
-        if (cuadranteVacio)
-        {
-            Debug.Log("Cuadrante vacío detectado. Forzando construcción de capa 0.");
-            return 0;
-        }
-        
-        // Buscar la primera capa no completada para cuadrantes parcialmente construidos
+        if (cuadranteVacio) return 0;
+
         for (int i = 0; i < quadrantSO.requiredLayers.Length; i++)
         {
             if (!quadrantSO.requiredLayers[i].isCompleted)
-            {
-                Debug.Log($"Primera capa incompleta: {i}");
                 return i;
-            }
         }
-        
-        // Si todas las capas están completas, no hay más capas para construir
-        Debug.Log("Todas las capas están completas. No se puede construir más en este cuadrante.");
-        return -1; // Valor especial para indicar que no hay más capas para construir
+        return -1;
     }
     
-    // Método auxiliar para obtener el SO del cuadrante
-    private BridgeQuadrantSO GetQuadrantSO(int x, int z)
+    // Acceso al SO del cuadrante (misma reflexión, pero parametrizada por grid)
+    private BridgeQuadrantSO GetQuadrantSO(BridgeConstructionGrid grid, int x, int z)
     {
-        // Usa reflexión para acceder al campo private constructionGrid
-        System.Type gridType = bridgeGrid.GetType();
-        System.Reflection.FieldInfo gridField = gridType.GetField("constructionGrid", 
+        System.Type gridType = grid.GetType();
+        var gridField = gridType.GetField("constructionGrid",
             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            
-        if (gridField == null)
-            return null;
-            
-        object grid = gridField.GetValue(bridgeGrid);
-        if (grid == null)
-            return null;
-            
-        // Acceder al elemento [x,z]
-        System.Type elementType = grid.GetType().GetElementType();
-        object element = ((System.Array)grid).GetValue(x, z);
-        if (element == null)
-            return null;
-            
-        // Obtener el campo quadrantSO
-        System.Reflection.FieldInfo soField = elementType.GetField("quadrantSO");
-        if (soField == null)
-            return null;
-            
+        if (gridField == null) return null;
+
+        object gridObj = gridField.GetValue(grid);
+        if (gridObj == null) return null;
+
+        System.Type elementType = gridObj.GetType().GetElementType();
+        object element = ((System.Array)gridObj).GetValue(x, z);
+        if (element == null) return null;
+
+        var soField = elementType.GetField("quadrantSO");
+        if (soField == null) return null;
+
         return soField.GetValue(element) as BridgeQuadrantSO;
     }
     
-    // Para otros efectos específicos de era
+    // Interacciones de era (usando el grid seleccionado dinámicamente)
     public void TryInteractWithQuadrant()
     {
-        if (bridgeGrid == null)
+        if (bridgeGrids == null || bridgeGrids.Length == 0)
         {
-            Debug.LogWarning("No hay una rejilla de puente asignada.");
+            Debug.LogWarning("No hay grids de puente disponibles.");
             return;
         }
         
         Debug.Log($"Jugador {gameObject.name} intentando interactuar con el puente...");
-            
-        // Encontrar cuadrante más cercano
+
         Vector3 buildPos = buildPoint != null ? buildPoint.position : transform.position + transform.forward;
-        bool foundTarget = FindTargetQuadrant(buildPos);
-        
-        if (foundTarget)
+        if (!FindTargetQuadrantAllGrids(buildPos, out currentTargetGrid, out targetX, out targetZ))
         {
-            Debug.Log($"Cuadrante objetivo encontrado en {targetX},{targetZ}");
-            
-            // Verificar tipo de interacción según el objeto que tenga el jugador
-            GameObject heldObject = objectHolder.GetHeldObject();
-            
-            if (heldObject != null)
+            Debug.Log($"No se encontró un cuadrante objetivo dentro del rango {interactionRange}.");
+            return;
+        }
+
+        GameObject heldObject = objectHolder.GetHeldObject();
+        if (heldObject != null)
+        {
+            string objectType = heldObject.tag;
+            switch (objectType)
             {
-                Debug.Log($"Objeto sostenido: {heldObject.name}");
-                
-                // Ejemplos de interacciones específicas de era
-                // Esto debería refinarse con un sistema más robusto de tipos de objetos
-                string objectType = heldObject.tag;
-                
-                switch (objectType)
-                {
-                    case "Heater":
-                        // Para la era industrial
-                        bridgeGrid.ApplyHeat(targetX, targetZ);
-                        Debug.Log("Aplicando calor al cuadrante");
-                        break;
-                    case "Battery":
-                        // Para la era futurista
-                        bridgeGrid.ReplaceBattery(targetX, targetZ);
-                        objectHolder.UseHeldObject(); // Consimir la batería
-                        Debug.Log("Reemplazando batería del cuadrante");
-                        break;
-                    default:
-                        // Intento de construcción normal
-                        Debug.Log("Intento de construcción normal con objeto genérico");
-                        TryBuildBridge();
-                        break;
-                }
-            }
-            else
-            {
-                Debug.Log("No hay objeto en la mano. Solo se puede interactuar con el puente teniendo un objeto.");
+                case "Heater":
+                    currentTargetGrid.ApplyHeat(targetX, targetZ);
+                    Debug.Log("Aplicando calor al cuadrante");
+                    break;
+                case "Battery":
+                    currentTargetGrid.ReplaceBattery(targetX, targetZ);
+                    objectHolder.UseHeldObject();
+                    Debug.Log("Reemplazando batería del cuadrante");
+                    break;
+                default:
+                    TryBuildBridge();
+                    break;
             }
         }
         else
         {
-            Debug.Log($"No se encontró un cuadrante objetivo dentro del rango {interactionRange}.");
+            Debug.Log("No hay objeto en la mano. Solo se puede interactuar con el puente teniendo un objeto.");
         }
     }
     
     /// <summary>
-    /// Indica si hay un cuadrante objetivo válido dentro de rango desde el buildPoint.
-    /// No construye; solo reutiliza la detección.
+    /// Indica si hay un cuadrante objetivo válido dentro de rango desde el buildPoint, en cualquier grid.
     /// </summary>
     public bool HasTargetQuadrantInRange()
     {
-        if (bridgeGrid == null || buildPoint == null) return false;
-        return FindTargetQuadrant(buildPoint.position);
+        if ((bridgeGrids == null || bridgeGrids.Length == 0) || buildPoint == null) return false;
+        return FindTargetQuadrantAllGrids(buildPoint.position, out _, out _, out _);
     }
-    
-    // Buscar el cuadrante más cercano en rango
-    private bool FindTargetQuadrant(Vector3 position)
+
+    // Selección de cuadrante entre TODOS los grids disponibles
+    private bool FindTargetQuadrantAllGrids(Vector3 position, out BridgeConstructionGrid grid, out int xSel, out int zSel)
     {
-        // Intentamos hacer un raycast hacia abajo para detectar el cuadrante
-        RaycastHit hit;
-        if (Physics.Raycast(position, Vector3.down, out hit, interactionRange, bridgeLayer))
+        grid = null;
+        xSel = -1;
+        zSel = -1;
+
+        if (bridgeGrids == null || bridgeGrids.Length == 0) return false;
+
+        // 1) Intento por raycast directo al layer del puente
+        if (Physics.Raycast(position, Vector3.down, out var hit, interactionRange, bridgeLayer))
         {
-            // Calcular la posición en la grilla (esto asume que la grilla está alineada con los ejes globales)
-            Vector3 localPos = hit.point - bridgeGrid.transform.position;
-            
-            int x = Mathf.FloorToInt(localPos.x / bridgeGrid.quadrantSize);
-            int z = Mathf.FloorToInt(localPos.z / bridgeGrid.quadrantSize);
-            
-            // Verificar validez
-            if (x >= 0 && x < bridgeGrid.gridWidth && z >= 0 && z < bridgeGrid.gridLength)
+            var hitGrid = hit.collider.GetComponentInParent<BridgeConstructionGrid>();
+            if (hitGrid != null)
             {
-                targetX = x;
-                targetZ = z;
-                return true;
-            }
-        }
-        
-        // Alternativamente, buscar el cuadrante más cercano si el raycast falla
-        float minDistance = float.MaxValue;
-        bool found = false;
-        
-        for (int x = 0; x < bridgeGrid.gridWidth; x++)
-        {
-            for (int z = 0; z < bridgeGrid.gridLength; z++)
-            {
-                Vector3 quadrantPos = bridgeGrid.transform.position + 
-                                      new Vector3(x * bridgeGrid.quadrantSize, 0, z * bridgeGrid.quadrantSize);
-                
-                float distance = Vector3.Distance(position, quadrantPos);
-                
-                if (distance < interactionRange && distance < minDistance)
+                Vector3 localPos = hit.point - hitGrid.transform.position;
+                int xi = Mathf.FloorToInt(localPos.x / hitGrid.quadrantSize);
+                int zi = Mathf.FloorToInt(localPos.z / hitGrid.quadrantSize);
+
+                if (xi >= 0 && xi < hitGrid.gridWidth && zi >= 0 && zi < hitGrid.gridLength)
                 {
-                    minDistance = distance;
-                    targetX = x;
-                    targetZ = z;
-                    found = true;
+                    grid = hitGrid;
+                    xSel = xi;
+                    zSel = zi;
+                    return true;
                 }
             }
         }
-        
+
+        // 2) Fallback: búsqueda por proximidad en todos los grids
+        float minDistance = float.MaxValue;
+        bool found = false;
+
+        foreach (var g in bridgeGrids)
+        {
+            if (g == null) continue;
+
+            for (int x = 0; x < g.gridWidth; x++)
+            {
+                for (int z = 0; z < g.gridLength; z++)
+                {
+                    Vector3 quadrantPos = g.transform.position + new Vector3(x * g.quadrantSize, 0, z * g.quadrantSize);
+                    float distance = Vector3.Distance(position, quadrantPos);
+                    if (distance < interactionRange && distance < minDistance)
+                    {
+                        minDistance = distance;
+                        grid = g;
+                        xSel = x;
+                        zSel = z;
+                        found = true;
+                    }
+                }
+            }
+        }
+
         return found;
     }
     
-    // Posibilidad de mostrar visualmente el cuadrante objetivo
+    // Gizmos: usa el grid seleccionado
     private void OnDrawGizmos()
     {
-        if (bridgeGrid != null && targetX >= 0 && targetZ >= 0)
+        if (currentTargetGrid != null && targetX >= 0 && targetZ >= 0)
         {
-            Vector3 targetPos = bridgeGrid.transform.position + 
-                               new Vector3(targetX * bridgeGrid.quadrantSize, 0.1f, targetZ * bridgeGrid.quadrantSize);
+            Vector3 targetPos = currentTargetGrid.transform.position +
+                                new Vector3(targetX * currentTargetGrid.quadrantSize, 0.1f, targetZ * currentTargetGrid.quadrantSize);
             
             Gizmos.color = Color.blue;
-            Gizmos.DrawWireCube(targetPos + new Vector3(bridgeGrid.quadrantSize/2, 0, bridgeGrid.quadrantSize/2), 
-                               new Vector3(bridgeGrid.quadrantSize, 0.2f, bridgeGrid.quadrantSize));
+            Gizmos.DrawWireCube(targetPos + new Vector3(currentTargetGrid.quadrantSize/2, 0, currentTargetGrid.quadrantSize/2),
+                                new Vector3(currentTargetGrid.quadrantSize, 0.2f, currentTargetGrid.quadrantSize));
         }
-        
-        // Dibujar el rango de interacción
+
         if (buildPoint != null)
         {
-            Gizmos.color = new Color(0, 1, 1, 0.2f); // Cyan transparente
+            Gizmos.color = new Color(0, 1, 1, 0.2f);
             Gizmos.DrawSphere(buildPoint.position, interactionRange);
         }
     }
