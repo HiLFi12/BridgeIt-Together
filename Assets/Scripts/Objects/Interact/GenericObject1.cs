@@ -9,7 +9,7 @@ public class GenericObject1 : MonoBehaviour, IInteractable
     [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private float tiempoRecarga = 1.0f;
-    
+    [SerializeField] private int uiIndex = -1;
 
     [SerializeField] private GameObject modeloVisual;
     
@@ -71,8 +71,7 @@ public class GenericObject1 : MonoBehaviour, IInteractable
             // Configurar el material generado
             ConfigurarMaterialGenerado(nuevoMaterial);
             
-            // Hacer que el jugador recoja la instancia recién creada
-            playerObjectHolder.PickUpExistingInstance(nuevoMaterial);
+            StartCoroutine(PickUpAfterConfiguration(nuevoMaterial, playerObjectHolder));
             
             StartCoroutine(Recargar());
             
@@ -82,6 +81,12 @@ public class GenericObject1 : MonoBehaviour, IInteractable
         {
             Debug.Log("El interactor no tiene el componente PlayerObjectHolder.");
         }
+    }
+    
+    private IEnumerator PickUpAfterConfiguration(GameObject material, PlayerObjectHolder holder)
+    {
+        yield return null;
+        holder.PickUpExistingInstance(material);
     }
     
     private void ConfigurarMaterialGenerado(GameObject material)
@@ -99,7 +104,16 @@ public class GenericObject1 : MonoBehaviour, IInteractable
         
         material.tag = "BridgeLayer0";
         
-        Debug.Log($"Material generado configurado: Era {era}, Capa 0, Tipo Wood");
+        IUIActivatable uiActivatable = material.GetComponent<IUIActivatable>();
+        if (uiActivatable != null)
+        {
+            uiActivatable.SetUIIndex(uiIndex);
+            Debug.Log($"Material generado configurado: Era {era}, Capa 0, Tipo Wood, UIIndex {uiIndex}");
+        }
+        else
+        {
+            Debug.LogWarning($"El material generado no tiene componente IUIActivatable");
+        }
     }
     
     private IEnumerator Recargar()
@@ -114,4 +128,4 @@ public class GenericObject1 : MonoBehaviour, IInteractable
     {
         //Aca pueden meter efectos
     }
-} 
+}

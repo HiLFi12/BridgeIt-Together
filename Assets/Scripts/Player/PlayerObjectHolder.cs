@@ -11,6 +11,9 @@ public class PlayerObjectHolder : MonoBehaviour
     [Header("Overrides por tipo de objeto")]
     [SerializeField] private Vector3 paloIgnifugoRotation = new Vector3(0f, 0f, -90f);
     [SerializeField] private Vector3 material1Rotation = new Vector3(0f, 0f, -90f);
+    
+    [Header("UI Manager")]
+    [SerializeField] private PlayerUIManager playerUIManager;
 
     private GameObject heldObject;
     private Rigidbody heldRigidbody;
@@ -27,6 +30,8 @@ public class PlayerObjectHolder : MonoBehaviour
 
         if (heldObject != null && heldObject != objectInstance)
         {
+            DeactivateUIForObject(heldObject);
+            
             if (heldRigidbody != null)
             {
                 heldRigidbody.isKinematic = false;
@@ -49,6 +54,7 @@ public class PlayerObjectHolder : MonoBehaviour
         }
 
         ApplyPickupPositioning(heldObject);
+        ActivateUIForObject(heldObject);
     }
 
     public void PickUpExistingInstance(GameObject objectInstance) => PickUp(objectInstance);
@@ -58,6 +64,9 @@ public class PlayerObjectHolder : MonoBehaviour
     public void DropObject()
     {
         if (heldObject == null) return;
+        
+        DeactivateUIForObject(heldObject);
+        
         heldObject.transform.SetParent(null, true);
         if (heldRigidbody != null)
         {
@@ -71,6 +80,9 @@ public class PlayerObjectHolder : MonoBehaviour
     public void UseHeldObject()
     {
         if (heldObject == null) return;
+        
+        DeactivateUIForObject(heldObject);
+        
         if (heldRigidbody != null)
         {
             heldRigidbody.isKinematic = false;
@@ -79,6 +91,28 @@ public class PlayerObjectHolder : MonoBehaviour
         }
         Destroy(heldObject);
         heldObject = null;
+    }
+    
+    private void ActivateUIForObject(GameObject obj)
+    {
+        if (playerUIManager == null || obj == null) return;
+        
+        IUIActivatable uiActivatable = obj.GetComponent<IUIActivatable>();
+        if (uiActivatable != null && uiActivatable.UIIndex >= 0)
+        {
+            playerUIManager.TurnOnUI(uiActivatable.UIIndex);
+        }
+    }
+    
+    private void DeactivateUIForObject(GameObject obj)
+    {
+        if (playerUIManager == null || obj == null) return;
+        
+        IUIActivatable uiActivatable = obj.GetComponent<IUIActivatable>();
+        if (uiActivatable != null && uiActivatable.UIIndex >= 0)
+        {
+            playerUIManager.TurnOffUI(uiActivatable.UIIndex);
+        }
     }
 
     private void ApplyPickupPositioning(GameObject instance)
