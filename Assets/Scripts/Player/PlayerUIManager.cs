@@ -10,8 +10,20 @@ public class PlayerUIManager : MonoBehaviour
         [Tooltip("UI que se muestra en el canvas del jugador")]
         public Image playerUI;
 
-        [Tooltip("UI de otros objetos")]
+        [Tooltip("UI de otros objetos (se puede usar junto con useBridgeQuadrants)")]
         public Image[] othersUI;
+        
+        [Header("Bridge Quadrants")]
+        [Tooltip("¿Este grupo usa UI de BridgeQuadrants?")]
+        public bool useBridgeQuadrants = false;
+        
+        [Tooltip("Índice de la capa del puente (0=Base, 1=Soporte, 2=Estructura)")]
+        [Range(0, 2)]
+        public int bridgeLayer = 0;
+        
+        // Lista dinámica de UI de cuadrantes (se llena automáticamente)
+        [HideInInspector]
+        public List<BridgeQuadrant> registeredQuadrants = new List<BridgeQuadrant>();
     }
 
     [Header("Grupos de UI")]
@@ -19,9 +31,38 @@ public class PlayerUIManager : MonoBehaviour
 
     private void Start()
     {
+        RegisterBridgeQuadrants();
+        
         for (int i = 0; i < uiGroups.Count; i++)
         {
             TurnOffUI(i);
+        }
+    }
+
+    private void RegisterBridgeQuadrants()
+    {
+        BridgeQuadrant[] allQuadrants = FindObjectsOfType<BridgeQuadrant>();
+        
+        foreach (UIGroup group in uiGroups)
+        {
+            if (group.useBridgeQuadrants)
+            {
+                group.registeredQuadrants.Clear();
+                
+                int foundCount = 0;
+                
+                foreach (BridgeQuadrant quadrant in allQuadrants)
+                {
+                    Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
+                    
+                    if (layerUI != null)
+                    {
+                        group.registeredQuadrants.Add(quadrant);
+                    }
+                }
+                
+                Debug.Log($"PlayerUIManager: Registrados {foundCount} de {allQuadrants.Length} cuadrantes para la capa {group.bridgeLayer}");
+            }
         }
     }
 
@@ -39,11 +80,23 @@ public class PlayerUIManager : MonoBehaviour
         {
             group.playerUI.gameObject.SetActive(true);
         }
-        else
-        {
-            Debug.LogWarning($"PlayerUIManager: PlayerUI en índice {index} es null");
-        }
 
+        if (group.useBridgeQuadrants)
+        {
+            // Activar solo las UI de cuadrantes donde se puede construir esa capa
+            foreach (BridgeQuadrant quadrant in group.registeredQuadrants)
+            {
+                if (quadrant != null && quadrant.CanBuildLayer(group.bridgeLayer))
+                {
+                    Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
+                    if (layerUI != null)
+                    {
+                        layerUI.gameObject.SetActive(true);
+                    }
+                }
+            }
+        } 
+        
         if (group.othersUI != null && group.othersUI.Length > 0)
         {
             foreach (Image otherUI in group.othersUI)
@@ -56,8 +109,7 @@ public class PlayerUIManager : MonoBehaviour
         }
     }
 
-    public void 
-        TurnOffUI(int index)
+    public void TurnOffUI(int index)
     {
         if (!IsValidIndex(index))
         {
@@ -72,6 +124,21 @@ public class PlayerUIManager : MonoBehaviour
             group.playerUI.gameObject.SetActive(false);
         }
 
+        if (group.useBridgeQuadrants)
+        {
+            foreach (BridgeQuadrant quadrant in group.registeredQuadrants)
+            {
+                if (quadrant != null)
+                {
+                    Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
+                    if (layerUI != null)
+                    {
+                        layerUI.gameObject.SetActive(false);
+                    }
+                }
+            }
+        }
+        
         if (group.othersUI != null && group.othersUI.Length > 0)
         {
             foreach (Image otherUI in group.othersUI)
@@ -87,5 +154,10 @@ public class PlayerUIManager : MonoBehaviour
     private bool IsValidIndex(int index)
     {
         return index >= 0 && index < uiGroups.Count;
+    }
+    
+    public void RefreshBridgeQuadrants()
+    {
+        RegisterBridgeQuadrants();
     }
 }

@@ -468,6 +468,17 @@ public class BridgeConstructionGrid : MonoBehaviour
         // PROCESAMIENTO DEL RESULTADO
         if (success)
         {
+            // Actualizar el currentLayer en el componente BridgeQuadrant
+            GameObject quadrantObj = constructionGrid[x, z].quadrantObject;
+            if (quadrantObj != null)
+            {
+                BridgeQuadrant bridgeQuadrant = quadrantObj.GetComponent<BridgeQuadrant>();
+                if (bridgeQuadrant != null)
+                {
+                    bridgeQuadrant.SetCurrentLayer(layerIndex);
+                }
+            }
+            
             // Actualizar visuales y estado físico
             UpdateQuadrantVisuals(x, z);
             PlayConstructionSound(x, z);
@@ -1197,3 +1208,4 @@ public class BridgeConstructionGrid : MonoBehaviour
         Debug.Log($"Puente completo: {cuadrantesRellenados} cuadrantes x 4 capas = {cuadrantesRellenados * 4} capas totales");
     }
 }
+

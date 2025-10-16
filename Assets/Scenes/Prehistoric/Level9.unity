@@ -634,7 +634,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: 'specificQuadrants.Array.data[0]'
@@ -5229,7 +5229,7 @@ PrefabInstance:
       objectReference: {fileID: 1978160938}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaEntreRondas
-      value: 45
+      value: 100000
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.size
@@ -7001,6 +7001,9 @@ MonoBehaviour:
   - playerUI: {fileID: 815807586}
     othersUI:
     - {fileID: 644670087}
+    useBridgeQuadrants: 1
+    bridgeLayer: 2
+    registeredQuadrants: []
 --- !u!1001 &1568242033
 PrefabInstance:
   m_ObjectHideFlags: 0
