@@ -175,4 +175,3 @@ public class Player2 : MonoBehaviour
         }
     }
 }
-

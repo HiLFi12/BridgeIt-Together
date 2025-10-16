@@ -142,6 +142,17 @@ public class GenericObject3 : MonoBehaviour, IInteractable, IHoldInteractable
             // Configurar el material generado
             ConfigurarMaterialGenerado(nuevoMaterial);
             
+            // Lógica para asignar el UIIndex al nuevo material, igual que GenericObject1
+            UIIndexSetter sourceIndexSetter = GetComponent<UIIndexSetter>();
+            int indexToAssign = sourceIndexSetter != null ? sourceIndexSetter.UIIndex : -1;
+
+            UIIndexSetter uiIndexSetter = nuevoMaterial.GetComponent<UIIndexSetter>();
+            if (uiIndexSetter == null)
+            {
+                uiIndexSetter = nuevoMaterial.AddComponent<UIIndexSetter>();
+            }
+            uiIndexSetter.SetUIIndex(indexToAssign);
+            
             // Hacer que el jugador recoja la instancia recién creada
             playerObjectHolder.PickUpExistingInstance(nuevoMaterial);
             Debug.Log("Material tipo 4 entregado con éxito.");

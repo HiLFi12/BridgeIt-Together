@@ -9,7 +9,6 @@ public class GenericObject1 : MonoBehaviour, IInteractable
     [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private float tiempoRecarga = 1.0f;
-    [SerializeField] private int uiIndex = -1;
 
     [SerializeField] private GameObject modeloVisual;
     
@@ -57,7 +56,7 @@ public class GenericObject1 : MonoBehaviour, IInteractable
         }
         
         PlayerObjectHolder playerObjectHolder = interactor.GetComponent<PlayerObjectHolder>();
-        
+
         if (playerObjectHolder != null)
         {
             if (playerObjectHolder.HasObjectInHand())
@@ -97,23 +96,19 @@ public class GenericObject1 : MonoBehaviour, IInteractable
         {
             materialInfo = material.AddComponent<BridgeMaterialInfo>();
         }
-        
         materialInfo.layerIndex = 0; // Tipo 1 corresponde a capa 0
-        materialInfo.era = era;
-        materialInfo.materialType = BridgeQuadrantSO.MaterialType.Wood; // Tipo 1 es madera
-        
-        material.tag = "BridgeLayer0";
-        
-        IUIActivatable uiActivatable = material.GetComponent<IUIActivatable>();
-        if (uiActivatable != null)
+
+        // Obtener el UIIndex desde el propio UIIndexSetter de GenericObject1
+        UIIndexSetter sourceIndexSetter = GetComponent<UIIndexSetter>();
+        int indexToAssign = sourceIndexSetter != null ? sourceIndexSetter.UIIndex : -1;
+
+        // Asignar el UIIndex al objeto generado
+        UIIndexSetter uiIndexSetter = material.GetComponent<UIIndexSetter>();
+        if (uiIndexSetter == null)
         {
-            uiActivatable.SetUIIndex(uiIndex);
-            Debug.Log($"Material generado configurado: Era {era}, Capa 0, Tipo Wood, UIIndex {uiIndex}");
+            uiIndexSetter = material.AddComponent<UIIndexSetter>();
         }
-        else
-        {
-            Debug.LogWarning($"El material generado no tiene componente IUIActivatable");
-        }
+        uiIndexSetter.SetUIIndex(indexToAssign);
     }
     
     private IEnumerator Recargar()

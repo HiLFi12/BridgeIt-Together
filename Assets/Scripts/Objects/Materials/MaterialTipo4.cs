@@ -7,17 +7,21 @@ using BridgeItTogether.Gameplay.Abstractions;
 /// Clase que representa un material tipo 4 (para la capa 4 del puente).
 /// En la era prehistórica, este material es un adoquín.
 /// </summary>
-public class MaterialTipo4 : MonoBehaviour, IHitable
+public class MaterialTipo4 : MonoBehaviour, IHitable, IUIActivatable
 {
     [Header("Configuración del material")]
     [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;
-    
+
+    [Header("UI Configuration")]
+    [SerializeField] private int uiIndex = 0;
+    public int UIIndex => uiIndex;
+
     private void Start()
     {
         // Asegurarse de que tiene un componente BridgeMaterialInfo
         EnsureBridgeMaterialInfo();
     }
-    
+
     private void EnsureBridgeMaterialInfo()
     {
         BridgeMaterialInfo materialInfo = GetComponent<BridgeMaterialInfo>();
@@ -35,8 +39,13 @@ public class MaterialTipo4 : MonoBehaviour, IHitable
         gameObject.tag = "BridgeLayer3";
     }
 
+    public void SetUIIndex(int index)
+    {
+        uiIndex = index;
+    }
+
     public void OnLaunched(Vector3 targetPosition)
     {
         
     }
-} 
+}

@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class PlayerUIManager : MonoBehaviour
 {
+    private static List<PlayerUIManager> _allManagers = new List<PlayerUIManager>();
+    private static Dictionary<int, int> _sharedActiveCount = new Dictionary<int, int>();
+
     [System.Serializable]
     public class UIGroup
     {
@@ -21,7 +24,6 @@ public class PlayerUIManager : MonoBehaviour
         [Range(0, 2)]
         public int bridgeLayer = 0;
         
-        // Lista dinámica de UI de cuadrantes (se llena automáticamente)
         [HideInInspector]
         public List<BridgeQuadrant> registeredQuadrants = new List<BridgeQuadrant>();
     }
@@ -29,19 +31,39 @@ public class PlayerUIManager : MonoBehaviour
     [Header("Grupos de UI")]
     [SerializeField] private List<UIGroup> uiGroups = new List<UIGroup>();
 
+    private void Awake()
+    {
+        if (!_allManagers.Contains(this))
+        {
+            _allManagers.Add(this);
+            Debug.Log($"PlayerUIManager registrado: {gameObject.name}. Total managers: {_allManagers.Count}");
+        }
+    }
+
+    private void OnDestroy()
+    {
+        _allManagers.Remove(this);
+    }
+
     private void Start()
     {
         RegisterBridgeQuadrants();
         
         for (int i = 0; i < uiGroups.Count; i++)
         {
-            TurnOffUI(i);
+            if (!_sharedActiveCount.ContainsKey(i))
+            {
+                _sharedActiveCount[i] = 0;
+            }
+            TurnOffUIInternal(i);
         }
     }
 
     private void RegisterBridgeQuadrants()
     {
         BridgeQuadrant[] allQuadrants = FindObjectsOfType<BridgeQuadrant>();
+        
+        Debug.Log($"PlayerUIManager ({gameObject.name}): Encontrados {allQuadrants.Length} cuadrantes en total");
         
         foreach (UIGroup group in uiGroups)
         {
@@ -58,21 +80,82 @@ public class PlayerUIManager : MonoBehaviour
                     if (layerUI != null)
                     {
                         group.registeredQuadrants.Add(quadrant);
+                        foundCount++;
                     }
                 }
                 
-                Debug.Log($"PlayerUIManager: Registrados {foundCount} de {allQuadrants.Length} cuadrantes para la capa {group.bridgeLayer}");
+                Debug.Log($"PlayerUIManager ({gameObject.name}): Registrados {foundCount} de {allQuadrants.Length} cuadrantes para la capa {group.bridgeLayer}");
             }
         }
     }
 
     public void TurnOnUI(int index)
     {
-        if (!IsValidIndex(index))
+        if (!IsValidIndex(index)) return;
+
+        if (!_sharedActiveCount.ContainsKey(index))
         {
-            Debug.LogWarning($"PlayerUIManager: Índice {index} fuera de rango. Total de grupos: {uiGroups.Count}");
+            _sharedActiveCount[index] = 0;
+        }
+
+        _sharedActiveCount[index]++;
+        
+        Debug.Log($"TurnOnUI({index}) llamado por {gameObject.name}. Conteo: {_sharedActiveCount[index]}");
+        
+        // Activar la playerUI SOLO de este manager
+        TurnOnPlayerUIOnly(index);
+        
+        // Activar las UI compartidas (othersUI y bridgeQuadrants) solo la primera vez
+        if (_sharedActiveCount[index] == 1)
+        {
+            foreach (PlayerUIManager manager in _allManagers)
+            {
+                if (manager != null)
+                {
+                    manager.TurnOnSharedUIOnly(index);
+                }
+            }
+        }
+    }
+
+    public void TurnOffUI(int index)
+    {
+        if (!IsValidIndex(index)) return;
+
+        if (!_sharedActiveCount.ContainsKey(index))
+        {
+            _sharedActiveCount[index] = 0;
             return;
         }
+
+        _sharedActiveCount[index]--;
+        
+        if (_sharedActiveCount[index] < 0)
+        {
+            _sharedActiveCount[index] = 0;
+        }
+        
+        Debug.Log($"TurnOffUI({index}) llamado por {gameObject.name}. Conteo: {_sharedActiveCount[index]}");
+        
+        // Desactivar la playerUI SOLO de este manager
+        TurnOffPlayerUIOnly(index);
+        
+        // Desactivar las UI compartidas solo cuando nadie las use
+        if (_sharedActiveCount[index] == 0)
+        {
+            foreach (PlayerUIManager manager in _allManagers)
+            {
+                if (manager != null)
+                {
+                    manager.TurnOffSharedUIOnly(index);
+                }
+            }
+        }
+    }
+
+    private void TurnOnPlayerUIOnly(int index)
+    {
+        if (!IsValidIndex(index)) return;
 
         UIGroup group = uiGroups[index];
 
@@ -80,10 +163,28 @@ public class PlayerUIManager : MonoBehaviour
         {
             group.playerUI.gameObject.SetActive(true);
         }
+    }
+
+    private void TurnOffPlayerUIOnly(int index)
+    {
+        if (!IsValidIndex(index)) return;
+
+        UIGroup group = uiGroups[index];
+
+        if (group.playerUI != null)
+        {
+            group.playerUI.gameObject.SetActive(false);
+        }
+    }
+
+    private void TurnOnSharedUIOnly(int index)
+    {
+        if (!IsValidIndex(index)) return;
+
+        UIGroup group = uiGroups[index];
 
         if (group.useBridgeQuadrants)
         {
-            // Activar solo las UI de cuadrantes donde se puede construir esa capa
             foreach (BridgeQuadrant quadrant in group.registeredQuadrants)
             {
                 if (quadrant != null && quadrant.CanBuildLayer(group.bridgeLayer))
@@ -95,7 +196,7 @@ public class PlayerUIManager : MonoBehaviour
                     }
                 }
             }
-        } 
+        }
         
         if (group.othersUI != null && group.othersUI.Length > 0)
         {
@@ -109,20 +210,11 @@ public class PlayerUIManager : MonoBehaviour
         }
     }
 
-    public void TurnOffUI(int index)
+    private void TurnOffSharedUIOnly(int index)
     {
-        if (!IsValidIndex(index))
-        {
-            Debug.LogWarning($"PlayerUIManager: Índice {index} fuera de rango. Total de grupos: {uiGroups.Count}");
-            return;
-        }
+        if (!IsValidIndex(index)) return;
 
         UIGroup group = uiGroups[index];
-
-        if (group.playerUI != null)
-        {
-            group.playerUI.gameObject.SetActive(false);
-        }
 
         if (group.useBridgeQuadrants)
         {
@@ -149,6 +241,20 @@ public class PlayerUIManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void TurnOnUIInternal(int index)
+    {
+        // Este método ya no se usa, pero lo mantengo para compatibilidad
+        TurnOnPlayerUIOnly(index);
+        TurnOnSharedUIOnly(index);
+    }
+
+    private void TurnOffUIInternal(int index)
+    {
+        // Este método ya no se usa, pero lo mantengo para compatibilidad
+        TurnOffPlayerUIOnly(index);
+        TurnOffSharedUIOnly(index);
     }
 
     private bool IsValidIndex(int index)

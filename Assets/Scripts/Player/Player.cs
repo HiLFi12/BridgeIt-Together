@@ -270,6 +270,16 @@ public class Player : MonoBehaviour, IHitable
             var col = interactables[i];
             if (col == null) continue;
 
+            // Ignorar el objeto que está en la mano
+            if (holder != null && holder.HasObjectInHand())
+            {
+                var heldObj = holder.GetHeldObject();
+                if (heldObj != null && (col.gameObject == heldObj || col.transform.IsChildOf(heldObj.transform)))
+                {
+                    continue;
+                }
+            }
+
             var candidato = col.GetComponentInParent<IInteractable>();
             if (candidato == null) continue;
 
