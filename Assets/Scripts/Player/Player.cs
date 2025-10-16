@@ -320,13 +320,7 @@ public class Player : MonoBehaviour, IHitable
 
     private void ShowInteractionUI()
     {
-        // Si las manos están ocupadas, no mostrar el InteractionUI
-        if (objectHolder != null && objectHolder.HasObjectInHand())
-        {
-            HideInteractionUI();
-            return;
-        }
-
+        // Mostrar la UI de interacción siempre que haya interactuables válidos cerca
         if (interactionUIImage != null && !interactionUIImage.gameObject.activeInHierarchy)
         {
             interactionUIImage.gameObject.SetActive(true);
