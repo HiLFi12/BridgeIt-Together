@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using BridgeItTogether.Gameplay.Abstractions;
 
-public class PaloIgnifugo : MonoBehaviour, IHitable
+public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
 {
     [Header("Configuración")]
     [SerializeField] private float radioDeteccion = 2.0f;
     [SerializeField] private GameObject efectoFuego;
     [SerializeField] private float tiempoEncendido = 9999f;
+
+    [Header("UI Configuration")]
+    [SerializeField] private int uiIndexApagado = 0;
+    [SerializeField] private int uiIndexEncendido = 1;
+    private int uiIndex = 0;
+    public int UIIndex => uiIndex;
 
     private bool estaEncendido = false;
     private float tiempoRestante = 0f;
@@ -61,6 +67,9 @@ public class PaloIgnifugo : MonoBehaviour, IHitable
         }
 
         tiempoRestante = encendido ? tiempoEncendido : 0f;
+
+        // Cambiar el índice de UI según el estado
+        uiIndex = encendido ? uiIndexEncendido : uiIndexApagado;
     }
 
     public bool EstaEncendido()
@@ -76,5 +85,10 @@ public class PaloIgnifugo : MonoBehaviour, IHitable
 
     public void OnLaunched(Vector3 targetPosition)
     {
+    }
+
+    public void SetUIIndex(int index)
+    {
+        uiIndex = index;
     }
 }
