@@ -257,7 +257,6 @@ public class PlayerUIManager : MonoBehaviour
 
     private void TurnOffUIInternal(int index)
     {
-        // Este método ya no se usa, pero lo mantengo para compatibilidad
         TurnOffPlayerUIOnly(index);
         TurnOffSharedUIOnly(index);
     }
@@ -270,5 +269,16 @@ public class PlayerUIManager : MonoBehaviour
     public void RefreshBridgeQuadrants()
     {
         RegisterBridgeQuadrants();
+    }
+
+    public void RefreshHeldObjectUI(int index)
+    {
+        // Apagar todas las UIs del canvas del player
+        for (int i = 0; i < uiGroups.Count; i++)
+        {
+            TurnOffPlayerUIOnly(i);
+        }
+        // Activar la UI del índice deseado
+        TurnOnPlayerUIOnly(index);
     }
 }

@@ -1019,6 +1019,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 83741412}
     m_Modifications:
+    - target: {fileID: 5378833713413782150, guid: f23faeec7473d35468bfc6093c2b57ca, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6817069981827546011, guid: f23faeec7473d35468bfc6093c2b57ca, type: 3}
       propertyPath: m_Name
       value: GenericObject2 (2)
@@ -1063,13 +1067,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5378833713413782150, guid: f23faeec7473d35468bfc6093c2b57ca, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 8944544607313492354, guid: f23faeec7473d35468bfc6093c2b57ca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 91828594}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6817069981827546011, guid: f23faeec7473d35468bfc6093c2b57ca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1293525859}
   m_SourcePrefab: {fileID: 100100000, guid: f23faeec7473d35468bfc6093c2b57ca, type: 3}
 --- !u!4 &150824693 stripped
 Transform:
@@ -3698,7 +3706,6 @@ GameObject:
   - component: {fileID: 815807585}
   - component: {fileID: 815807587}
   - component: {fileID: 815807586}
-  - component: {fileID: 815807588}
   m_Layer: 0
   m_Name: BridgeFrame
   m_TagString: Untagged
@@ -3763,20 +3770,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815807584}
   m_CullTransparentMesh: 1
---- !u!114 &815807588
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 815807584}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c52a5385cd5054283809f1301009dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lockY: 1
-  invertRotation: 0
 --- !u!1 &820056643
 GameObject:
   m_ObjectHideFlags: 0
@@ -4970,7 +4963,6 @@ GameObject:
   - component: {fileID: 1164144603}
   - component: {fileID: 1164144606}
   - component: {fileID: 1164144605}
-  - component: {fileID: 1164144604}
   m_Layer: 0
   m_Name: TrunkFrame
   m_TagString: Untagged
@@ -4997,20 +4989,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -11}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1164144604
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1164144602}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c52a5385cd5054283809f1301009dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lockY: 1
-  invertRotation: 0
 --- !u!114 &1164144605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5324,6 +5302,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 985317587}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1206476756 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5879399821406597270, guid: 3a5054450548d4440854a00973a4b017, type: 3}
+  m_PrefabInstance: {fileID: 7567158235566962814}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1206476761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206476756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2c52a5385cd5054283809f1301009dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockY: 1
+  invertRotation: 0
 --- !u!1001 &1216409943
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6231,6 +6228,23 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1902253508}
   m_SourcePrefab: {fileID: 100100000, guid: 9772c1baa136c534093b0f903b312e3c, type: 3}
+--- !u!1 &1293525856 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6817069981827546011, guid: f23faeec7473d35468bfc6093c2b57ca, type: 3}
+  m_PrefabInstance: {fileID: 150824692}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1293525859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293525856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 722de96496f74ce7b006c95a3b5aa9c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &1296231631 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3003273131019561867, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
@@ -8835,7 +8849,6 @@ GameObject:
   - component: {fileID: 1859725458}
   - component: {fileID: 1859725461}
   - component: {fileID: 1859725460}
-  - component: {fileID: 1859725459}
   m_Layer: 0
   m_Name: CampfireFrame
   m_TagString: Untagged
@@ -8862,20 +8875,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1859725459
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1859725457}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c52a5385cd5054283809f1301009dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lockY: 1
-  invertRotation: 0
 --- !u!114 &1859725460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10964,7 +10963,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5879399821406597270, guid: 3a5054450548d4440854a00973a4b017, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1206476761}
   m_SourcePrefab: {fileID: 100100000, guid: 3a5054450548d4440854a00973a4b017, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
