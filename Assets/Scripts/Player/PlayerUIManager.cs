@@ -10,6 +10,8 @@ public class PlayerUIManager : MonoBehaviour
     [System.Serializable]
     public class UIGroup
     {
+        public string name;
+        
         [Tooltip("UI que se muestra en el canvas del jugador")]
         public Image playerUI;
 
@@ -62,29 +64,30 @@ public class PlayerUIManager : MonoBehaviour
     private void RegisterBridgeQuadrants()
     {
         BridgeQuadrant[] allQuadrants = FindObjectsOfType<BridgeQuadrant>();
-        
         Debug.Log($"PlayerUIManager ({gameObject.name}): Encontrados {allQuadrants.Length} cuadrantes en total");
-        
-        foreach (UIGroup group in uiGroups)
+        for (int q = 0; q < allQuadrants.Length; q++)
         {
+            var quad = allQuadrants[q];
+            string uiInfo = $"Quadrant '{quad.gameObject.name}': layer0UI={(quad.GetLayerUI(0)!=null)}, layer1UI={(quad.GetLayerUI(1)!=null)}, layer2UI={(quad.GetLayerUI(2)!=null)}";
+            Debug.Log(uiInfo);
+        }
+        for (int i = 0; i < uiGroups.Count; i++)
+        {
+            UIGroup group = uiGroups[i];
             if (group.useBridgeQuadrants)
             {
                 group.registeredQuadrants.Clear();
-                
                 int foundCount = 0;
-                
                 foreach (BridgeQuadrant quadrant in allQuadrants)
                 {
                     Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
-                    
                     if (layerUI != null)
                     {
                         group.registeredQuadrants.Add(quadrant);
                         foundCount++;
                     }
                 }
-                
-                Debug.Log($"PlayerUIManager ({gameObject.name}): Registrados {foundCount} de {allQuadrants.Length} cuadrantes para la capa {group.bridgeLayer}");
+                Debug.Log($"PlayerUIManager ({gameObject.name}): Grupo[{i}] '{group.name}' Registrados {foundCount} de {allQuadrants.Length} cuadrantes para la capa {group.bridgeLayer}");
             }
         }
     }
@@ -185,6 +188,7 @@ public class PlayerUIManager : MonoBehaviour
 
         if (group.useBridgeQuadrants)
         {
+            Debug.Log($"PlayerUIManager ({gameObject.name}): Activando BridgeQuadrants para grupo[{index}] '{group.name}' capa {group.bridgeLayer}, registrados: {group.registeredQuadrants.Count}");
             foreach (BridgeQuadrant quadrant in group.registeredQuadrants)
             {
                 if (quadrant != null && quadrant.CanBuildLayer(group.bridgeLayer))
@@ -192,6 +196,7 @@ public class PlayerUIManager : MonoBehaviour
                     Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
                     if (layerUI != null)
                     {
+                        Debug.Log($"Activando UI de BridgeQuadrant '{quadrant.gameObject.name}' para capa {group.bridgeLayer} en grupo[{index}] '{group.name}'");
                         layerUI.gameObject.SetActive(true);
                     }
                 }
@@ -252,7 +257,6 @@ public class PlayerUIManager : MonoBehaviour
 
     private void TurnOffUIInternal(int index)
     {
-        // Este método ya no se usa, pero lo mantengo para compatibilidad
         TurnOffPlayerUIOnly(index);
         TurnOffSharedUIOnly(index);
     }
@@ -265,5 +269,16 @@ public class PlayerUIManager : MonoBehaviour
     public void RefreshBridgeQuadrants()
     {
         RegisterBridgeQuadrants();
+    }
+
+    public void RefreshHeldObjectUI(int index)
+    {
+        // Apagar todas las UIs del canvas del player
+        for (int i = 0; i < uiGroups.Count; i++)
+        {
+            TurnOffPlayerUIOnly(i);
+        }
+        // Activar la UI del índice deseado
+        TurnOnPlayerUIOnly(index);
     }
 }

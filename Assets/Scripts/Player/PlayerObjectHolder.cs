@@ -17,9 +17,17 @@ public class PlayerObjectHolder : MonoBehaviour
 
     private GameObject heldObject;
     private Rigidbody heldRigidbody;
+    private int lastUIIndex = -1;
 
     private Transform Anchor => holdAnchor != null ? holdAnchor : transform;
 
+    private void Update()
+    {
+        if (heldObject == null) return;
+        // Actualizar la UI del objeto en mano en cada frame
+        UpdateHeldObjectUI();
+    }
+    
     public void PickUp(GameObject objectInstance)
     {
         if (objectInstance == null)
@@ -55,6 +63,12 @@ public class PlayerObjectHolder : MonoBehaviour
 
         ApplyPickupPositioning(heldObject);
         ActivateUIForObject(heldObject);
+        // Set lastUIIndex
+        IUIActivatable uiActivatable = heldObject.GetComponent<IUIActivatable>();
+        if (uiActivatable != null)
+        {
+            lastUIIndex = uiActivatable.UIIndex;
+        }
     }
 
     public void PickUpExistingInstance(GameObject objectInstance) => PickUp(objectInstance);
@@ -66,7 +80,7 @@ public class PlayerObjectHolder : MonoBehaviour
         if (heldObject == null) return;
         
         DeactivateUIForObject(heldObject);
-        
+        lastUIIndex = -1;
         heldObject.transform.SetParent(null, true);
         if (heldRigidbody != null)
         {
@@ -135,6 +149,25 @@ public class PlayerObjectHolder : MonoBehaviour
 
         instance.transform.localPosition = Vector3.zero;
         instance.transform.localRotation = Quaternion.Euler(targetRotation);
+    }
+
+    private void UpdateHeldObjectUI()
+    {
+        if (playerUIManager == null || heldObject == null) return;
+        
+        IUIActivatable uiActivatable = heldObject.GetComponent<IUIActivatable>();
+        if (uiActivatable != null && uiActivatable.UIIndex >= 0)
+        {
+            int currentIndex = uiActivatable.UIIndex;
+            if (currentIndex != lastUIIndex)
+            {
+                if (lastUIIndex != -1)
+                    playerUIManager.TurnOffUI(lastUIIndex);
+                playerUIManager.TurnOnUI(currentIndex);
+                lastUIIndex = currentIndex;
+            }
+            playerUIManager.RefreshHeldObjectUI(currentIndex);
+        }
     }
 
     public GameObject GetHeldObjectLegacy() => heldObject;

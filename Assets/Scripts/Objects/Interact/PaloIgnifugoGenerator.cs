@@ -26,31 +26,37 @@ public class PaloIgnifugoGenerator : MonoBehaviour, IInteractable
             Debug.Log("Generador en recarga, espera un momento.");
             return;
         }
-        
         if (paloIgnifugoPrefab == null)
         {
             Debug.LogError("No hay prefab de palo ignífugo asignado.");
             return;
         }
-        
         PlayerObjectHolder playerObjectHolder = interactor.GetComponent<PlayerObjectHolder>();
-        
         if (playerObjectHolder != null)
         {
             if (playerObjectHolder.HasObjectInHand())
             {
                 Debug.Log("Jugador ya sostiene un objeto. Intercambiando objetos.");
             }
-            
             // Generar una nueva instancia del palo ignífugo en la escena
-            GameObject nuevoPoloIgnifugo = Instantiate(paloIgnifugoPrefab, transform.position + Vector3.up * 0.5f, transform.rotation);
-            
+            GameObject nuevoPaloIgnifugo = Instantiate(paloIgnifugoPrefab, transform.position + Vector3.up * 0.5f, transform.rotation);
+
+            // Obtener el UIIndex desde el propio UIIndexSetter del generador
+            UIIndexSetter sourceIndexSetter = GetComponent<UIIndexSetter>();
+            int indexToAssign = sourceIndexSetter != null ? sourceIndexSetter.UIIndex : -1;
+
+            // Asignar el UIIndex al palo ignífugo generado
+            UIIndexSetter paloUIIndexSetter = nuevoPaloIgnifugo.GetComponent<UIIndexSetter>();
+            if (paloUIIndexSetter == null)
+            {
+                paloUIIndexSetter = nuevoPaloIgnifugo.AddComponent<UIIndexSetter>();
+            }
+            paloUIIndexSetter.SetUIIndex(indexToAssign);
+
             // Hacer que el jugador recoja la instancia recién creada
-            playerObjectHolder.PickUpExistingInstance(nuevoPoloIgnifugo);
-            
-            // Iniciamos la recarga
+            playerObjectHolder.PickUpExistingInstance(nuevoPaloIgnifugo);
+
             StartCoroutine(Recargar());
-            
             Debug.Log("Has obtenido un palo ignífugo.");
         }
         else
@@ -69,4 +75,4 @@ public class PaloIgnifugoGenerator : MonoBehaviour, IInteractable
         
         enRecarga = false;
     }
-} 
+}
