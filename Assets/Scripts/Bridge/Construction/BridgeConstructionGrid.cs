@@ -13,15 +13,14 @@ public class BridgeConstructionGrid : MonoBehaviour
     public BridgeQuadrantSO defaultQuadrantSO;
     public GameObject quadrantPrefab;
     public Transform quadrantParent;    [Header("Configuración de Capas")]
-    [Tooltip("Alturas Y específicas para cada capa del puente (Base, Soporte, Estructura, Superficie)")]
-    public float[] layerHeights = new float[] { 0.0f, 0.5f, 1.0f, 1.5f };
+    [Tooltip("Alturas Y específicas para cada capa del puente (Base, Soporte, Superficie)")]
+    public float[] layerHeights = new float[] { 0.0f, 0.5f, 1.5f };
     
-    [Tooltip("Escalas individuales para cada capa del puente (Base, Soporte, Estructura, Superficie)")]
+    [Tooltip("Escalas individuales para cada capa del puente (Base, Soporte, Superficie)")]
     public Vector3[] layerScales = new Vector3[] { 
         Vector3.one,        // Capa 0: Base - escala normal
         Vector3.one,        // Capa 1: Soporte - escala normal  
-        Vector3.one,        // Capa 2: Estructura - escala normal
-        Vector3.one         // Capa 3: Superficie - escala normal
+        Vector3.one         // Capa 2: Superficie - escala normal
     };
 
     // Nuevo: modo de escala
@@ -48,7 +47,7 @@ public class BridgeConstructionGrid : MonoBehaviour
     {
         public GameObject quadrantObject;
         public BridgeQuadrantSO quadrantSO;
-        public Renderer[] layerRenderers = new Renderer[4];
+    public Renderer[] layerRenderers = new Renderer[0];
         public Collider quadrantCollider;
         public Vector3 worldPosition;
     }
@@ -197,17 +196,17 @@ public class BridgeConstructionGrid : MonoBehaviour
     // Validación de propiedades en el editor
     private void OnValidate()
     {
-        // Validar que el array de alturas tenga el tamaño correcto (4 capas)
-        if (layerHeights == null || layerHeights.Length != 4)
+        // Validar que el array de alturas tenga el tamaño correcto (3 capas)
+        if (layerHeights == null || layerHeights.Length != 3)
         {
-            layerHeights = new float[] { 0.0f, 0.5f, 1.0f, 1.5f };
+            layerHeights = new float[] { 0.0f, 0.5f, 1.5f };
             Debug.LogWarning("Array de alturas de capas resetado a valores por defecto. Ajústalo según tus necesidades.", this);
         }
 
-        // Validar que el array de escalas tenga el tamaño correcto (4 capas)
-        if (layerScales == null || layerScales.Length != 4)
+        // Validar que el array de escalas tenga el tamaño correcto (3 capas)
+        if (layerScales == null || layerScales.Length != 3)
         {
-            layerScales = new Vector3[] { Vector3.one, Vector3.one, Vector3.one, Vector3.one };
+            layerScales = new Vector3[] { Vector3.one, Vector3.one, Vector3.one };
             Debug.LogWarning("Array de escalas de capas resetado a valores por defecto. Ajústalo según tus necesidades.", this);
         }
 
@@ -228,8 +227,9 @@ public class BridgeConstructionGrid : MonoBehaviour
                 quadrantParent = container.transform;
 
                 Debug.Log("Se ha creado automáticamente el contenedor de cuadrantes. Asígnalo en el inspector para que persista.");
-            }
-        }        // Si estamos en tiempo de edición y hay cambios en quadrantSize, actualizar la grilla
+        }
+        }
+        // Si estamos en tiempo de edición y hay cambios en quadrantSize, actualizar la grilla
         if (!Application.isPlaying && constructionGrid != null)
         {
             // Llamar al reescalado solo si la grilla ya está inicializada
@@ -322,7 +322,10 @@ public class BridgeConstructionGrid : MonoBehaviour
                         }
 
                         // Preparar los contenedores para los renderizadores de las capas
-                        constructionGrid[x, z].layerRenderers = new Renderer[4];
+                        int rendererCount = constructionGrid[x, z].quadrantSO.requiredLayers != null
+                            ? constructionGrid[x, z].quadrantSO.requiredLayers.Length
+                            : 0;
+                        constructionGrid[x, z].layerRenderers = new Renderer[rendererCount];
                     }
                     else
                     {
@@ -941,11 +944,10 @@ public class BridgeConstructionGrid : MonoBehaviour
     [ContextMenu("Preset: Puente Bajo")]
     public void SetLowBridgeHeights()
     {
-        layerHeights = new float[] { 0.0f, 0.3f, 0.6f, 0.9f };
+        layerHeights = new float[] { 0.0f, 0.3f, 0.9f };
         layerScales = new Vector3[] { 
             new Vector3(1.0f, 0.8f, 1.0f),  // Base: más aplastada
             new Vector3(0.9f, 1.0f, 0.9f),  // Soporte: ligeramente más pequeño
-            new Vector3(1.0f, 0.7f, 1.0f),  // Estructura: más baja
             new Vector3(1.1f, 0.5f, 1.1f)   // Superficie: más ancha pero baja
         };
         Debug.Log("Configurado puente bajo: alturas compactas y escalas optimizadas");
@@ -957,8 +959,8 @@ public class BridgeConstructionGrid : MonoBehaviour
     [ContextMenu("Preset: Puente Estándar")]
     public void SetStandardBridgeHeights()
     {
-        layerHeights = new float[] { 0.0f, 0.5f, 1.0f, 1.5f };
-        layerScales = new Vector3[] { Vector3.one, Vector3.one, Vector3.one, Vector3.one };
+        layerHeights = new float[] { 0.0f, 0.5f, 1.5f };
+        layerScales = new Vector3[] { Vector3.one, Vector3.one, Vector3.one };
         Debug.Log("Configurado puente estándar: alturas y escalas balanceadas");
     }
 
@@ -968,13 +970,13 @@ public class BridgeConstructionGrid : MonoBehaviour
     [ContextMenu("Preset: Puente Alto")]
     public void SetHighBridgeHeights()
     {
-        layerHeights = new float[] { 0.0f, 0.8f, 1.6f, 2.4f };
+        layerHeights = new float[] { 0.0f, 0.8f, 2.4f };
         layerScales = new Vector3[] { 
             new Vector3(1.2f, 1.0f, 1.2f),  // Base: más ancha para estabilidad
             new Vector3(1.0f, 1.5f, 1.0f),  // Soporte: más alto
-            new Vector3(1.1f, 1.2f, 1.1f),  // Estructura: robusta
             new Vector3(1.0f, 0.8f, 1.0f)   // Superficie: normal pero más delgada
-        };        Debug.Log("Configurado puente alto: alturas elevadas y escalas robustas");
+        };
+        Debug.Log("Configurado puente alto: alturas elevadas y escalas robustas");
     }
 
     /// <summary>
@@ -983,11 +985,10 @@ public class BridgeConstructionGrid : MonoBehaviour
     [ContextMenu("Preset: Puente Prehistórico Robusto")]
     public void SetPrehistoricBridgeScales()
     {
-        layerHeights = new float[] { 0.0f, 0.6f, 1.2f, 1.8f };
+        layerHeights = new float[] { 0.0f, 0.6f, 1.8f };
         layerScales = new Vector3[] { 
             new Vector3(1.3f, 1.5f, 1.3f),  // Base: muy gruesa y ancha
             new Vector3(1.1f, 2.0f, 1.1f),  // Soporte: pilares altos y robustos
-            new Vector3(1.2f, 1.0f, 1.2f),  // Estructura: ancha para estabilidad
             new Vector3(1.0f, 0.6f, 1.0f)   // Superficie: plana pero resistente
         };
         Debug.Log("Configurado puente prehistórico: estructuras robustas y gruesas");
@@ -999,7 +1000,7 @@ public class BridgeConstructionGrid : MonoBehaviour
     [ContextMenu("Preset: Escalas Uniformes")]
     public void SetUniformScales()
     {
-        layerScales = new Vector3[] { Vector3.one, Vector3.one, Vector3.one, Vector3.one };
+        layerScales = new Vector3[] { Vector3.one, Vector3.one, Vector3.one };
         Debug.Log("Todas las escalas resetadas a Vector3.one (uniforme)");
     }
 
@@ -1009,13 +1010,13 @@ public class BridgeConstructionGrid : MonoBehaviour
     [ContextMenu("Preset: Puente Elegante")]
     public void SetElegantBridgeScales()
     {
-        layerHeights = new float[] { 0.0f, 0.4f, 0.8f, 1.2f };
+        layerHeights = new float[] { 0.0f, 0.4f, 1.2f };
         layerScales = new Vector3[] { 
             new Vector3(0.9f, 0.7f, 0.9f),  // Base: más delgada
             new Vector3(0.8f, 1.8f, 0.8f),  // Soporte: pilares altos y delgados
-            new Vector3(0.9f, 0.8f, 0.9f),  // Estructura: elegante
             new Vector3(1.0f, 0.4f, 1.0f)   // Superficie: muy plana
-        };        Debug.Log("Configurado puente elegante: estructuras delgadas y estilizadas");
+        };
+        Debug.Log("Configurado puente elegante: estructuras delgadas y estilizadas");
     }    /// <summary>
     /// Aplica las escalas actuales a todas las capas existentes en el puente
     /// Útil cuando cambias las escalas en tiempo de ejecución
@@ -1205,7 +1206,7 @@ public class BridgeConstructionGrid : MonoBehaviour
           Debug.Log($"=== DEBUG COMPLETADO ===");
         Debug.Log($"Cuadrantes procesados: {cuadrantesRellenados}");
         Debug.Log($"Capas rellenadas: {capasRellenadas}");
-        Debug.Log($"Puente completo: {cuadrantesRellenados} cuadrantes x 4 capas = {cuadrantesRellenados * 4} capas totales");
+    Debug.Log($"Puente completo: {cuadrantesRellenados} cuadrantes x 3 capas = {cuadrantesRellenados * 3} capas totales");
     }
 }
 

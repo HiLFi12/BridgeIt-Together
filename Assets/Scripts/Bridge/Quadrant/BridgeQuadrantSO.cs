@@ -33,7 +33,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     }
 
     /// <summary>
-    /// Enum para tipos de materiales compatible con MaterialTipo4
+    /// Enum para tipos de materiales compatible con el material de superficie
     /// </summary>
     [System.Serializable]
     public enum MaterialType
@@ -46,7 +46,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
 
     [Header("Configuración General")]
     public EraType era;
-    public LayerInfo[] requiredLayers = new LayerInfo[4];
+    public LayerInfo[] requiredLayers = new LayerInfo[3];
     public bool hasCollision = false;
     public LastLayerState lastLayerState = LastLayerState.Complete;
 

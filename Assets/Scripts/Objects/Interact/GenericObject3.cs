@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Objeto genérico tipo 3 que permite al jugador obtener un material tipo 4
+/// Objeto genérico tipo 3 que permite al jugador obtener un material tipo 3 (superficie)
 /// al mantener presionado el botón de interacción durante 1 segundo.
 /// En la era prehistórica, este material es un adoquín.
 /// </summary>
@@ -73,7 +73,7 @@ public class GenericObject3 : MonoBehaviour, IInteractable, IHoldInteractable
             if (!enProceso)
             {
                 IniciarProceso(interactor);
-                Debug.Log("Mantén presionado para obtener el material tipo 4.");
+                Debug.Log("Mantén presionado para obtener el material tipo 3 (superficie).");
             }
         }
         else
@@ -118,12 +118,12 @@ public class GenericObject3 : MonoBehaviour, IInteractable, IHoldInteractable
             return;
         }
         
-        // Obtener el prefab del material tipo 4 para la era actual
-        GameObject materialPrefab = materialPrefabsSO.GetMaterialPrefab(4, era);
+        // Obtener el prefab del material tipo 3 para la era actual
+        GameObject materialPrefab = materialPrefabsSO.GetMaterialPrefab(3, era);
         
         if (materialPrefab == null)
         {
-            Debug.LogError($"No se encontró prefab para material tipo 4 de la era {era}.");
+            Debug.LogError($"No se encontró prefab para material tipo 3 de la era {era}.");
             return;
         }
 
@@ -136,7 +136,7 @@ public class GenericObject3 : MonoBehaviour, IInteractable, IHoldInteractable
                 Debug.Log("Jugador ya sostiene un objeto. Intercambiando objetos.");
             }
             
-            // Generar una nueva instancia del PrefabMaterial4 en la escena
+            // Generar una nueva instancia del material de superficie en la escena
             GameObject nuevoMaterial = Instantiate(materialPrefab, transform.position + Vector3.up * 0.5f, transform.rotation);
             
             // Configurar el material generado
@@ -155,7 +155,7 @@ public class GenericObject3 : MonoBehaviour, IInteractable, IHoldInteractable
             
             // Hacer que el jugador recoja la instancia recién creada
             playerObjectHolder.PickUpExistingInstance(nuevoMaterial);
-            Debug.Log("Material tipo 4 entregado con éxito.");
+            Debug.Log("Material tipo 3 (superficie) entregado con éxito.");
             
             // Opcional: Reproducir sonido o efecto visual
             ProducirEfectos();
@@ -164,20 +164,20 @@ public class GenericObject3 : MonoBehaviour, IInteractable, IHoldInteractable
     
     private void ConfigurarMaterialGenerado(GameObject material)
     {
-        // Configurar el material generado como material de tipo 4 de la era correspondiente
+        // Configurar el material generado como material de tipo superficie (nuevo tipo 3) de la era correspondiente
         BridgeMaterialInfo materialInfo = material.GetComponent<BridgeMaterialInfo>();
         if (materialInfo == null)
         {
             materialInfo = material.AddComponent<BridgeMaterialInfo>();
         }
-        
-        materialInfo.layerIndex = 3; // Tipo 4 corresponde a capa 3 (superficie)
+
+        materialInfo.layerIndex = 2; // Tipo superficie corresponde a la capa superior (índice 2)
         materialInfo.era = era;
-        materialInfo.materialType = BridgeQuadrantSO.MaterialType.Stone; // Tipo 4 es piedra/adoquín
-        
-        material.tag = "BridgeLayer3";
-        
-        Debug.Log($"Material tipo 4 generado configurado: Era {era}, Capa 3, Tipo Stone");
+        materialInfo.materialType = BridgeQuadrantSO.MaterialType.Stone; // Superficie usa piedra/adoquín
+
+        material.tag = "BridgeLayer2";
+
+        Debug.Log($"Material superficie generado configurado: Era {era}, Capa 2, Tipo Stone");
     }
     
     private IEnumerator Recargar()

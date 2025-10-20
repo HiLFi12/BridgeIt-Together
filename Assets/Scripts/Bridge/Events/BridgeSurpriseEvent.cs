@@ -15,7 +15,7 @@ public class EventoSorpresa
     public int despuesDeRonda = 1;
     
     [Header("Destrucción del Puente")]
-    [Range(0, 4), Tooltip("Número de capas que permanecerán después del evento:\n• 0 = destrucción completa (destruye todas las capas 0-3)\n• 1 = solo permanece la base (destruye capas 1-3)\n• 2 = permanecen base + soporte (destruye capas 2-3)\n• 3 = permanecen base + soporte + estructura (destruye capa 3)\n• 4 = puente completo (no se destruye nada)")]
+    [Range(0, 3), Tooltip("Número de capas que permanecerán después del evento:\n• 0 = destrucción completa (destruye todas las capas 0-2)\n• 1 = solo permanece la base (destruye capas 1-2)\n• 2 = permanecen base + soporte (destruye la capa superficial)\n• 3 = puente completo (no se destruye nada)")]
     public int capaObjetivo = 1;
     
     [Header("Configuración de Cuadrantes")]
@@ -211,14 +211,22 @@ public class BridgeSurpriseEvent : MonoBehaviour
                 {
                     // Destruir capas desde la capa superior hacia abajo según capaObjetivo
                     // capaObjetivo = número de capas que PERMANECEN (0=destruir todo, 1=solo base, 2=base+soporte, etc.)
-                    // Ejemplo: capaObjetivo=0 significa destruir todas (capas 3,2,1,0), capaObjetivo=1 significa que solo queda la capa 0 (destruir capas 3,2,1)
-                    
+                    int capasDisponibles = quadrantSO.requiredLayers.Length;
+                    int capasObjetivoClamped = Mathf.Clamp(evento.capaObjetivo, 0, capasDisponibles);
+
+                    if (evento.capaObjetivo != capasObjetivoClamped && evento.mostrarMensajesDebug)
+                    {
+                        Debug.LogWarning($"  ⚠️ capaObjetivo {evento.capaObjetivo} se ajustó a {capasObjetivoClamped} para coincidir con las {capasDisponibles} capas disponibles.");
+                    }
+
+                    // Ejemplo: capaObjetivo=0 significa destruir todas (capas 2,1,0); capaObjetivo=1 deja solo la base (destruye capas 2 y 1)
+
                     if (evento.mostrarMensajesDebug)
                     {
-                        Debug.Log($"  🔍 Cuadrante [{x},{z}]: capaObjetivo={evento.capaObjetivo}, destruyendo capas desde 3 hasta {evento.capaObjetivo}");
+                        Debug.Log($"  🔍 Cuadrante [{x},{z}]: capaObjetivo={capasObjetivoClamped}, destruyendo capas desde {capasDisponibles - 1} hasta {capasObjetivoClamped}");
                     }
                     
-                    for (int layer = 3; layer > evento.capaObjetivo - 1; layer--)
+                    for (int layer = capasDisponibles - 1; layer >= capasObjetivoClamped; layer--)
                     {
                         if (quadrantSO.requiredLayers[layer].isCompleted)
                         {
@@ -232,7 +240,7 @@ public class BridgeSurpriseEvent : MonoBehaviour
                             
                             if (evento.mostrarMensajesDebug)
                             {
-                                Debug.Log($"  ✗ Capa {layer} destruida en cuadrante [{x},{z}] (objetivo: conservar {evento.capaObjetivo} capas)");
+                                Debug.Log($"  ✗ Capa {layer} destruida en cuadrante [{x},{z}] (objetivo: conservar {capasObjetivoClamped} capas)");
                             }
                         }
                         else if (evento.mostrarMensajesDebug)
@@ -249,9 +257,9 @@ public class BridgeSurpriseEvent : MonoBehaviour
                         
                         // Si capaObjetivo = 0, no deben quedar capas
                         // Si capaObjetivo > 0, verificar si las capas que deberían permanecer están completadas
-                        if (evento.capaObjetivo > 0)
+                        if (capasObjetivoClamped > 0)
                         {
-                            for (int i = 0; i < evento.capaObjetivo; i++)
+                            for (int i = 0; i < capasObjetivoClamped; i++)
                             {
                                 if (quadrantSO.requiredLayers[i].isCompleted)
                                 {
@@ -265,7 +273,7 @@ public class BridgeSurpriseEvent : MonoBehaviour
                         if (evento.mostrarMensajesDebug)
                         {
                             Debug.Log($"  🔍 Estado post-destrucción en cuadrante [{x},{z}]: tieneCapasRestantes={tieneCapasRestantes}");
-                            for (int debugLayer = 0; debugLayer < 4; debugLayer++)
+                            for (int debugLayer = 0; debugLayer < quadrantSO.requiredLayers.Length; debugLayer++)
                             {
                                 bool estaCompleta = quadrantSO.requiredLayers[debugLayer].isCompleted;
                                 Debug.Log($"    📊 Capa {debugLayer}: {(estaCompleta ? "✅ Completa" : "❌ Destruida")}");
@@ -297,14 +305,19 @@ public class BridgeSurpriseEvent : MonoBehaviour
         
         if (evento.mostrarMensajesDebug || mostrarDebugInfo)
         {
-            string descripcionObjetivo = evento.capaObjetivo switch
+            int capasMaximas = bridgeGrid != null && bridgeGrid.defaultQuadrantSO != null &&
+                               bridgeGrid.defaultQuadrantSO.requiredLayers != null
+                ? bridgeGrid.defaultQuadrantSO.requiredLayers.Length
+                : 3;
+            int capasObjetivoResumen = Mathf.Clamp(evento.capaObjetivo, 0, capasMaximas);
+
+            string descripcionObjetivo = capasObjetivoResumen switch
             {
                 0 => "destrucción completa (todas las capas eliminadas)",
                 1 => "solo permanece la base (capa 0)",
                 2 => "permanecen base + soporte (capas 0-1)",
-                3 => "permanecen base + soporte + estructura (capas 0-2)",
-                4 => "puente completo (sin destrucción)",
-                _ => $"{evento.capaObjetivo} capas permanecen"
+                3 => "puente completo (base + soporte + superficie)",
+                _ => $"{capasObjetivoResumen} capas permanecen"
             };
             
             Debug.Log($"🎭 Destrucción completada: {cuadrantesAfectados} cuadrantes afectados, {capasDestruidas} capas destruidas. Resultado: {descripcionObjetivo}");

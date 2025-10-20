@@ -150,7 +150,7 @@ public class FutureMixerManager : MonoBehaviour, IInteractable
 
     private IEnumerator ColocarConDelay(GameObject player, int itemType)
     {
-        Debug.Log($"Tipo detectado: {(itemType == 1 ? "Material Tipo 4 (Batería)" : "Material para mezclar")} - Esperando {delayColocacion}s...");
+        Debug.Log($"Tipo detectado: {(itemType == 1 ? "Material tipo 3 (batería)" : "Material para mezclar")} - Esperando {delayColocacion}s...");
         
         // Esperar el delay configurado
         yield return new WaitForSeconds(delayColocacion);
@@ -158,8 +158,8 @@ public class FutureMixerManager : MonoBehaviour, IInteractable
         // 3. Ejecutar la colocación según el tipo
         switch (itemType)
         {
-            case 1: // Material Tipo 4 (para cargar batería)
-                Debug.Log("Cargando batería con material tipo 4");
+            case 1: // Material superficie (nuevo tipo 3) para cargar batería
+                Debug.Log("Cargando batería con material tipo 3 (superficie)");
                 batterySystem?.Interact(player);
                 break;
 
@@ -174,14 +174,14 @@ public class FutureMixerManager : MonoBehaviour, IInteractable
     {
         if (objeto == null) return 0;
 
-        // Tipo 1: Material Tipo 4 (para cargar batería)
+        // Tipo 1: Material superficie (tipo 3) para cargar batería
         if (objeto.GetComponent<MaterialTipo4>() != null)
             return 1;
 
         BridgeMaterialInfo materialInfo = objeto.GetComponent<BridgeMaterialInfo>();
         
-        // Verificar si es material tipo 4 (layerIndex 3)
-        if (materialInfo != null && materialInfo.layerIndex == 3)
+        // Verificar si es material tipo superficie (capa superior índice 2)
+        if (materialInfo != null && materialInfo.layerIndex == 2)
             return 1;
 
         // Tipo 2: Material tipo 1 o tipo 2 (para mezclar)

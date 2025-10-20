@@ -76,12 +76,12 @@ public class BridgeInitialConstructorEditor : Editor
         
         EditorGUILayout.Space();
         
-        // Estado de la última capa (solo si se construyen 4 capas)
-        if (currentLayers == 4)
+        // Estado de la última capa (solo si se construyen las 3 capas)
+        if (currentLayers == 3)
         {
             EditorGUILayout.LabelField("Estado de la Última Capa", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("lastLayerState"));
-            EditorGUILayout.HelpBox("Solo aplica cuando se construyen las 4 capas completas.", MessageType.Info);
+            EditorGUILayout.HelpBox("Solo aplica cuando se construyen las 3 capas completas.", MessageType.Info);
             EditorGUILayout.Space();
         }
         
@@ -119,10 +119,9 @@ public class BridgeInitialConstructorEditor : Editor
         switch (layers)
         {
             case 0: return "El puente no se construirá. Los jugadores deberán construir desde cero.";
-            case 1: return "Solo se construirá la capa base (fundación). Los jugadores necesitarán añadir soporte, estructura y superficie.";
-            case 2: return "Se construirán la base y el soporte. Los jugadores necesitarán añadir estructura y superficie.";
-            case 3: return "Se construirán base, soporte y estructura. Los jugadores solo necesitarán añadir la superficie final.";
-            case 4: return "El puente estará completamente construido. Útil para niveles de reparación o mantenimiento.";
+            case 1: return "Solo se construirá la capa base (fundación). Los jugadores necesitarán añadir soporte y superficie.";
+            case 2: return "Se construirán la base y el soporte. Los jugadores solo necesitarán añadir la superficie.";
+            case 3: return "El puente estará completamente construido. Útil para niveles de reparación o mantenimiento.";
             default: return "";
         }
     }

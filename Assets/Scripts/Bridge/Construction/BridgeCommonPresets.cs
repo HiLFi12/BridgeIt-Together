@@ -106,13 +106,13 @@ public class BridgeCommonPresets : MonoBehaviour
         if (!ValidateConstructor()) return;
         
         SetConstructorValues(
-            layers: 4,
+            layers: 3,
             allQuadrants: true,
             lastState: BridgeQuadrantSO.LastLayerState.Complete,
             debugMessages: true
         );
         
-        Debug.Log("✓ Preset aplicado: Puente Completo (4 capas)");
+        Debug.Log("✓ Preset aplicado: Puente Completo (3 capas)");
         LogPresetDescription("El puente está completamente construido y funcional.");
     }
     
@@ -126,13 +126,13 @@ public class BridgeCommonPresets : MonoBehaviour
         if (!ValidateConstructor()) return;
         
         SetConstructorValues(
-            layers: 4,
+            layers: 3,
             allQuadrants: true,
             lastState: BridgeQuadrantSO.LastLayerState.Damaged,
             debugMessages: true
         );
         
-        Debug.Log("✓ Preset aplicado: Puente Dañado (4 capas, estado dañado)");
+        Debug.Log("✓ Preset aplicado: Puente Dañado (3 capas, estado dañado)");
         LogPresetDescription("El puente está completo pero dañado. Los jugadores deben repararlo.");
     }
     

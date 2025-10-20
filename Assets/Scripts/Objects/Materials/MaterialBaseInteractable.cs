@@ -41,9 +41,14 @@ public abstract class MaterialBaseInteractable : MonoBehaviour, IGrababble, IHit
         {
             materialInfo = gameObject.AddComponent<BridgeMaterialInfo>();
         }
-        materialInfo.layerIndex = LayerIndex;
+        int clampedIndex = Mathf.Clamp(LayerIndex, 0, 2);
+        if (LayerIndex != clampedIndex)
+        {
+            Debug.LogWarning($"{name}: LayerIndex {LayerIndex} ajustado a {clampedIndex} para coincidir con las capas disponibles.", this);
+        }
+        materialInfo.layerIndex = clampedIndex;
         materialInfo.era = era;
-        UpdateTagByLayer(LayerIndex);
+        UpdateTagByLayer(clampedIndex);
     }
 
     private void UpdateTagByLayer(int index)
@@ -53,7 +58,6 @@ public abstract class MaterialBaseInteractable : MonoBehaviour, IGrababble, IHit
             case 0: gameObject.tag = "BridgeLayer0"; break;
             case 1: gameObject.tag = "BridgeLayer1"; break;
             case 2: gameObject.tag = "BridgeLayer2"; break;
-            case 3: gameObject.tag = "BridgeLayer3"; break;
             default: gameObject.tag = "BridgeLayer0"; break;
         }
     }

@@ -12,7 +12,7 @@ public class BridgeConstructionPreset : ScriptableObject
     public string description = "Descripción del preset de construcción inicial";
     
     [Header("Configuración de Construcción")]
-    [Range(0, 4)]
+    [Range(0, 3)]
     public int initialConstructedLayers = 0;
     
     [Header("Configuración de Cuadrantes")]
@@ -207,8 +207,7 @@ public class BridgePresetManager : MonoBehaviour
         Debug.Log("- 'Puente Vacío' (0 capas)");
         Debug.Log("- 'Solo Base' (1 capa)");
         Debug.Log("- 'Base y Soporte' (2 capas)");
-        Debug.Log("- 'Casi Completo' (3 capas)");
-        Debug.Log("- 'Completo' (4 capas)");
-        Debug.Log("- 'Completo Dañado' (4 capas, estado dañado)");
+        Debug.Log("- 'Completo' (3 capas)");
+        Debug.Log("- 'Completo Dañado' (3 capas, estado dañado)");
     }
 }

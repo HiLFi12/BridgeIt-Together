@@ -10,7 +10,7 @@ public class BridgeInitialConstructor : MonoBehaviour
     [SerializeField] private BridgeConstructionGrid bridgeGrid;
     
     [Header("Estado Inicial de Construcción")]
-    [Range(0, 4), Tooltip("0 = Sin construir, 1 = Solo capa base, 2 = Base + soporte, 3 = Base + soporte + estructura, 4 = Puente completo")]
+    [Range(0, 3), Tooltip("0 = Sin construir, 1 = Solo capa base, 2 = Base + soporte, 3 = Puente completo (base + soporte + superficie)")]
     [SerializeField] private int initialConstructedLayers = 0;
     
     [Header("Configuración Específica")]
@@ -103,7 +103,7 @@ public class BridgeInitialConstructor : MonoBehaviour
                 }
                 
                 // Si es la última capa y se especificó un estado particular, aplicarlo
-                if (quadrantSuccess && initialConstructedLayers == 4 && lastLayerState != BridgeQuadrantSO.LastLayerState.Complete)
+                if (quadrantSuccess && initialConstructedLayers == 3 && lastLayerState != BridgeQuadrantSO.LastLayerState.Complete)
                 {
                     SetLastLayerState(x, z, lastLayerState);
                 }

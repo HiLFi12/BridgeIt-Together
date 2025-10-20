@@ -71,7 +71,7 @@ namespace Gameplay.Heat
             if (workingSpawner != null)
             {
                 workingSpawner.ActivateSpawner();
-                Debug.Log("Material tipo 3 listo en el spawner.");
+                Debug.Log("Material tipo 3 (superficie) listo en el spawner.");
             }
             else
             {

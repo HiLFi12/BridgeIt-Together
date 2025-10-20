@@ -146,7 +146,12 @@ public class PlayerBridgeInteraction : MonoBehaviour
             int gridLengthLocal = currentTargetGrid.gridLength;
             for (int zIter = 0; zIter < gridLengthLocal; zIter++)
             {
-                for (int layer = correctLayerIndex; layer <= 3; layer++)
+                BridgeQuadrantSO columnQuadrant = currentTargetGrid.GetQuadrantSO(targetX, zIter);
+                int maxLayerIndex = (columnQuadrant != null && columnQuadrant.requiredLayers != null && columnQuadrant.requiredLayers.Length > 0)
+                    ? columnQuadrant.requiredLayers.Length - 1
+                    : correctLayerIndex;
+
+                for (int layer = correctLayerIndex; layer <= maxLayerIndex; layer++)
                 {
                     bool layerBuilt = currentTargetGrid.TryBuildLayer(targetX, zIter, layer, objectInHand);
                     success = success || layerBuilt;
@@ -172,7 +177,7 @@ public class PlayerBridgeInteraction : MonoBehaviour
     }
     
     /// <summary>
-    /// Intenta reparar un cuadrante dañado usando MaterialTipo4 (adoquín)
+    /// Intenta reparar un cuadrante dañado usando material de superficie (adoquín)
     /// </summary>
     private bool TryRepairQuadrant(BridgeQuadrantSO quadrant, GameObject materialObject)
     {

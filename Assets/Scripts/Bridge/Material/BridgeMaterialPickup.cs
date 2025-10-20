@@ -29,6 +29,12 @@ public class BridgeMaterialPickup : MonoBehaviour, IInteractable
             visualModel = transform.GetChild(0).gameObject;
         }
         
+        if (layerIndex > 2)
+        {
+            Debug.LogWarning($"BridgeMaterialPickup: layerIndex {layerIndex} fuera de rango. Ajustando a 2 (Superficie).", this);
+            layerIndex = 2;
+        }
+
         // CRÍTICO: Si tenemos un materialPrefab, configurarlo con el layerIndex correcto
         if (materialPrefab != null)
         {
@@ -49,10 +55,7 @@ public class BridgeMaterialPickup : MonoBehaviour, IInteractable
                 materialPrefab.tag = "BridgeLayer1"; // Soporte
                 break;
             case 2:
-                materialPrefab.tag = "BridgeLayer2"; // Estructura
-                break;
-            case 3:
-                materialPrefab.tag = "BridgeLayer3"; // Superficie
+                materialPrefab.tag = "BridgeLayer2"; // Superficie
                 break;
             default:
                 materialPrefab.tag = "BridgeLayer0"; // Por defecto, asignamos Base
@@ -108,10 +111,7 @@ public class BridgeMaterialPickup : MonoBehaviour, IInteractable
                 gameObject.tag = "BridgeLayer1"; // Soporte
                 break;
             case 2:
-                gameObject.tag = "BridgeLayer2"; // Estructura
-                break;
-            case 3:
-                gameObject.tag = "BridgeLayer3"; // Superficie
+                gameObject.tag = "BridgeLayer2"; // Superficie
                 break;
             default:
                 gameObject.tag = "BridgeLayer0"; // Por defecto, asignamos Base
@@ -182,8 +182,7 @@ public class BridgeMaterialPickup : MonoBehaviour, IInteractable
             {
                 case 0: gizmoColor = Color.blue; break;   // Base
                 case 1: gizmoColor = Color.green; break;  // Soporte
-                case 2: gizmoColor = Color.yellow; break; // Estructura
-                case 3: gizmoColor = Color.red; break;    // Superficie
+                case 2: gizmoColor = Color.red; break;    // Superficie
                 default: gizmoColor = Color.white; break;
             }
             

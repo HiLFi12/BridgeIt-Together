@@ -228,8 +228,8 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
         
         yield return new WaitForSeconds(tiempoCoccion);
         
-        GameObject materialTipo3Prefab = materialPrefabsSO.GetMaterialPrefab(3, era);
-        if (materialTipo3Prefab != null)
+    GameObject materialSuperficiePrefab = materialPrefabsSO.GetMaterialPrefab(3, era);
+        if (materialSuperficiePrefab != null)
         {
             Vector3 spawnPosition = resultadoSpawnPoint != null
                 ? resultadoSpawnPoint.position
@@ -239,8 +239,8 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
                 ? resultadoSpawnPoint.rotation
                 : Quaternion.identity;
 
-            Instantiate(materialTipo3Prefab, spawnPosition, spawnRotation);
-            Debug.Log("Material tipo 3 creado con éxito.");
+            Instantiate(materialSuperficiePrefab, spawnPosition, spawnRotation);
+            Debug.Log("Material tipo 3 (superficie) creado con éxito.");
         }
         else
         {

@@ -48,10 +48,10 @@ public class BatterySystem : MonoBehaviour, IInteractable
         
         GameObject heldObject = playerObjectHolder.GetHeldObject();
         
-        // Verificar si el objeto es material tipo 4
-        if (!EsMaterialTipo4(heldObject))
+        // Verificar si el objeto es material tipo superficie (nuevo tipo 3)
+        if (!EsMaterialTipoSuperficie(heldObject))
         {
-            Debug.Log("Este material no se puede usar para cargar la batería. Necesitas material tipo 4.");
+            Debug.Log("Este material no se puede usar para cargar la batería. Necesitas material tipo 3 (superficie).");
             return;
         }
         
@@ -84,17 +84,17 @@ public class BatterySystem : MonoBehaviour, IInteractable
         Debug.Log($"Batería cargada. Cargas actuales: {cargasActuales}/{maxCargas}");
     }
 
-    private bool EsMaterialTipo4(GameObject objeto)
+    private bool EsMaterialTipoSuperficie(GameObject objeto)
     {
         if (objeto == null) return false;
         
-        // Verificar si tiene el componente MaterialTipo4
+        // Verificar si tiene el componente MaterialTipo4 (legacy nombre de script)
         if (objeto.GetComponent<MaterialTipo4>() != null)
             return true;
         
         // Verificar mediante BridgeMaterialInfo
         BridgeMaterialInfo materialInfo = objeto.GetComponent<BridgeMaterialInfo>();
-        if (materialInfo != null && materialInfo.layerIndex == 3) // layerIndex 3 = tipo 4
+        if (materialInfo != null && materialInfo.layerIndex == 2) // layerIndex 2 = tipo superficie
             return true;
         
         return false;

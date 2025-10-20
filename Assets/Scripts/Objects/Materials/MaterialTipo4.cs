@@ -4,7 +4,7 @@ using UnityEngine;
 using BridgeItTogether.Gameplay.Abstractions;
 
 /// <summary>
-/// Clase que representa un material tipo 4 (para la capa 4 del puente).
+/// Clase que representa el material de la capa superior del puente (nuevo tipo 3).
 /// En la era prehistórica, este material es un adoquín.
 /// </summary>
 public class MaterialTipo4 : MonoBehaviour, IHitable, IUIActivatable
@@ -30,13 +30,13 @@ public class MaterialTipo4 : MonoBehaviour, IHitable, IUIActivatable
             materialInfo = gameObject.AddComponent<BridgeMaterialInfo>();
         }
         
-        // Configurar el material como tipo 4 (índice 3 corresponde a la capa 4)
-        materialInfo.layerIndex = 3;
+        // Configurar el material como superficie (índice 2)
+        materialInfo.layerIndex = 2;
         materialInfo.era = era;
-        materialInfo.materialType = BridgeQuadrantSO.MaterialType.Adoquin; // Solo MaterialTipo4 es adoquín
+        materialInfo.materialType = BridgeQuadrantSO.MaterialType.Adoquin; // Superficie usa adoquín
         
         // Asegurarnos de que el objeto tenga el tag correcto
-        gameObject.tag = "BridgeLayer3";
+        gameObject.tag = "BridgeLayer2";
     }
 
     public void SetUIIndex(int index)
