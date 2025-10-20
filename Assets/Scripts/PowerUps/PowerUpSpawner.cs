@@ -1,16 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
-/// Versión simplificada rehacida desde cero: un solo prefab y lista de spawn points.
-/// Llama a <see cref="SpawnRandom"/> para instanciarlo en un punto aleatorio.
+/// Versión simplificada rehacida desde cero: reutiliza un único objeto y lista de spawn points.
+/// Llama a <see cref="SpawnRandom"/> para activarlo en un punto aleatorio.
 /// </summary>
 public class PowerUpSpawner : MonoBehaviour
 {
-    [Header("Prefab a instanciar")]
-    [Tooltip("PowerUp (o cualquier GameObject) que será instanciado una única vez.")]
-    public GameObject prefab;
+    [Header("Objeto a activar")]
+    [FormerlySerializedAs("prefab")]
+    [Tooltip("Referencia a un GameObject existente (desactivado) que será reposicionado y activado una única vez.")]
+    public GameObject pooledObject;
 
     [Header("Puntos de spawn (Empty Transforms en escena)")]
     public List<Transform> spawnPoints = new List<Transform>();
@@ -29,32 +31,41 @@ public class PowerUpSpawner : MonoBehaviour
     private bool hasSpawned = false;
 
     /// <summary>
-    /// Instancia el prefab en un punto aleatorio de la lista.
+    /// Activa el objeto reutilizable en un punto aleatorio de la lista.
     /// </summary>
     public void SpawnRandom()
     {
         if (hasSpawned)
             return; // Ya se generó el único spawn
 
-        if (prefab == null || spawnPoints == null || spawnPoints.Count == 0)
+        if (pooledObject == null || spawnPoints == null || spawnPoints.Count == 0)
         {
-            Debug.LogWarning("[PowerUpSpawner] Prefab o spawnPoints no asignados.");
+            Debug.LogWarning("[PowerUpSpawner] Objeto a activar o spawnPoints no asignados.");
             return;
         }
 
-    Transform point = spawnPoints[Random.Range(0, spawnPoints.Count)];
-    // Combinar la rotación del spawn point con la del prefab para respetar la orientación propia
-    Quaternion finalRot = point.rotation * prefab.transform.rotation;
-    GameObject spawned = Instantiate(prefab, point.position, finalRot);
+        if (pooledObject.activeInHierarchy)
+        {
+            Debug.LogWarning("[PowerUpSpawner] El objeto configurado ya está activo, no se puede reutilizar para el spawn único.");
+            return;
+        }
+
+        Transform point = spawnPoints[Random.Range(0, spawnPoints.Count)];
+        // Combinar la rotación del spawn point con la del objeto para respetar la orientación propia
+        Quaternion finalRot = point.rotation * pooledObject.transform.rotation;
+        Vector3 targetPosition = new Vector3(point.position.x, point.position.y, point.position.z);
+
+        pooledObject.transform.SetPositionAndRotation(targetPosition, finalRot);
+        pooledObject.SetActive(true);
 
         // Instanciar efecto de aparición si existe
         if (spawnEffectPrefab != null)
         {
             Vector3 fxPos = point.TransformPoint(effectOffset);
             GameObject fx = Instantiate(spawnEffectPrefab, fxPos, finalRot);
-            if (attachEffectAsChild && spawned != null)
+            if (attachEffectAsChild && pooledObject != null)
             {
-                fx.transform.SetParent(spawned.transform, true);
+                fx.transform.SetParent(pooledObject.transform, true);
             }
 
             // Auto-destroy si tiene ParticleSystem principal
