@@ -33,7 +33,8 @@ public class Player : MonoBehaviour, IHitable
 
     [Header("Build UI")]
     [SerializeField] private Image buildUIImage;
-
+    
+    private GameConditionManager gameConditionManager;
     private PlayerObjectHolder objectHolder;
     private PlayerBridgeInteraction bridgeInteraction;
     private PlayerAnimator playerAnimator;
@@ -44,6 +45,7 @@ public class Player : MonoBehaviour, IHitable
     private InputAction buildAction;
     private InputAction dashAction;
     private InputAction dropAction;
+    private InputAction pauseAction;
 
     // Dash state
     private bool isDashing = false;
@@ -65,6 +67,7 @@ public class Player : MonoBehaviour, IHitable
         characterController = GetComponent<CharacterController>();
         playerController = GetComponent<PlayerController>();
         playerInput = GetComponent<PlayerInput>();
+        gameConditionManager = FindObjectOfType<GameConditionManager>();
         
         if (playerInput != null)
         {
@@ -72,6 +75,7 @@ public class Player : MonoBehaviour, IHitable
             buildAction = playerInput.actions.FindAction("Build");
             dashAction = playerInput.actions.FindAction("Dash");
             dropAction = playerInput.actions.FindAction("Drop");
+            pauseAction = playerInput.actions.FindAction("Pause");
         }
         
         interactionUIImage.gameObject.SetActive(false);
@@ -115,6 +119,11 @@ public class Player : MonoBehaviour, IHitable
         if (dropAction.triggered || Input.GetKeyDown(dropKey))
         {
             TryDropObject();
+        }
+
+        if (pauseAction.triggered)
+        {
+            gameConditionManager.PauseGame();
         }
 
         if ((buildAction.triggered || Input.GetKeyDown(buildKey)) && bridgeInteraction != null)

@@ -130,16 +130,21 @@ public class GameConditionManager : MonoBehaviour
         // Detectar presión de ESC para pausar/reanudar el juego
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (juegoTerminado) return; // No permitir pausa si el juego ya terminó
+            PauseGame();
+        }
+    }
+
+    public void PauseGame()
+    {
+        if (juegoTerminado) return; // No permitir pausa si el juego ya terminó
             
-            if (juegoEnPausa)
-            {
-                ReanudarJuego();
-            }
-            else
-            {
-                PausarJuego();
-            }
+        if (juegoEnPausa)
+        {
+            ReanudarJuego();
+        }
+        else
+        {
+            PausarJuego();
         }
     }
     
