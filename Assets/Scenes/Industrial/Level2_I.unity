@@ -7380,17 +7380,15 @@ MonoBehaviour:
   quadrantSize: 1.71
   defaultQuadrantSO: {fileID: 11400000, guid: b338c7d0318145546978c7258e063255, type: 2}
   quadrantPrefab: {fileID: 1437374063}
-  quadrantParent: {fileID: 1196880118}
+  quadrantParent: {fileID: 1510592666}
   layerHeights:
-  - -1.81
-  - -0.8
-  - -0.3
+  - -2.5
+  - -0.15
   - 0.4
   layerScales:
-  - {x: 0.011, y: 0.05, z: 0.05}
+  - {x: 0.018, y: 0.04, z: 0.04}
   - {x: 50, y: 50, z: 50}
-  - {x: 0.005, y: 0.2, z: 0.06}
-  - {x: 1.5, y: 0.5, z: 1.3}
+  - {x: 1.5, y: 0.2, z: 1.5}
   layerScaleMode: 1
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
@@ -7415,6 +7413,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1196880118}
+  - {fileID: 1510592666}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &991265664
@@ -10650,17 +10649,15 @@ MonoBehaviour:
   quadrantSize: 1.71
   defaultQuadrantSO: {fileID: 11400000, guid: b338c7d0318145546978c7258e063255, type: 2}
   quadrantPrefab: {fileID: 1437374063}
-  quadrantParent: {fileID: 1717782598}
+  quadrantParent: {fileID: 1510592666}
   layerHeights:
-  - -1.81
-  - -0.8
-  - -0.3
+  - -2.5
+  - -0.15
   - 0.4
   layerScales:
-  - {x: 0.011, y: 0.05, z: 0.05}
+  - {x: 0.018, y: 0.04, z: 0.04}
   - {x: 50, y: 50, z: 50}
-  - {x: 0.005, y: 0.2, z: 0.06}
-  - {x: 1.5, y: 0.5, z: 1.3}
+  - {x: 1.5, y: 0.2, z: 1.5}
   layerScaleMode: 1
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
@@ -11672,6 +11669,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3863016212730197734, guid: da5327b0ffd9bb849b596274a49961c3, type: 3}
   m_PrefabInstance: {fileID: 1510343403}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1510592665
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1510592666}
+  m_Layer: 0
+  m_Name: QuadrantContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1510592666
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1510592665}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 985317587}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1511839368
 PrefabInstance:
   m_ObjectHideFlags: 0

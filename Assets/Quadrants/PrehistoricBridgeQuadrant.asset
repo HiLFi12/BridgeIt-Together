@@ -23,16 +23,12 @@ MonoBehaviour:
     material: {fileID: -876546973899608171, guid: ee63d9a0cecb859458d9fd8b01c5d563, type: 3}
     isCompleted: 0
   - layerName: 2
-    visualPrefab: {fileID: 403930078715100155, guid: d1eb3f56692ba8f49a40fa1be7585cd2, type: 3}
-    material: {fileID: 785750615295369694, guid: 6ba71ada50922774b84e7143815e2a30, type: 3}
-    isCompleted: 0
-  - layerName: 3
     visualPrefab: {fileID: 403930078715100155, guid: cd79f2b892c29224ba5d676cf5a901f8, type: 3}
     material: {fileID: 7549781418554286500, guid: 4662b093ea753b947bb0ab680b98fbed, type: 3}
     isCompleted: 0
   hasCollision: 1
   lastLayerState: 0
-  maxUsesBeforeDamage: 5
+  maxUsesBeforeDamage: 1
   currentUses: 0
   maxTemperature: 100
   currentTemperature: 100
@@ -40,6 +36,9 @@ MonoBehaviour:
   damageChance: 0.3
   batteryLife: 100
   batteryDrainRate: 5
+  heatActive: 0
+  debugLife: 0
+  debugLifeInterval: 0.5
   damagedMaterial: {fileID: 2100000, guid: 25a76c028a5fca048800dd297963835a, type: 2}
   destroyedMaterial: {fileID: 2100000, guid: 31746a195f76e364f801898c80305451, type: 2}
   destructionEffectPrefab: {fileID: 0}

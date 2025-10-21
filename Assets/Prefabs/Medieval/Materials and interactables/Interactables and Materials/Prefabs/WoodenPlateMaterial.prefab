@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 4798057770260841691}
   - component: {fileID: 522323863924586740}
   - component: {fileID: 2092612414845876481}
-  - component: {fileID: 4376379176151540239}
   - component: {fileID: -527013593482892998}
   - component: {fileID: 7766925655272979789}
   - component: {fileID: -1193031665251364902}
+  - component: {fileID: 5798837704389697381}
   m_Layer: 3
   m_Name: WoodenPlateMaterial
   m_TagString: Material
@@ -112,19 +112,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.1004723, y: 1.7440349, z: 1.1448807}
   m_Center: {x: -0.010828452, y: 0.37201762, z: 0.03473421}
---- !u!114 &4376379176151540239
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8709062679644081020}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b03718ee6f216214799a109e0299944d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  era: 1
 --- !u!114 &-527013593482892998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,3 +163,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &5798837704389697381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8709062679644081020}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b076b721ed1ad248bd54493bb9a06eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  era: 1

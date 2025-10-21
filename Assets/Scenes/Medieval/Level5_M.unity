@@ -5841,17 +5841,15 @@ MonoBehaviour:
   quadrantSize: 1.8
   defaultQuadrantSO: {fileID: 11400000, guid: dc289388ff952494da534bf59c75595b, type: 2}
   quadrantPrefab: {fileID: 1437374063}
-  quadrantParent: {fileID: 1196880118}
+  quadrantParent: {fileID: 1256324997}
   layerHeights:
-  - -1.81
-  - -0.8
-  - -0.41
-  - 0.53
+  - -1.6
+  - -0.1
+  - 0.3
   layerScales:
-  - {x: 0.011, y: 0.05, z: 0.05}
-  - {x: 80, y: 80, z: 20}
-  - {x: 40, y: 70, z: 40}
-  - {x: 1.5, y: 0.2, z: 1.3}
+  - {x: 0.015, y: 0.04, z: 0.04}
+  - {x: 65, y: 60, z: 20}
+  - {x: 1.5, y: 0.2, z: 1.7}
   layerScaleMode: 1
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
@@ -5876,6 +5874,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1196880118}
+  - {fileID: 1256324997}
   m_Father: {fileID: 743677454}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &987376172 stripped
@@ -7646,6 +7645,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1253845797}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1256324996
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1256324997}
+  m_Layer: 0
+  m_Name: QuadrantContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1256324997
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1256324996}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 985317587}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1256423485
 GameObject:
   m_ObjectHideFlags: 0
@@ -12190,6 +12220,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 59014cbb95242cb41b98430bd4870eda, type: 3}
+--- !u!1 &1894004365
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1894004366}
+  m_Layer: 0
+  m_Name: QuadrantContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1894004366
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1894004365}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1968330783}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1922331958 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7608672962820044972, guid: 9539d968481bd904eb7955a7e9f15f00, type: 3}
@@ -12624,17 +12685,15 @@ MonoBehaviour:
   quadrantSize: 1.8
   defaultQuadrantSO: {fileID: 11400000, guid: dc289388ff952494da534bf59c75595b, type: 2}
   quadrantPrefab: {fileID: 1437374063}
-  quadrantParent: {fileID: 1465775683}
+  quadrantParent: {fileID: 1894004366}
   layerHeights:
-  - -1.81
-  - -0.8
-  - -0.41
-  - 0.53
+  - -1.6
+  - -0.1
+  - 0.3
   layerScales:
-  - {x: 0.011, y: 0.05, z: 0.05}
-  - {x: 80, y: 80, z: 20}
-  - {x: 40, y: 70, z: 40}
-  - {x: 1.5, y: 0.2, z: 1.3}
+  - {x: 0.015, y: 0.04, z: 0.04}
+  - {x: 65, y: 60, z: 20}
+  - {x: 1.5, y: 0.2, z: 1.7}
   layerScaleMode: 1
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
@@ -12659,6 +12718,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1465775683}
+  - {fileID: 1894004366}
   m_Father: {fileID: 743677454}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1973463512

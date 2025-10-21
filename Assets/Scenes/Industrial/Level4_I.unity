@@ -1684,6 +1684,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 54f0834dad40a0a4ea062fa44f930908, type: 3}
+--- !u!1 &179506976
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 179506977}
+  m_Layer: 0
+  m_Name: QuadrantContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &179506977
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 179506976}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 287711463}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &183575333
 GameObject:
   m_ObjectHideFlags: 0
@@ -2199,20 +2230,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridWidth: 3
   gridLength: 2
-  quadrantSize: 1.89
+  quadrantSize: 1.78
   defaultQuadrantSO: {fileID: 11400000, guid: b338c7d0318145546978c7258e063255, type: 2}
   quadrantPrefab: {fileID: 1437374063}
-  quadrantParent: {fileID: 1663652829}
+  quadrantParent: {fileID: 179506977}
   layerHeights:
-  - -1.81
-  - -0.8
-  - -0.3
+  - -2.5
+  - -0.15
   - 0.4
   layerScales:
-  - {x: 0.011, y: 0.05, z: 0.05}
+  - {x: 0.018, y: 0.04, z: 0.04}
   - {x: 50, y: 50, z: 50}
-  - {x: 0.005, y: 0.2, z: 0.06}
-  - {x: 1.5, y: 0.5, z: 1.3}
+  - {x: 1.5, y: 0.2, z: 1.5}
   layerScaleMode: 1
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
@@ -2237,6 +2266,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1663652829}
+  - {fileID: 179506977}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &299727904
@@ -2910,17 +2940,15 @@ MonoBehaviour:
   quadrantSize: 1.51
   defaultQuadrantSO: {fileID: 11400000, guid: b338c7d0318145546978c7258e063255, type: 2}
   quadrantPrefab: {fileID: 1437374063}
-  quadrantParent: {fileID: 1840403095}
+  quadrantParent: {fileID: 179506977}
   layerHeights:
-  - -1.81
-  - -0.8
-  - -0.3
+  - -2.5
+  - -0.15
   - 0.4
   layerScales:
-  - {x: 0.011, y: 0.05, z: 0.05}
+  - {x: 0.018, y: 0.04, z: 0.04}
   - {x: 50, y: 50, z: 50}
-  - {x: 0.005, y: 0.2, z: 0.06}
-  - {x: 1.5, y: 0.5, z: 1.3}
+  - {x: 1.5, y: 0.2, z: 1.5}
   layerScaleMode: 1
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
@@ -3032,6 +3060,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &398169702
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 398169703}
+  m_Layer: 0
+  m_Name: QuadrantContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &398169703
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 398169702}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 985317587}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &402306625
 PrefabInstance:
@@ -8338,17 +8397,15 @@ MonoBehaviour:
   quadrantSize: 1.74
   defaultQuadrantSO: {fileID: 11400000, guid: b338c7d0318145546978c7258e063255, type: 2}
   quadrantPrefab: {fileID: 1437374063}
-  quadrantParent: {fileID: 1196880118}
+  quadrantParent: {fileID: 398169703}
   layerHeights:
-  - -1.81
-  - -0.8
-  - -0.3
+  - -2.5
+  - -0.15
   - 0.4
   layerScales:
-  - {x: 0.011, y: 0.05, z: 0.05}
+  - {x: 0.018, y: 0.04, z: 0.04}
   - {x: 50, y: 50, z: 50}
-  - {x: 0.005, y: 0.2, z: 0.06}
-  - {x: 1.5, y: 0.5, z: 1.3}
+  - {x: 1.5, y: 0.2, z: 1.5}
   layerScaleMode: 1
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
@@ -8373,6 +8430,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1196880118}
+  - {fileID: 398169703}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &991265664
