@@ -731,11 +731,47 @@ public class BridgeConstructionGrid : MonoBehaviour
 
                     info.layerRenderers[i] = layerObj.GetComponentInChildren<Renderer>();
 
-                    // Importante: desactivar colliders en objetos visuales de la capa para no contaminar detecciones (HeatSphere)
+                    // Colliders por capa:
+                    // - Capas intermedias: desactivar colliders para evitar contaminación de detecciones.
+                    // - Última capa (Superficie): asegurar que tenga BoxCollider habilitado para interacción/superficie.
+                    bool isLastLayer = (i == info.quadrantSO.requiredLayers.Length - 1);
                     var visualColliders = layerObj.GetComponentsInChildren<Collider>(true);
-                    foreach (var vc in visualColliders)
+                    if (!isLastLayer)
                     {
-                        vc.enabled = false;
+                        foreach (var vc in visualColliders)
+                        {
+                            vc.enabled = false;
+                        }
+                    }
+                    else
+                    {
+                        // Intentar habilitar BoxCollider existente; si no existe, añadir uno al objeto raíz de la capa
+                        BoxCollider box = layerObj.GetComponent<BoxCollider>();
+                        if (box == null)
+                        {
+                            box = layerObj.AddComponent<BoxCollider>();
+                        }
+                        // Ajustar propiedades principales del collider de superficie
+                        box.enabled = true;
+                        box.isTrigger = false;
+                        // Ajuste de tamaño a cuadrante en XZ, conservando Y del prefab si existía
+                        Vector3 currentSize = box.size;
+                        if (currentSize == Vector3.zero)
+                        {
+                            currentSize = new Vector3(1f, 0.1f, 1f);
+                        }
+                        box.size = new Vector3(quadrantSize, currentSize.y, quadrantSize);
+                        // Centrar el collider en el objeto de capa
+                        box.center = Vector3.zero;
+
+                        // Deshabilitar otros colliders que no sean el BoxCollider principal
+                        foreach (var vc in visualColliders)
+                        {
+                            if (vc != null && vc != box)
+                            {
+                                vc.enabled = false;
+                            }
+                        }
                     }
 
                     if (info.layerRenderers[i] == null)
@@ -773,6 +809,30 @@ public class BridgeConstructionGrid : MonoBehaviour
                         }
                         info.layerRenderers[i] = null;
                         break;
+                }
+
+                // Asegurar aquí (también para objetos ya existentes) que la última capa tenga su BoxCollider habilitado
+                if (info.layerRenderers[i] != null)
+                {
+                    GameObject lastLayerObj = info.layerRenderers[i].gameObject;
+                    if (lastLayerObj != null)
+                    {
+                        BoxCollider box = lastLayerObj.GetComponent<BoxCollider>();
+                        if (box == null)
+                        {
+                            box = lastLayerObj.AddComponent<BoxCollider>();
+                        }
+                        box.enabled = true;
+                        box.isTrigger = false;
+                        // Ajustar tamaño al cuadrante en XZ para asegurar superficie sólida uniforme
+                        Vector3 currentSize = box.size;
+                        if (currentSize == Vector3.zero)
+                        {
+                            currentSize = new Vector3(1f, 0.1f, 1f);
+                        }
+                        box.size = new Vector3(quadrantSize, currentSize.y, quadrantSize);
+                        box.center = Vector3.zero;
+                    }
                 }
             }
         }

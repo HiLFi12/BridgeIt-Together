@@ -93,23 +93,41 @@ public class PlayerBridgeInteraction : MonoBehaviour
 
         BridgeMaterialInfo materialInfo = objectInHand.GetComponent<BridgeMaterialInfo>();
         
-        // Reparación con adoquín si corresponde
-        if (materialInfo != null && materialInfo.materialType == BridgeQuadrantSO.MaterialType.Adoquin)
+        // Reparación de última capa (superficie): aceptar adoquín o, como fallback, cualquier material de la capa superior
         {
             BridgeQuadrantSO targetQuadrant = currentTargetGrid.GetQuadrantSO(targetX, targetZ);
             if (targetQuadrant != null && targetQuadrant.IsDamaged())
             {
-                bool repairSuccess = TryRepairQuadrant(targetQuadrant, objectInHand);
-                if (repairSuccess)
+                int lastIdx = (targetQuadrant.requiredLayers != null && targetQuadrant.requiredLayers.Length > 0)
+                    ? targetQuadrant.requiredLayers.Length - 1
+                    : 2;
+
+                bool canAttemptRepair = false;
+                if (materialInfo != null)
                 {
-                    objectHolder.UseHeldObject();
-                    Debug.Log("Cuadrante reparado exitosamente con adoquín.");
+                    canAttemptRepair =
+                        materialInfo.materialType == BridgeQuadrantSO.MaterialType.Adoquin ||
+                        materialInfo.layerIndex == lastIdx;
                 }
-                else
+                else if (objectInHand != null && objectInHand.tag == $"BridgeLayer{lastIdx}")
                 {
-                    Debug.LogWarning("No se pudo reparar el cuadrante con este material.");
+                    canAttemptRepair = true;
                 }
-                return; // reparación ya manejada
+
+                if (canAttemptRepair)
+                {
+                    bool repairSuccess = TryRepairQuadrant(targetQuadrant, objectInHand);
+                    if (repairSuccess)
+                    {
+                        objectHolder.UseHeldObject();
+                        Debug.Log("Cuadrante reparado exitosamente con material de superficie (adoquín).");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("No se pudo reparar el cuadrante con este material de superficie.");
+                    }
+                    return; // reparación ya manejada (éxito o fallo)
+                }
             }
         }
 
@@ -185,7 +203,24 @@ public class PlayerBridgeInteraction : MonoBehaviour
         if (!quadrant.IsDamaged()) return false;
 
         BridgeMaterialInfo materialInfo = materialObject.GetComponent<BridgeMaterialInfo>();
-        if (materialInfo == null || materialInfo.materialType != BridgeQuadrantSO.MaterialType.Adoquin) return false;
+        int lastIdx = (quadrant.requiredLayers != null && quadrant.requiredLayers.Length > 0)
+            ? quadrant.requiredLayers.Length - 1
+            : 2;
+
+        // Aceptar reparación si: es adoquín, o es material de la capa superior (por compatibilidad)
+        bool isValidRepairMaterial = false;
+        if (materialInfo != null)
+        {
+            isValidRepairMaterial =
+                materialInfo.materialType == BridgeQuadrantSO.MaterialType.Adoquin ||
+                materialInfo.layerIndex == lastIdx;
+        }
+        else if (materialObject.tag == $"BridgeLayer{lastIdx}")
+        {
+            isValidRepairMaterial = true;
+        }
+
+        if (!isValidRepairMaterial) return false;
 
         return quadrant.TryAddLayer(BridgeQuadrantSO.MaterialType.Adoquin, 1);
     }
