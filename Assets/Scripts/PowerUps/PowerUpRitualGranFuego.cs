@@ -257,8 +257,8 @@ public class PowerUpRitualGranFuego : PowerUpBase
         {
             for (int z = 0; z < bridgeGrid.gridLength; z++)
             {
-                // Construir capas 0, 1 y 2 (hasta la capa 3 según el spec)
-                for (int layerIndex = 0; layerIndex <= 2; layerIndex++)
+                // Construir capas 0 y 1 (hasta la capa 2 según el spec)
+                for (int layerIndex = 0; layerIndex <= 1; layerIndex++)
                 {
                     // Solo construir si el cuadrante no está ya completo en esta capa
                     // o no ha alcanzado dicha capa
