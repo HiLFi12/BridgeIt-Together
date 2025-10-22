@@ -42,6 +42,13 @@ public class PowerUpRitualGranFuego : PowerUpBase
     [SerializeField, Tooltip("Si está activado, el power-up no expirará por tiempo (TTL) y permanecerá en el mapa hasta ser consumido.")]
     private bool infiniteLifetime = false;
 
+    [Header("Construcción Automática")]
+    [Tooltip("Índice de capa máximo a construir (0=Base, 1=Soporte, 2=Superficie).")]
+    [SerializeField, Range(0, 2)] private int buildUpToLayer = 2; // por defecto construye hasta capa 3 (índice 2)
+
+    // Permitir que otros sistemas (Grid) respeten el tope configurado
+    public int MaxLayerToBuild => buildUpToLayer;
+
     protected override void Start()
     {
         base.Start();
@@ -248,20 +255,23 @@ public class PowerUpRitualGranFuego : PowerUpBase
     }
 
     /// <summary>
-    /// Construye automáticamente los cuadrantes del puente hasta la capa 3 (índice 2)
-    /// según las especificaciones del documento
+    /// Construye automáticamente los cuadrantes del puente hasta la capa indicada en buildUpToLayer.
     /// </summary>
     private void ConstructBridgeAutomatically()
     {
+        // Topes seguros según la grilla (fallback a 2 = tres capas)
+        int maxGridLayer = (bridgeGrid != null && bridgeGrid.layerHeights != null)
+            ? Mathf.Max(0, bridgeGrid.layerHeights.Length - 1)
+            : 2;
+
+        int targetMax = Mathf.Clamp(buildUpToLayer, 0, maxGridLayer);
+
         for (int x = 0; x < bridgeGrid.gridWidth; x++)
         {
             for (int z = 0; z < bridgeGrid.gridLength; z++)
             {
-                // Construir capas 0 y 1 (hasta la capa 2 según el spec)
-                for (int layerIndex = 0; layerIndex <= 1; layerIndex++)
+                for (int layerIndex = 0; layerIndex <= targetMax; layerIndex++)
                 {
-                    // Solo construir si el cuadrante no está ya completo en esta capa
-                    // o no ha alcanzado dicha capa
                     bridgeGrid.TryBuildLayer(x, z, layerIndex, null);
                 }
             }
@@ -295,5 +305,10 @@ public class PowerUpRitualGranFuego : PowerUpBase
             bridgeGrid = FindObjectOfType<BridgeConstructionGrid>();
         }
         // Ya no se asignan los puntos de spawn por código, se asignan solo por inspector
+        // Asegurar el rango del tope según la grilla
+        int maxGridLayer = (bridgeGrid != null && bridgeGrid.layerHeights != null)
+            ? Mathf.Max(0, bridgeGrid.layerHeights.Length - 1)
+            : 2;
+        buildUpToLayer = Mathf.Clamp(buildUpToLayer, 0, maxGridLayer);
     }
 }

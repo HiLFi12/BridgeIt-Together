@@ -120,9 +120,10 @@ public class BridgeConstructionGrid : MonoBehaviour
         isPowerUpActive = true;
 
         // Ejecutar comportamiento específico según el tipo de PowerUp
-        if (powerUp is PowerUpRitualGranFuego)
+        if (powerUp is PowerUpRitualGranFuego ritual)
         {
-            StartCoroutine(HandleRitualGranFuego());
+            // Respetar el tope configurado en el power-up
+            StartCoroutine(HandleRitualGranFuego(ritual.MaxLayerToBuild));
         }
         else if (powerUp is PowerUpConstructorHolografico)
         {
@@ -145,10 +146,12 @@ public class BridgeConstructionGrid : MonoBehaviour
     }
 
     // Comportamientos específicos para cada PowerUp
-    private IEnumerator HandleRitualGranFuego()
+    private IEnumerator HandleRitualGranFuego(int targetMaxLayer)
     {
-        Debug.Log("PowerUp Ritual de Gran Fuego activado - Construyendo capas automáticamente");
-        // Construir automáticamente todos los cuadrantes hasta la capa 3
+        Debug.Log("PowerUp Ritual de Gran Fuego activado - Construyendo capas automáticamente respetando tope");
+        // Construir automáticamente todos los cuadrantes hasta el tope indicado
+        int maxGridLayer = (layerHeights != null && layerHeights.Length > 0) ? layerHeights.Length - 1 : 2;
+        int loopMax = Mathf.Clamp(targetMaxLayer, 0, maxGridLayer);
         for (int x = 0; x < gridWidth; x++)
         {
             for (int z = 0; z < gridLength; z++)
@@ -156,8 +159,8 @@ public class BridgeConstructionGrid : MonoBehaviour
                 var so = GetQuadrantSO(x, z);
                 if (so != null)
                 {
-                    // Construir capas 0, 1 y 2 en orden
-                    for (int layer = 0; layer <= 2; layer++)
+                    // Construir capas desde 0 hasta loopMax en orden
+                    for (int layer = 0; layer <= loopMax; layer++)
                     {
                         // Mientras la capa no esté completa, intenta construirla
                         if (!so.requiredLayers[layer].isCompleted)
