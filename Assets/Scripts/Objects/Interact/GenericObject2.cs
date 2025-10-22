@@ -22,13 +22,6 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
     private bool slotTipo2Ocupado = false;
     private bool enProcesoCoccion = false;
 
-    [Header("Interacción manual (Medieval)")]
-    [SerializeField] private float tiempoMantenerE = 1.5f; // segundos que hay que mantener presionado
-    private bool esperandoHold = false;
-    private float tiempoHoldActual = 0f;
-    private GameObject jugadorInteractuando = null;
-
-
     public InteractPriority InteractPriority => interactPriority;
     
     // Método para obtener la era del objeto
@@ -51,31 +44,6 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
 
     protected virtual void Update()
     {
-        // Progreso de interacción mantenida solo aplica a la era medieval
-        if (era == BridgeQuadrantSO.EraType.Medieval && esperandoHold && jugadorInteractuando != null)
-        {
-            // Solo avanzar si ambos materiales siguen cargados y no hay cocción en curso
-            if (slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion && CanStartProcess())
-            {
-                tiempoHoldActual += Time.deltaTime;
-                if (tiempoHoldActual >= tiempoMantenerE)
-                {
-                    // Iniciar el proceso de creación y resetear el hold
-                    if (CanStartProcess())
-                    {
-                        StartCoroutine(ProcesarMaterial());
-                    }
-                    ResetearHold();
-                }
-            }
-            else
-            {
-                // Si ya no están disponibles las condiciones, cancelar el hold
-                ResetearHold();
-            }
-        }
-
-        // Auto-arranque para eras que lo permitan (p.ej. Prehistoric por defecto, Industrial vía override)
         if (ShouldAutoStart() && slotTipo1Ocupado && slotTipo2Ocupado && !enProcesoCoccion && CanStartProcess())
         {
             Debug.Log("Auto-arrancando proceso de cocción.");
@@ -98,23 +66,9 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
         {
             if (slotTipo1Ocupado && slotTipo2Ocupado)
             {
-                if (era == BridgeQuadrantSO.EraType.Prehistoric && !enProcesoCoccion)
+                if (!enProcesoCoccion && CanStartProcess())
                 {
-                    if (CanStartProcess())
-                    {
-                        StartCoroutine(ProcesarMaterial());
-                    }
-                }
-                else if (era == BridgeQuadrantSO.EraType.Medieval)
-                {
-                    // Iniciar interacción mantenida
-                    if (!esperandoHold)
-                    {
-                        esperandoHold = true;
-                        tiempoHoldActual = 0f;
-                        jugadorInteractuando = interactor;
-                        Debug.Log("Mantén presionado el botón para activar la cocción (era medieval).");
-                    }
+                    StartCoroutine(ProcesarMaterial());
                 }
             }
             else
@@ -143,14 +97,8 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
                     Debug.Log("Ya hay un material tipo 1 en la mezcladora.");
                 }
                 break;
+                
             case 2:
-                // Verificar si el material requiere estar 'listo'
-                var tipo2Ready = heldObject.GetComponent<MaterialTipo2Ready>();
-                if (tipo2Ready != null && !tipo2Ready.IsReady)
-                {
-                    Debug.Log("Este material tipo 2 debe estar listo para poder mezclarse.");
-                    break;
-                }
                 if (!slotTipo2Ocupado)
                 {
                     slotTipo2Ocupado = true;
@@ -164,22 +112,12 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
                     Debug.Log("Ya hay un material tipo 2 en la mezcladora.");
                 }
                 break;
+                
             default:
                 Debug.Log("Este material no se puede usar en la mezcladora.");
                 break;
         }
     }
-
-    // Cancelación al soltar la tecla de interacción
-    public void DetenerInteraccion()
-    {
-        if (esperandoHold)
-        {
-            ResetearHold();
-            Debug.Log("Interacción cancelada. Debes mantener presionado para iniciar la cocción.");
-        }
-    }
-    
 
     private int DeterminarTipoMaterial(GameObject objeto)
     {
@@ -228,8 +166,8 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
         
         yield return new WaitForSeconds(tiempoCoccion);
         
-    GameObject materialSuperficiePrefab = materialPrefabsSO.GetMaterialPrefab(3, era);
-        if (materialSuperficiePrefab != null)
+        GameObject materialTipo3Prefab = materialPrefabsSO.GetMaterialPrefab(3, era);
+        if (materialTipo3Prefab != null)
         {
             Vector3 spawnPosition = resultadoSpawnPoint != null
                 ? resultadoSpawnPoint.position
@@ -239,8 +177,8 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
                 ? resultadoSpawnPoint.rotation
                 : Quaternion.identity;
 
-            Instantiate(materialSuperficiePrefab, spawnPosition, spawnRotation);
-            Debug.Log("Material tipo 3 (superficie) creado con éxito.");
+            Instantiate(materialTipo3Prefab, spawnPosition, spawnRotation);
+            Debug.Log("Material tipo 3 creado con éxito.");
         }
         else
         {
@@ -267,19 +205,22 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
         return true;
     }
 
-    // Nuevo punto de extensión: por defecto sólo auto-arranca en Prehistórica; derivadas pueden habilitar otras eras
     protected virtual bool ShouldAutoStart()
     {
-        return era == BridgeQuadrantSO.EraType.Prehistoric
-            || era == BridgeQuadrantSO.EraType.Medieval
-            || era == BridgeQuadrantSO.EraType.Contemporary
-            || era == BridgeQuadrantSO.EraType.Futuristic;
+        switch (era)
+        {
+            case BridgeQuadrantSO.EraType.Prehistoric:
+            case BridgeQuadrantSO.EraType.Medieval:
+            case BridgeQuadrantSO.EraType.Contemporary:
+            case BridgeQuadrantSO.EraType.Futuristic:
+                return true;
+            default:
+                return false;
+        }
     }
 
-    private void ResetearHold()
+    public void DetenerInteraccion()
     {
-        esperandoHold = false;
-        tiempoHoldActual = 0f;
-        jugadorInteractuando = null;
+        // Interacción de hold eliminada; no hay lógica que cancelar.
     }
 }

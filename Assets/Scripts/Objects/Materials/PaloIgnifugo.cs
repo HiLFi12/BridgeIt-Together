@@ -25,20 +25,6 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
         SetEncendido(false);
     }
 
-    private void Update()
-    {
-        if (estaEncendido)
-        {
-            tiempoRestante -= Time.deltaTime;
-            if (tiempoRestante <= 0)
-            {
-                SetEncendido(false);
-                Debug.Log("El palo ignífugo se ha apagado.");
-            }
-        }
-    }
-
-
     public void SetEncendido(bool encendido)
     {
         estaEncendido = encendido;
@@ -59,11 +45,6 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
     {
         if (playerUIManager != null)
         {
-            // Apagar la UI anterior
-            playerUIManager.TurnOffUI(UIIndex);
-            // Activar la nueva UI
-            playerUIManager.TurnOnUI(index);
-            playerUIManager.SendMessage("TurnOnPlayerUIOnly", index);
             playerUIManager.RefreshHeldObjectUI(index);
         }
         UIIndex = index;

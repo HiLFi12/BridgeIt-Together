@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 6463711483442369390}
   - component: {fileID: 8782181587198311221}
   - component: {fileID: 2206009628788694786}
+  - component: {fileID: 8236691098902494047}
   m_Layer: 3
   m_Name: PaloGenerator
   m_TagString: Untagged
@@ -63,7 +64,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8865839102335078775}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -277.56, y: 230.78, z: 213.74}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -107,6 +108,19 @@ MonoBehaviour:
   paloIgnifugoPrefab: {fileID: 8865839102335078775, guid: e49e274337bc8b443821656844c32a97, type: 3}
   interactPriority: 2
   tiempoRecarga: 0.5
+--- !u!114 &8236691098902494047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8865839102335078775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7366ae91dfcb44d28c126f410c2135c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiIndex: 3
 --- !u!1001 &1464960812831965091
 PrefabInstance:
   m_ObjectHideFlags: 0
