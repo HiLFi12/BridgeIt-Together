@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour, IHitable
 {
@@ -32,12 +33,19 @@ public class Player : MonoBehaviour, IHitable
 
     [Header("Build UI")]
     [SerializeField] private Image buildUIImage;
-
+    
+    private GameConditionManager gameConditionManager;
     private PlayerObjectHolder objectHolder;
     private PlayerBridgeInteraction bridgeInteraction;
     private PlayerAnimator playerAnimator;
     private CharacterController characterController;
     private PlayerController playerController;
+    private PlayerInput playerInput;
+    private InputAction interactAction;
+    private InputAction buildAction;
+    private InputAction dashAction;
+    private InputAction dropAction;
+    private InputAction pauseAction;
 
     // Dash state
     private bool isDashing = false;
@@ -58,6 +66,17 @@ public class Player : MonoBehaviour, IHitable
         playerAnimator = GetComponent<PlayerAnimator>();
         characterController = GetComponent<CharacterController>();
         playerController = GetComponent<PlayerController>();
+        playerInput = GetComponent<PlayerInput>();
+        gameConditionManager = FindObjectOfType<GameConditionManager>();
+        
+        if (playerInput != null)
+        {
+            interactAction = playerInput.actions.FindAction("Interact");
+            buildAction = playerInput.actions.FindAction("Build");
+            dashAction = playerInput.actions.FindAction("Dash");
+            dropAction = playerInput.actions.FindAction("Drop");
+            pauseAction = playerInput.actions.FindAction("Pause");
+        }
         
         interactionUIImage.gameObject.SetActive(false);
         // Inicializar BuildUI oculto
@@ -90,19 +109,24 @@ public class Player : MonoBehaviour, IHitable
         }
 
         // Detectar input de dash
-        if (Input.GetKeyDown(dashKey) && canDash)
+        if ((dashAction.triggered || Input.GetKeyDown(dashKey)) && canDash)
         {
             TryStartDash();
         }
 
         TryInteract();
 
-        if (Input.GetKeyDown(dropKey))
+        if (dropAction.triggered || Input.GetKeyDown(dropKey))
         {
             TryDropObject();
         }
 
-        if (Input.GetKeyDown(buildKey) && bridgeInteraction != null)
+        if (pauseAction.triggered)
+        {
+            gameConditionManager.PauseGame();
+        }
+
+        if ((buildAction.triggered || Input.GetKeyDown(buildKey)) && bridgeInteraction != null)
         {
             bridgeInteraction.TryInteractWithQuadrant();
             
@@ -306,7 +330,7 @@ public class Player : MonoBehaviour, IHitable
         {
             ShowInteractionUI();
 
-            if (Input.GetKeyDown(interactKey))
+            if (interactAction.triggered || Input.GetKeyDown(interactKey))
             {
                 var seleccionado = candidatos[UnityEngine.Random.Range(0, candidatos.Count)];
                 seleccionado.Interact(this.gameObject);
