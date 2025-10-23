@@ -20,6 +20,8 @@ public class BridgeQuadrant : MonoBehaviour
 
     private int currentLayer = -1; // -1 significa vacío, 0-2 son las capas construidas
 
+    public BridgeConstructionGrid grid;
+
     public Image GetLayerUI(int layerIndex)
     {
         return layerIndex switch
@@ -38,10 +40,20 @@ public class BridgeQuadrant : MonoBehaviour
         // Capa 1 se puede construir si la capa 0 está construida (currentLayer == 0)
         // Capa 2 se puede construir si la capa 1 está construida (currentLayer == 1)
 
+        bool canBuild = false;
         if (layerIndex == 0)
-            return currentLayer == -1;
+            canBuild = currentLayer == -1;
+        else
+            canBuild = currentLayer == layerIndex - 1;
 
-        return currentLayer == layerIndex - 1;
+        if (!canBuild) return false;
+
+        // Check reachability
+        if (grid == null) return true; // fallback if no grid reference
+        int x = GetX();
+        int z = GetZ();
+        if (x == -1 || z == -1) return true; // fallback if can't parse
+        return grid.IsQuadrantReachable(x, z);
     }
 
     public void SetCurrentLayer(int layer)
@@ -52,6 +64,20 @@ public class BridgeQuadrant : MonoBehaviour
     public int GetCurrentLayer()
     {
         return currentLayer;
+    }
+
+    private int GetX()
+    {
+        string[] parts = gameObject.name.Split('_');
+        if (parts.Length >= 3 && int.TryParse(parts[1], out int x)) return x;
+        return -1;
+    }
+
+    private int GetZ()
+    {
+        string[] parts = gameObject.name.Split('_');
+        if (parts.Length >= 3 && int.TryParse(parts[2], out int z)) return z;
+        return -1;
     }
 
     private void Awake()

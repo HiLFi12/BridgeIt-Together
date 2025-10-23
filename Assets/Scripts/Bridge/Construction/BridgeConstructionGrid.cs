@@ -288,6 +288,10 @@ public class BridgeConstructionGrid : MonoBehaviour
 
                         constructionGrid[x, z].quadrantObject = quadrantObj;
 
+                        // Set grid reference in BridgeQuadrant
+                        var bridgeQuad = quadrantObj.GetComponent<BridgeQuadrant>();
+                        if (bridgeQuad != null) bridgeQuad.grid = this;
+
                         // Asegurar que el objeto de cuadrante tenga BridgeQuadrantInstance y vincular el SO
                         var instance = quadrantObj.GetComponent<BridgeQuadrantInstance>();
                         if (instance == null)
@@ -940,6 +944,19 @@ public class BridgeConstructionGrid : MonoBehaviour
             return constructionGrid[x, z].quadrantSO;
 
         return null;
+    }
+
+    public bool IsQuadrantReachable(int x, int z)
+    {
+        if (x == 0 || x == gridWidth - 1) return true;
+        return IsQuadrantComplete(x - 1, z) || IsQuadrantComplete(x + 1, z);
+    }
+
+    private bool IsQuadrantComplete(int x, int z)
+    {
+        if (constructionGrid[x, z] == null || constructionGrid[x, z].quadrantSO == null) return false;
+        // Assuming complete if layer 2 is completed
+        return constructionGrid[x, z].quadrantSO.requiredLayers[2].isCompleted;
     }    [Header("Debug Tools")]
     [SerializeField] private bool showDebugTools = false;    /// <summary>
     /// Configura alturas predefinidas para un puente bajo y compacto
