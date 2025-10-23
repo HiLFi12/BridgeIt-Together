@@ -33,6 +33,7 @@ public class InputDeviceManager : MonoBehaviour
         {
             player2Gamepad = Gamepad.all[0];
             player2Devices.Add(player2Gamepad);
+            player2Devices.Add(Keyboard.current);
         }
         if (Gamepad.all.Count > 1)
         {
