@@ -13,11 +13,17 @@ public class InputDeviceManager : MonoBehaviour
     private HashSet<InputDevice> player1Devices = new HashSet<InputDevice>();
     private HashSet<InputDevice> player2Devices = new HashSet<InputDevice>();
 
+    private Player player1Script;
+    private Player player2Script;
+
     void Awake()
     {
         // Crear instancias separadas de ActionAssets
         player1.actions = Instantiate(player1.actions);
         player2.actions = Instantiate(player2.actions);
+
+        player1Script = player1.GetComponent<Player>();
+        player2Script = player2.GetComponent<Player>();
 
         // Deshabilitar el auto-switching
         player1.neverAutoSwitchControlSchemes = true;
@@ -43,6 +49,10 @@ public class InputDeviceManager : MonoBehaviour
 
         // Configurar filtros de dispositivos
         SetupDeviceFilters();
+
+        // Set initial UI types
+        player1Script.SetUIType(player1Gamepad != null);
+        player2Script.SetUIType(player2Gamepad != null);
 
         // Habilitar acciones
         player1.actions.Enable();
@@ -88,6 +98,7 @@ public class InputDeviceManager : MonoBehaviour
                     player2Devices.Remove(device); // Remover versión vieja
                     player2Devices.Add(newGamepad);
                     SetupDeviceFilters();
+                    player2Script.SetUIType(true);
                     Debug.Log($"Gamepad reconectado a Player2");
                     return;
                 }
@@ -99,6 +110,7 @@ public class InputDeviceManager : MonoBehaviour
                     player1Devices.Remove(device); // Remover versión vieja
                     player1Devices.Add(newGamepad);
                     SetupDeviceFilters();
+                    player1Script.SetUIType(true);
                     Debug.Log($"Gamepad reconectado a Player1");
                     return;
                 }
@@ -109,6 +121,7 @@ public class InputDeviceManager : MonoBehaviour
                     player2Gamepad = newGamepad;
                     player2Devices.Add(newGamepad);
                     SetupDeviceFilters();
+                    player2Script.SetUIType(true);
                     Debug.Log($"Gamepad asignado a Player2");
                 }
                 else if (player1Gamepad == null)
@@ -116,6 +129,7 @@ public class InputDeviceManager : MonoBehaviour
                     player1Gamepad = newGamepad;
                     player1Devices.Add(newGamepad);
                     SetupDeviceFilters();
+                    player1Script.SetUIType(true);
                     Debug.Log($"Gamepad asignado a Player1");
                 }
                 break;
@@ -126,12 +140,20 @@ public class InputDeviceManager : MonoBehaviour
                 if (player2Devices.Contains(device))
                 {
                     player2Devices.Remove(device);
+                    if (device == player2Gamepad)
+                    {
+                        player2Script.SetUIType(false);
+                    }
                     SetupDeviceFilters();
                     Debug.Log($"Gamepad removido de Player2");
                 }
                 else if (player1Devices.Contains(device))
                 {
                     player1Devices.Remove(device);
+                    if (device == player1Gamepad)
+                    {
+                        player1Script.SetUIType(false);
+                    }
                     SetupDeviceFilters();
                     Debug.Log($"Gamepad removido de Player1");
                 }
