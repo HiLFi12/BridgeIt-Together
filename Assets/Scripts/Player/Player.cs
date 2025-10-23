@@ -54,6 +54,8 @@ public class Player : MonoBehaviour, IHitable
     private Vector3 dashDirection;
     private float dashTimer = 0f;
 
+    private HashSet<IInteractable> ignoredInteractables = new HashSet<IInteractable>();
+
     [Header("Debug Bridge Hotkey")]
     [SerializeField] private bool enableFillBridgeHotkey = false;
     [SerializeField] private KeyCode fillBridgeKey = KeyCode.G;
@@ -275,6 +277,7 @@ public class Player : MonoBehaviour, IHitable
         if (elements == 0) 
         {
             HideInteractionUI();
+            ignoredInteractables.Clear();
             return;
         }
 
@@ -288,6 +291,7 @@ public class Player : MonoBehaviour, IHitable
 
         var candidatos = new List<IInteractable>();
         InteractPriority mejorPrioridad = InteractPriority.VeryLow;
+        var currentInRange = new HashSet<IInteractable>();
 
         for (int i = 0; i < elements; i++)
         {
@@ -306,6 +310,10 @@ public class Player : MonoBehaviour, IHitable
 
             var candidato = col.GetComponentInParent<IInteractable>();
             if (candidato == null) continue;
+
+            currentInRange.Add(candidato);
+
+            if (ignoredInteractables.Contains(candidato)) continue;
 
             var torch = col.GetComponentInParent<TorchInteractable>();
             var prioridadEfectiva = candidato.InteractPriority;
@@ -334,11 +342,22 @@ public class Player : MonoBehaviour, IHitable
             {
                 var seleccionado = candidatos[UnityEngine.Random.Range(0, candidatos.Count)];
                 seleccionado.Interact(this.gameObject);
+
+                ignoredInteractables.Add(seleccionado);
             }
         }
         else
         {
             HideInteractionUI();
+        }
+
+        // Remover de ignorados aquellos que salieron del rango
+        foreach (var ignored in new List<IInteractable>(ignoredInteractables))
+        {
+            if (!currentInRange.Contains(ignored))
+            {
+                ignoredInteractables.Remove(ignored);
+            }
         }
     }
 
