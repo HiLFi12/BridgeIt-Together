@@ -6,8 +6,8 @@ using BridgeItTogether.Gameplay.Spawning;
 
 /// <summary>
 /// Tutorial 1 manager: monitorea el BridgeConstructionGrid y, cuando TODOS los cuadrantes
-/// están completos (todas las capas), desactiva el movimiento de los jugadores y activa
-/// el CarSpawner (hijos VehicleGen y RoundController).
+/// estén en estado Complete (no Damaged/Destroyed), activa el CarSpawner (VehicleGen/RoundController).
+/// Ya NO congela a los jugadores al completar.
 /// </summary>
 [DisallowMultipleComponent]
 public class Tutorial1Manager : MonoBehaviour
@@ -17,8 +17,8 @@ public class Tutorial1Manager : MonoBehaviour
     [SerializeField] private float checkInterval = 0.25f;
     [SerializeField] private bool showDebugLogs = true;
 
-    [Header("Players to freeze (opcional)")]
-    [Tooltip("Si se deja vacío, se buscarán todos los PlayerController de la escena.")]
+    [Header("Players to freeze (opcional - NO usado)")]
+    [Tooltip("Se mantiene por compatibilidad, ya no se congela a los jugadores.")]
     [SerializeField] private List<PlayerController> playersToFreeze = new List<PlayerController>();
 
     [Header("Car Spawner Root")]
@@ -77,6 +77,7 @@ public class Tutorial1Manager : MonoBehaviour
         }
     }
 
+    // Condición de victoria: cada cuadrante debe estar en estado "Complete" (no alcanza con estar "built" si está "Damaged").
     private bool AreAllQuadrantsComplete()
     {
         if (bridgeGrid == null) return false;
@@ -88,25 +89,61 @@ public class Tutorial1Manager : MonoBehaviour
             {
                 var so = bridgeGrid.GetQuadrantSO(x, z);
                 if (so == null) return false;
-                int last = Mathf.Max(0, so.requiredLayers.Length - 1);
-                if (!so.requiredLayers[last].isCompleted) return false;
+                if (!IsQuadrantCompleteAndRepaired(so)) return false;
             }
         }
         return true;
+    }
+
+    // Usa lastLayerState == Complete si está disponible; si no, cae a verificar que la última capa esté marcada como completada.
+    private bool IsQuadrantCompleteAndRepaired(object quadrantSO)
+    {
+        if (quadrantSO == null) return false;
+        var t = quadrantSO.GetType();
+
+        // 1) Intentar leer lastLayerState (campo o propiedad) y exigir "Complete"
+        var stateProp = t.GetProperty("lastLayerState") ?? t.GetProperty("LastLayerState");
+        var stateField = t.GetField("lastLayerState") ?? t.GetField("LastLayerState");
+        object stateObj = null;
+        if (stateProp != null) stateObj = stateProp.GetValue(quadrantSO);
+        else if (stateField != null) stateObj = stateField.GetValue(quadrantSO);
+
+        if (stateObj != null)
+        {
+            string stateName = stateObj.ToString(); // Enum.ToString() -> "Complete"/"Damaged"/"Destroyed"
+            if (!string.Equals(stateName, "Complete", System.StringComparison.OrdinalIgnoreCase))
+                return false;
+            return true;
+        }
+
+        // 2) Fallback: requiredLayers[last].isCompleted (menos estricto si no hay estado)
+        var reqLayersPi = t.GetProperty("requiredLayers");
+        var reqLayersFi = t.GetField("requiredLayers");
+        object arrObj = reqLayersPi != null ? reqLayersPi.GetValue(quadrantSO) : reqLayersFi?.GetValue(quadrantSO);
+        if (arrObj is System.Array arr && arr.Length > 0)
+        {
+            var last = arr.GetValue(arr.Length - 1);
+            if (last != null)
+            {
+                var lt = last.GetType();
+                var donePi = lt.GetProperty("isCompleted") ?? lt.GetProperty("IsCompleted");
+                var doneFi = lt.GetField("isCompleted") ?? lt.GetField("IsCompleted");
+                bool isCompleted = false;
+                if (donePi != null) isCompleted = (bool)donePi.GetValue(last);
+                else if (doneFi != null) isCompleted = (bool)doneFi.GetValue(last);
+                return isCompleted;
+            }
+        }
+        return false;
     }
 
     private void OnBridgeFullyCompleted()
     {
         if (triggered) return;
         triggered = true;
-        if (showDebugLogs) Debug.Log("[Tutorial1Manager] Puente COMPLETO. Desactivando movimiento y activando CarSpawner.");
+        if (showDebugLogs) Debug.Log("[Tutorial1Manager] Puente COMPLETO (estado Complete en todos los cuadrantes). Activando CarSpawner.");
 
-        // 1) Desactivar movimiento de jugadores
-        foreach (var pc in playersToFreeze)
-        {
-            if (pc == null) continue;
-            pc.enabled = false;
-        }
+        // 1) YA NO se desactiva el movimiento de los jugadores.
 
         // 2) Activar CarSpawner (root y componentes clave)
         ActivateCarSpawner();
@@ -151,14 +188,12 @@ public class Tutorial1Manager : MonoBehaviour
         }
 
         // Asegurar componentes habilitados
-        // VehicleSpawner
         var spawner = carSpawnerRoot != null
             ? carSpawnerRoot.GetComponentInChildren<VehicleSpawner>(true)
             : FindFirstObjectByType<VehicleSpawner>(FindObjectsInactive.Include);
         if (spawner != null && !spawner.gameObject.activeInHierarchy)
             spawner.gameObject.SetActive(true);
 
-        // RoundController
         var round = carSpawnerRoot != null
             ? carSpawnerRoot.GetComponentInChildren<RoundController>(true)
             : FindFirstObjectByType<RoundController>(FindObjectsInactive.Include);

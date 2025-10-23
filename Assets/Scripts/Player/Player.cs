@@ -29,11 +29,17 @@ public class Player : MonoBehaviour, IHitable
     [SerializeField] private Transform dashSpawn;
     
     [Header("Interaction UI")]
-    [SerializeField] private Image interactionUIImage;
+    [SerializeField] private Image interactionKeyUI;
+    [SerializeField] private Image interactionPadUI;
 
     [Header("Build UI")]
-    [SerializeField] private Image buildUIImage;
+    [SerializeField] private Image buildKeyUI;
+    [SerializeField] private Image buildPadUI;
     
+    private bool usePadUI = false;
+    private Image CurrentInteractionUI => usePadUI ? interactionPadUI : interactionKeyUI;
+    private Image CurrentBuildUI => usePadUI ? buildPadUI : buildKeyUI;
+
     private GameConditionManager gameConditionManager;
     private PlayerObjectHolder objectHolder;
     private PlayerBridgeInteraction bridgeInteraction;
@@ -53,6 +59,8 @@ public class Player : MonoBehaviour, IHitable
     private float dashCooldownTimer = 0f;
     private Vector3 dashDirection;
     private float dashTimer = 0f;
+
+    private HashSet<IInteractable> ignoredInteractables = new HashSet<IInteractable>();
 
     [Header("Debug Bridge Hotkey")]
     [SerializeField] private bool enableFillBridgeHotkey = false;
@@ -78,10 +86,6 @@ public class Player : MonoBehaviour, IHitable
             pauseAction = playerInput.actions.FindAction("Pause");
         }
         
-        interactionUIImage.gameObject.SetActive(false);
-        // Inicializar BuildUI oculto
-        if (buildUIImage != null) buildUIImage.gameObject.SetActive(false);
-
         // Intentar auto-asignar grid si no se arrastró en inspector
         if (bridgeGrid == null)
         {
@@ -275,6 +279,7 @@ public class Player : MonoBehaviour, IHitable
         if (elements == 0) 
         {
             HideInteractionUI();
+            ignoredInteractables.Clear();
             return;
         }
 
@@ -288,6 +293,7 @@ public class Player : MonoBehaviour, IHitable
 
         var candidatos = new List<IInteractable>();
         InteractPriority mejorPrioridad = InteractPriority.VeryLow;
+        var currentInRange = new HashSet<IInteractable>();
 
         for (int i = 0; i < elements; i++)
         {
@@ -306,6 +312,10 @@ public class Player : MonoBehaviour, IHitable
 
             var candidato = col.GetComponentInParent<IInteractable>();
             if (candidato == null) continue;
+
+            currentInRange.Add(candidato);
+
+            if (ignoredInteractables.Contains(candidato)) continue;
 
             var torch = col.GetComponentInParent<TorchInteractable>();
             var prioridadEfectiva = candidato.InteractPriority;
@@ -334,35 +344,45 @@ public class Player : MonoBehaviour, IHitable
             {
                 var seleccionado = candidatos[UnityEngine.Random.Range(0, candidatos.Count)];
                 seleccionado.Interact(this.gameObject);
+
+                ignoredInteractables.Add(seleccionado);
             }
         }
         else
         {
             HideInteractionUI();
         }
+
+        // Remover de ignorados aquellos que salieron del rango
+        foreach (var ignored in new List<IInteractable>(ignoredInteractables))
+        {
+            if (!currentInRange.Contains(ignored))
+            {
+                ignoredInteractables.Remove(ignored);
+            }
+        }
     }
 
     private void ShowInteractionUI()
     {
-        // Mostrar la UI de interacción siempre que haya interactuables válidos cerca
-        if (interactionUIImage != null && !interactionUIImage.gameObject.activeInHierarchy)
+        if (CurrentInteractionUI != null && !CurrentInteractionUI.gameObject.activeInHierarchy)
         {
-            interactionUIImage.gameObject.SetActive(true);
+            CurrentInteractionUI.gameObject.SetActive(true);
         }
     }
 
     private void HideInteractionUI()
     {
-        if (interactionUIImage != null && interactionUIImage.gameObject.activeInHierarchy)
+        if (CurrentInteractionUI != null && CurrentInteractionUI.gameObject.activeInHierarchy)
         {
-            interactionUIImage.gameObject.SetActive(false);
+            CurrentInteractionUI.gameObject.SetActive(false);
         }
     }
 
     // Mostrar/ocultar BuildUI (similar a InteractionUI)
     private void UpdateBuildUI()
     {
-        if (buildUIImage == null || bridgeInteraction == null || objectHolder == null)
+        if (bridgeInteraction == null || objectHolder == null)
         {
             HideBuildUI();
             return;
@@ -380,14 +400,14 @@ public class Player : MonoBehaviour, IHitable
 
     private void ShowBuildUI()
     {
-        if (!buildUIImage.gameObject.activeInHierarchy)
-            buildUIImage.gameObject.SetActive(true);
+        if (CurrentBuildUI != null && !CurrentBuildUI.gameObject.activeInHierarchy)
+            CurrentBuildUI.gameObject.SetActive(true);
     }
 
     private void HideBuildUI()
     {
-        if (buildUIImage.gameObject.activeInHierarchy)
-            buildUIImage.gameObject.SetActive(false);
+        if (CurrentBuildUI != null && CurrentBuildUI.gameObject.activeInHierarchy)
+            CurrentBuildUI.gameObject.SetActive(false);
     }
 
     private void TryDropObject()
@@ -440,5 +460,15 @@ public class Player : MonoBehaviour, IHitable
             Gizmos.color = Color.cyan;
             Gizmos.DrawLine(transform.position, transform.position + dashDirection * dashDistance);
         }
+    }
+
+    public void SetUIType(bool usePad)
+    {
+        usePadUI = usePad;
+        // Ocultar todas y mostrar la correcta
+        if (interactionKeyUI != null) interactionKeyUI.gameObject.SetActive(!usePad);
+        if (interactionPadUI != null) interactionPadUI.gameObject.SetActive(usePad);
+        if (buildKeyUI != null) buildKeyUI.gameObject.SetActive(!usePad);
+        if (buildPadUI != null) buildPadUI.gameObject.SetActive(usePad);
     }
 }
