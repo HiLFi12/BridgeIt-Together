@@ -57,12 +57,16 @@ public class Paso2Dash : MonoBehaviour
 
     private void OnDashPerformed(InputAction.CallbackContext _)
     {
+        // Se completa con un solo dash de cualquiera de los jugadores
+        if (_completado) return;
         CompletarPaso();
     }
 
     // Alternativa: llamar esto desde el script de Player cuando hace dash.
     public void NotificarDash()
     {
+        // Se completa con un solo dash de cualquiera de los jugadores
+        if (_completado) return;
         CompletarPaso();
     }
 
