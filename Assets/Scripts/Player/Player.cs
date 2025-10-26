@@ -59,6 +59,9 @@ public class Player : MonoBehaviour, IHitable
     private float dashCooldownTimer = 0f;
     private Vector3 dashDirection;
     private float dashTimer = 0f;
+    
+    public PlayerInput PlayerInput => playerInput;
+    public PlayerController PlayerController => playerController;
 
     private HashSet<IInteractable> ignoredInteractables = new HashSet<IInteractable>();
 

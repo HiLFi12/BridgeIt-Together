@@ -15,10 +15,14 @@ public class LifeStarsUI : MonoBehaviour
     private void Start()
     {
         currentLives = maxLives;
-        for (int i = 0; i < maxLives; i++)
+
+        if (layoutGroup != null)
         {
-            var star = Instantiate(starPrefab, layoutGroup.transform);
-            stars.Add(star);
+            for (int i = 0; i < maxLives; i++)
+            {
+                var star = Instantiate(starPrefab, layoutGroup.transform);
+                stars.Add(star);
+            }
         }
     }
 
