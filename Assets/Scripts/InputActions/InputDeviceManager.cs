@@ -99,7 +99,6 @@ public class InputDeviceManager : MonoBehaviour
                     player2Devices.Add(newGamepad);
                     SetupDeviceFilters();
                     player2Script.SetUIType(true);
-                    Debug.Log($"Gamepad reconectado a Player2");
                     return;
                 }
 
@@ -110,9 +109,8 @@ public class InputDeviceManager : MonoBehaviour
                     player1Devices.Remove(device); // Remover versión vieja
                     player1Devices.Add(newGamepad);
                     SetupDeviceFilters();
-                    player1Script.SetUIType(true);
                     Debug.Log($"Gamepad reconectado a Player1");
-                    return;
+                    player1Script.SetUIType(true);
                 }
 
                 // Nuevo gamepad

@@ -21,19 +21,27 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private Player player;
     
     private int _currentStepIndex = -1;
+    private List<TutorialSO> clonedTutorials = new List<TutorialSO>();
     
     private void Start()
     {
         if (player == null) player = GetComponent<Player>();
         
-        // Inicializar todos los TutorialSO
+        // Inicializar todos los TutorialSO clonados
+        clonedTutorials.Clear();
         foreach (var step in tutorialSteps)
         {
             if (step.tutorialSo != null)
             {
-                step.tutorialSo.player = player;
-                step.tutorialSo.Initialize();
-                step.tutorialSo.OnTutorialCompleted += OnTutorialCompleted;
+                TutorialSO clone = Instantiate(step.tutorialSo);
+                clone.player = player;
+                clone.Initialize();
+                clone.OnTutorialCompleted += OnTutorialCompleted;
+                clonedTutorials.Add(clone);
+            }
+            else
+            {
+                clonedTutorials.Add(null);
             }
         }
         
@@ -47,9 +55,9 @@ public class TutorialManager : MonoBehaviour
     private void Update()
     {
         // Actualizar el TutorialSO actual si existe
-        if (_currentStepIndex >= 0 && _currentStepIndex < tutorialSteps.Count)
+        if (_currentStepIndex >= 0 && _currentStepIndex < clonedTutorials.Count)
         {
-            var currentSO = tutorialSteps[_currentStepIndex].tutorialSo;
+            var currentSO = clonedTutorials[_currentStepIndex];
             if (currentSO != null)
             {
                 currentSO.UpdateTutorial();
@@ -132,7 +140,7 @@ public class TutorialManager : MonoBehaviour
                 }
             }
             
-            Debug.Log($"Avanzado al paso del tutorial: {_currentStepIndex} - {newStep.tutorialSo?.TutorialName ?? "Sin nombre"}");
+            Debug.Log($"Avanzado al paso del tutorial: {_currentStepIndex} - {clonedTutorials[_currentStepIndex]?.TutorialName ?? "Sin nombre"}");
         }
     }
     
@@ -155,10 +163,14 @@ public class TutorialManager : MonoBehaviour
                     ui.gameObject.SetActive(false);
                 }
             }
-            
-            if (step.tutorialSo != null)
+        }
+        
+        // Resetear los clones
+        foreach (var clone in clonedTutorials)
+        {
+            if (clone != null)
             {
-                step.tutorialSo.ResetTutorial();
+                clone.ResetTutorial();
             }
         }
         
@@ -174,5 +186,5 @@ public class TutorialManager : MonoBehaviour
     // Propiedad para obtener el paso currente
     public int CurrentStepIndex => _currentStepIndex;
     
-    public TutorialSO CurrentTutorialSO => (_currentStepIndex >= 0 && _currentStepIndex < tutorialSteps.Count) ? tutorialSteps[_currentStepIndex].tutorialSo : null;
+    public TutorialSO CurrentTutorialSO => (_currentStepIndex >= 0 && _currentStepIndex < clonedTutorials.Count) ? clonedTutorials[_currentStepIndex] : null;
 }
