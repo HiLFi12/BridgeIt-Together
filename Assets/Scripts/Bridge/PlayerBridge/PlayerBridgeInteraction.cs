@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 [RequireComponent(typeof(PlayerObjectHolder))]
 public class PlayerBridgeInteraction : MonoBehaviour
@@ -29,16 +30,19 @@ public class PlayerBridgeInteraction : MonoBehaviour
     private int targetZ = -1;
     private int currentLayerIndex = 0;
     
+    // Event fired when TryBuildBridge is executed
+    public event Action OnTryBuildAttempt;
+
     private void Start()
     {
         objectHolder = GetComponent<PlayerObjectHolder>();
         
-        if ((bridgeGrids == null || bridgeGrids.Length == 0) && autoFindBridgeGrids)
+        if ((bridgeGrids == null || bridgeGrids.Length ==0) && autoFindBridgeGrids)
         {
 #if UNITY_2023_1_OR_NEWER
-            bridgeGrids = Object.FindObjectsByType<BridgeConstructionGrid>(FindObjectsSortMode.None);
+            bridgeGrids = UnityEngine.Object.FindObjectsByType<BridgeConstructionGrid>(FindObjectsSortMode.None);
 #else
-            bridgeGrids = Object.FindObjectsOfType<BridgeConstructionGrid>();
+            bridgeGrids = FindObjectsOfType<BridgeConstructionGrid>();
 #endif
         }
 
@@ -56,6 +60,9 @@ public class PlayerBridgeInteraction : MonoBehaviour
     // Esta función debe ser llamada desde el sistema de interacción del jugador
     public void TryBuildBridge()
     {
+        // Notify listeners that a build attempt is being executed
+        OnTryBuildAttempt?.Invoke();
+
         if (bridgeGrids == null || bridgeGrids.Length == 0)
         {
             Debug.LogWarning($"No hay grids de puente disponibles para el jugador {gameObject.name}.");
