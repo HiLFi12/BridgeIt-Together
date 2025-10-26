@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 /// <summary>
 /// Corteza resistente, objeto único de la era prehistórica.
-/// Produce resina (material tipo 2) cuando se interactúa con ella usando un palo ignífugo encendido.
+/// Produce resina (material tipo2) cuando se interactúa con ella usando un palo ignífugo encendido.
 /// </summary>
 public class CortezaResistente : MonoBehaviour, IInteractable
 {
@@ -16,6 +17,9 @@ public class CortezaResistente : MonoBehaviour, IInteractable
     
     private bool enRecarga = false;
     
+    // Event fired when resin is successfully extracted from this bark
+    public static event Action<GameObject> OnResinExtracted;
+
     // Propiedad requerida por la interfaz IInteractable
     public InteractPriority InteractPriority => interactPriority;
     
@@ -60,13 +64,16 @@ public class CortezaResistente : MonoBehaviour, IInteractable
             // Consumir el palo ignífugo
             playerObjectHolder.UseHeldObject();
             
-            // Generar resina (material tipo 2)
+            // Generar resina (material tipo2)
             GenerarResina();
             
             // Iniciar recarga
             StartCoroutine(Recargar());
             
             Debug.Log("Has extraído resina de la corteza.");
+
+            // Notify listeners that resin was extracted by this interactor
+            OnResinExtracted?.Invoke(interactor);
         }
         else
         {
@@ -74,12 +81,12 @@ public class CortezaResistente : MonoBehaviour, IInteractable
         }
     }
     
-    // Genera el material tipo 2 (resina)
+    // Genera el material tipo2 (resina)
     private void GenerarResina()
     {
         if (materialPrefabsSO == null) return;
         
-        // Obtener el prefab de la resina (material tipo 2) para la era prehistórica
+        // Obtener el prefab de la resina (material tipo2) para la era prehistórica
         GameObject resinaPrefab = materialPrefabsSO.GetMaterialPrefab(2, BridgeQuadrantSO.EraType.Prehistoric);
         
         if (resinaPrefab != null)
@@ -95,7 +102,7 @@ public class CortezaResistente : MonoBehaviour, IInteractable
         }
         else
         {
-            Debug.LogError("No se encontró prefab para material tipo 2 (resina) de la era prehistórica.");
+            Debug.LogError("No se encontró prefab para material tipo2 (resina) de la era prehistórica.");
         }
     }
     
@@ -115,4 +122,4 @@ public class CortezaResistente : MonoBehaviour, IInteractable
         // TODO: Reproducir efectos visuales o sonidos
         // Por ejemplo, partículas de resina cayendo, sonido de goteo, etc.
     }
-} 
+}
