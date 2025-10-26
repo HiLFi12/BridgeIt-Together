@@ -8,7 +8,7 @@ public class TutorialSO : ScriptableObject
     [SerializeField] private string description;
     
     [Header("Completion")]
-    [SerializeField] private bool tutorialFinished = false;
+    private bool tutorialFinished = false;
     
     public Player player;
     

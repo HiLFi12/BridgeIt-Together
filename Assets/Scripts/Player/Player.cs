@@ -63,6 +63,9 @@ public class Player : MonoBehaviour, IHitable
     public PlayerInput PlayerInput => playerInput;
     public PlayerController PlayerController => playerController;
 
+    public delegate void PlayerInteractedHandler();
+    public event PlayerInteractedHandler OnPlayerInteracted;
+
     private HashSet<IInteractable> ignoredInteractables = new HashSet<IInteractable>();
 
     [Header("Debug Bridge Hotkey")]
@@ -349,6 +352,7 @@ public class Player : MonoBehaviour, IHitable
                 seleccionado.Interact(this.gameObject);
 
                 ignoredInteractables.Add(seleccionado);
+                OnPlayerInteracted?.Invoke();
             }
         }
         else
