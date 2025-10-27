@@ -141,7 +141,7 @@ public class TutorialManager : MonoBehaviour
     private void AdvanceToStep(int stepIndex)
     {
         // Apagar UI del paso actual
-        if (_currentStepIndex >= 0 && _currentStepIndex < tutorialSteps.Count)
+        if (_currentStepIndex >=0 && _currentStepIndex < tutorialSteps.Count)
         {
             var currentStep = tutorialSteps[_currentStepIndex];
             foreach (var ui in currentStep.stepUIs)
@@ -156,8 +156,21 @@ public class TutorialManager : MonoBehaviour
         // Cambiar al nuevo paso
         _currentStepIndex = stepIndex;
 
+        // Resetear e inicializar el TutorialSO clonado antes de mostrar la UI
+        if (_currentStepIndex >=0 && _currentStepIndex < clonedTutorials.Count)
+        {
+            var clone = clonedTutorials[_currentStepIndex];
+            if (clone != null)
+            {
+                // Reset and reassign player just in case
+                clone.ResetTutorial();
+                clone.player = player;
+                clone.Initialize();
+            }
+        }
+
         // Prender UI del nuevo paso
-        if (_currentStepIndex >= 0 && _currentStepIndex < tutorialSteps.Count)
+        if (_currentStepIndex >=0 && _currentStepIndex < tutorialSteps.Count)
         {
             var newStep = tutorialSteps[_currentStepIndex];
             foreach (var ui in newStep.stepUIs)
