@@ -58,9 +58,6 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             }
 
             rb = GetComponent<Rigidbody>() ?? gameObject.AddComponent<Rigidbody>();
-            rb.useGravity = true;
-            rb.isKinematic = false;
-            rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 #if UNITY_6000_0_OR_NEWER
             rb.linearVelocity = Vector3.zero;
 #else
