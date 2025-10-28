@@ -696,7 +696,9 @@ public class BridgeConstructionGrid : MonoBehaviour
             if (info.quadrantSO.requiredLayers[i].isCompleted)
             {
                 // Si aún no hay un renderizador para esta capa, crearlo
-                if (info.layerRenderers[i] == null && info.quadrantSO.requiredLayers[i].visualPrefab != null)                {                    // Calcular la posición correcta para la visualización usando las alturas configurables
+                if (info.layerRenderers[i] == null && info.quadrantSO.requiredLayers[i].visualPrefab != null)
+                {
+                    // Calcular la posición correcta para la visualización usando las alturas configurables
                     float layerHeight = (i < layerHeights.Length) ? layerHeights[i] : (0.5f * i);
                     Vector3 posicionCorrecta = info.worldPosition + new Vector3(
                         quadrantSize / 2,  // Centrado en X
@@ -749,26 +751,21 @@ public class BridgeConstructionGrid : MonoBehaviour
                     }
                     else
                     {
-                        // Intentar habilitar BoxCollider existente; si no existe, añadir uno al objeto raíz de la capa
                         BoxCollider box = layerObj.GetComponent<BoxCollider>();
                         if (box == null)
                         {
                             box = layerObj.AddComponent<BoxCollider>();
                         }
-                        // Ajustar propiedades principales del collider de superficie
                         box.enabled = true;
                         box.isTrigger = false;
-                        // Ajuste de tamaño a cuadrante en XZ, conservando Y del prefab si existía
                         Vector3 currentSize = box.size;
                         if (currentSize == Vector3.zero)
                         {
                             currentSize = new Vector3(1f, 0.1f, 1f);
                         }
                         box.size = new Vector3(quadrantSize, currentSize.y, quadrantSize);
-                        // Centrar el collider en el objeto de capa
                         box.center = Vector3.zero;
 
-                        // Deshabilitar otros colliders que no sean el BoxCollider principal
                         foreach (var vc in visualColliders)
                         {
                             if (vc != null && vc != box)
@@ -776,6 +773,9 @@ public class BridgeConstructionGrid : MonoBehaviour
                                 vc.enabled = false;
                             }
                         }
+
+                        // NUEVO: bindeo del visualizador de daño en la última capa al instanciarla
+                        BindQuadrantDamageVisualizer(layerObj, info.quadrantSO);
                     }
 
                     if (info.layerRenderers[i] == null)
@@ -787,7 +787,8 @@ public class BridgeConstructionGrid : MonoBehaviour
                         {
                             Debug.LogWarning($"No se encontró ningún Renderer en el prefab de la capa {i}. Asegúrate de que el prefab tenga un componente Renderer.", this);
                         }
-                    }                    // Log para depuración
+                    }
+                    // Log para depuración
                     Debug.Log($"Creada visualización para capa {i} en posición {posicionCorrecta}");
                 }
             }
@@ -799,11 +800,26 @@ public class BridgeConstructionGrid : MonoBehaviour
                 switch (info.quadrantSO.lastLayerState)
                 {
                     case BridgeQuadrantSO.LastLayerState.Complete:
+                        // Restaurar material de la capa final
                         info.layerRenderers[i].material = info.quadrantSO.requiredLayers[i].material;
+
+                        // Asegurar que el visualizador esté bindeado (por si ya existía la capa)
+                        {
+                            string nombreCapa = $"Layer_{i}_{info.quadrantSO.requiredLayers[i].layerName}";
+                            var lastLayerRoot = info.quadrantObject.transform.Find(nombreCapa)?.gameObject;
+                            if (lastLayerRoot != null) BindQuadrantDamageVisualizer(lastLayerRoot, info.quadrantSO);
+                        }
                         break;
+
                     case BridgeQuadrantSO.LastLayerState.Damaged:
-                        info.layerRenderers[i].material = info.quadrantSO.damagedMaterial;
+                        // NUEVO: no cambiamos material; tintamos por instancia con el visualizador
+                        {
+                            string nombreCapa = $"Layer_{i}_{info.quadrantSO.requiredLayers[i].layerName}";
+                            var lastLayerRoot = info.quadrantObject.transform.Find(nombreCapa)?.gameObject;
+                            ApplyDamagedVisualToLastLayer(lastLayerRoot, info.quadrantSO);
+                        }
                         break;
+
                     case BridgeQuadrantSO.LastLayerState.Destroyed:
                         // Si está destruida, asegurarnos de quitar también la visual de la última capa
                         var go = info.layerRenderers[i].gameObject;
@@ -828,7 +844,6 @@ public class BridgeConstructionGrid : MonoBehaviour
                         }
                         box.enabled = true;
                         box.isTrigger = false;
-                        // Ajustar tamaño al cuadrante en XZ para asegurar superficie sólida uniforme
                         Vector3 currentSize = box.size;
                         if (currentSize == Vector3.zero)
                         {
@@ -1288,5 +1303,72 @@ public class BridgeConstructionGrid : MonoBehaviour
         Debug.Log($"Capas rellenadas: {capasRellenadas}");
     Debug.Log($"Puente completo: {cuadrantesRellenados} cuadrantes x 3 capas = {cuadrantesRellenados * 3} capas totales");
     }
+
+    // Llama esto cuando marques un cuadrante como Damaged o cuando instancies/actives la última capa (Layer 2)
+    private void BindQuadrantDamageVisualizer(GameObject lastLayerRoot, BridgeQuadrantSO so)
+    {
+        if (lastLayerRoot == null || so == null) return;
+
+        // Recolectar renderers de la última capa
+        var renderers = lastLayerRoot.GetComponentsInChildren<Renderer>(true);
+        if (renderers == null || renderers.Length == 0) return;
+
+        // Intentar localizar el tipo por reflexión para evitar referencias duras
+        var visType = System.Type.GetType("QuadrantDamageVisualizer");
+        if (visType == null)
+        {
+            // Fall-back: intentar buscar por nombre calificado común (Assembly-CSharp)
+            visType = System.Type.GetType("QuadrantDamageVisualizer, Assembly-CSharp");
+        }
+        if (visType == null)
+        {
+            // Si no existe el tipo (por ejemplo, script removido), no hacemos nada
+            return;
+        }
+
+        // Obtener o añadir el componente de forma dinámica
+        var existing = lastLayerRoot.GetComponent(visType);
+        if (existing == null)
+        {
+            existing = lastLayerRoot.AddComponent(visType);
+        }
+
+        // Invocar método Bind(BridgeQuadrantSO, Renderer[])
+        var bindMethod = visType.GetMethod("Bind", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        if (bindMethod != null)
+        {
+            bindMethod.Invoke(existing, new object[] { so, renderers });
+        }
+    }
+
+    // Ejemplo de reemplazo donde antes se hacía: renderer.sharedMaterial = so.damagedMaterial;
+    private void ApplyDamagedVisualToLastLayer(GameObject lastLayerRoot, BridgeQuadrantSO so)
+    {
+        if (lastLayerRoot == null || so == null) return;
+
+        var renderers = lastLayerRoot.GetComponentsInChildren<Renderer>(true);
+        if (renderers == null || renderers.Length == 0) return;
+
+        // Reutilizamos el mismo mecanismo de bindeo por reflexión
+        var visType = System.Type.GetType("QuadrantDamageVisualizer")
+                     ?? System.Type.GetType("QuadrantDamageVisualizer, Assembly-CSharp");
+        if (visType == null) return;
+
+        var existing = lastLayerRoot.GetComponent(visType) ?? lastLayerRoot.AddComponent(visType);
+        var bindMethod = visType.GetMethod("Bind", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        if (bindMethod != null)
+        {
+            bindMethod.Invoke(existing, new object[] { so, renderers });
+        }
+    }
+
+    // Donde antes hacías:
+    // someRenderer.sharedMaterial = quadrantSO.damagedMaterial;
+    // Reemplazar por:
+    // ApplyDamagedVisualToLastLayer(lastLayerRoot, quadrantSO);
+
+    // Para estado “reparado/complete”, podés opcionalmente restaurar el color base así:
+    // var vis = lastLayerRoot.GetComponent<QuadrantDamageVisualizer>();
+    // if (vis != null) vis.Bind(quadrantSO, lastLayerRoot.GetComponentsInChildren<Renderer>(true));
 }
 

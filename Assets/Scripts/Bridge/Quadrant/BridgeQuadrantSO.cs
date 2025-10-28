@@ -87,17 +87,32 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     public AudioClip destructionSound;
     public AudioClip repairSound;
 
+    [Header("Vida Unificada")]
+    [Tooltip("Vida máxima normalizada (default 100). Para Futurista/Industrial se mapea a battery/temperature.")]
+    public float maxLife = 100f;
+    [Tooltip("Vida actual para eras no Futurista/Industrial.")]
+    public float currentLife = 100f;
+    [Range(0f, 1f)]
+    [Tooltip("Umbral (fracción) a partir del cual el cuadrante entra en estado Damaged.")]
+    public float damagedThreshold01 = 0.40f;
+
+    [Header("Daño por impacto (fallback)")]
+    [Tooltip("Daño aplicado por impacto cuando se usa el camino antiguo (grid.OnVehicleImpact).")]
+    public float damagePerImpact = 5f;
+
     public void Initialize()
     {
         hasCollision = false;
         lastLayerState = LastLayerState.Complete;
-        
+
         foreach (var layer in requiredLayers)
-        {
             layer.isCompleted = false;
-        }
 
         ResetEraSpecificState();
+
+        // Inicializar vida unificada
+        currentLife = maxLife;
+        // Futurista/Industrial usan sus propios depósitos (battery/temperature), pero el ratio de vida se obtiene de ellos.
     }
 
     private void ResetEraSpecificState()
@@ -107,19 +122,96 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
             case EraType.Prehistoric:
             case EraType.Medieval:
                 currentUses = 0;
+                // Vida completa al iniciar
+                currentLife = maxLife;
                 break;
             case EraType.Industrial:
                 currentTemperature = maxTemperature;
                 break;
             case EraType.Contemporary:
+                currentLife = maxLife;
                 break;
             case EraType.Futuristic:
                 batteryLife = 100f;
                 break;
         }
         heatActive = false;
-    // Eliminado sistema de waterBlockers (gestionado ahora por BridgeQuadrantInstance)
         RecalculateTurned();
+    }
+
+    // Vida unificada (ratio 0..1)
+    public float GetLifeRatio()
+    {
+        switch (era)
+        {
+            case EraType.Industrial:
+                return maxTemperature > 0f ? Mathf.Clamp01(currentTemperature / maxTemperature) : 0f;
+            case EraType.Futuristic:
+                return Mathf.Clamp01(batteryLife / 100f);
+            default:
+                return maxLife > 0f ? Mathf.Clamp01(currentLife / maxLife) : 0f;
+        }
+    }
+
+    private void SetLifeByRatio(float ratio01)
+    {
+        ratio01 = Mathf.Clamp01(ratio01);
+        switch (era)
+        {
+            case EraType.Industrial:
+                currentTemperature = maxTemperature * ratio01;
+                break;
+            case EraType.Futuristic:
+                batteryLife = 100f * ratio01;
+                break;
+            default:
+                currentLife = maxLife * ratio01;
+                break;
+        }
+    }
+
+    // Daño genérico en puntos de “vida” (mismo rango que battery/temperature: 100 = vida completa)
+    public void ApplyGenericDamage(float amount)
+    {
+        if (amount <= 0f) return;
+
+        switch (era)
+        {
+            case EraType.Industrial:
+                currentTemperature = Mathf.Max(0f, currentTemperature - amount);
+                break;
+            case EraType.Futuristic:
+                batteryLife = Mathf.Max(0f, batteryLife - amount);
+                break;
+            default:
+                currentLife = Mathf.Max(0f, currentLife - amount);
+                break;
+        }
+
+        EvaluateStateFromLife();
+    }
+
+    // Aplica estados Damaged/Destroyed según el ratio de vida
+    private void EvaluateStateFromLife()
+    {
+        float r = GetLifeRatio();
+
+        if (r <= 0f)
+        {
+            lastLayerState = LastLayerState.Destroyed;
+            DestroyLastLayer();
+            return;
+        }
+
+        // Cambiar a "< 40%" (antes usaba <=)
+        if (r < damagedThreshold01 && lastLayerState == LastLayerState.Complete)
+        {
+            lastLayerState = LastLayerState.Damaged;
+        }
+        else if (r > damagedThreshold01 && lastLayerState == LastLayerState.Damaged)
+        {
+            lastLayerState = LastLayerState.Complete;
+        }
     }
 
     public bool TryAddLayer(int layerIndex, GameObject layerObject)
@@ -184,7 +276,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
 
         requiredLayers[layerIndex].isCompleted = true;
         Debug.Log($"ÉXITO: Capa {layerIndex} marcada como completada.");
-        
+
         CheckIfAllLayersCompleted();
 
         string estadoPosterior = "";
@@ -199,15 +291,24 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
 
     private void CheckIfAllLayersCompleted()
     {
-        // Opción 1: activar colisión desde la PRIMERA capa construida
         bool firstLayerCompleted = requiredLayers.Length > 0 && requiredLayers[0].isCompleted;
         hasCollision = firstLayerCompleted;
 
-        // Solo considerar "Complete" el estado lógico completo cuando TODAS las capas estén construidas
         bool allLayersCompleted = requiredLayers[requiredLayers.Length - 1].isCompleted;
         if (allLayersCompleted && lastLayerState != LastLayerState.Complete)
         {
             lastLayerState = LastLayerState.Complete;
+        }
+
+        // Al completar todas las capas, reestablecer vida completa
+        if (allLayersCompleted)
+        {
+            switch (era)
+            {
+                case EraType.Industrial: currentTemperature = maxTemperature; break;
+                case EraType.Futuristic: batteryLife = 100f; break;
+                default: currentLife = maxLife; break;
+            }
         }
     }
 
@@ -220,20 +321,16 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
             case EraType.Industrial:
                 if (lastLayerState != LastLayerState.Destroyed)
                 {
-                    // Sólo decae si NO tiene calor o si el calor está bloqueado por agua
                     if (!isTurned)
                     {
                         currentTemperature -= temperatureDecayRate * deltaTime;
                         if (currentTemperature < 0f) currentTemperature = 0f;
                     }
 
-                    // Transición de Complete -> Damaged al pasar 50%
-                    if (lastLayerState == LastLayerState.Complete && currentTemperature < maxTemperature / 2f)
-                    {
+                    // Umbral de dañado al 40%
+                    if (lastLayerState == LastLayerState.Complete && GetLifeRatio() < damagedThreshold01)
                         lastLayerState = LastLayerState.Damaged;
-                    }
 
-                    // Si llega a 0, destruir TODAS las capas y marcar Destroyed
                     if (currentTemperature <= 0f)
                     {
                         lastLayerState = LastLayerState.Destroyed;
@@ -255,14 +352,27 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
                 break;
             
             case EraType.Futuristic:
-                if (lastLayerState == LastLayerState.Complete)
+                if (lastLayerState != LastLayerState.Destroyed)
                 {
-                    batteryLife -= batteryDrainRate * deltaTime;
-                    if (batteryLife < 50)
+                    if (lastLayerState == LastLayerState.Complete || lastLayerState == LastLayerState.Damaged)
                     {
-                        lastLayerState = LastLayerState.Damaged;
+                        batteryLife -= batteryDrainRate * deltaTime;
+                        batteryLife = Mathf.Max(0f, batteryLife);
+
+                        if (lastLayerState == LastLayerState.Complete && GetLifeRatio() < damagedThreshold01)
+                            lastLayerState = LastLayerState.Damaged;
+
+                        if (batteryLife <= 0f)
+                        {
+                            lastLayerState = LastLayerState.Destroyed;
+                            DestroyLastLayer();
+                        }
                     }
                 }
+                break;
+
+            default:
+                // Prehistoric/Medieval/Contemporary no tienen decay pasivo por defecto
                 break;
         }
     }
@@ -276,40 +386,8 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
             return;
         }
 
-        switch (era)
-        {
-            case EraType.Prehistoric:
-            case EraType.Medieval:
-                currentUses++;
-                if (currentUses >= maxUsesBeforeDamage / 2 && lastLayerState == LastLayerState.Complete)
-                {
-                    lastLayerState = LastLayerState.Damaged;
-                }
-                else if (currentUses >= maxUsesBeforeDamage && lastLayerState == LastLayerState.Damaged)
-                {
-                    lastLayerState = LastLayerState.Destroyed;
-                    DestroyLastLayer();
-                }
-                break;
-            
-            case EraType.Contemporary:
-                if (lastLayerState == LastLayerState.Complete)
-                {
-                    if (Random.value < damageChance)
-                    {
-                        lastLayerState = LastLayerState.Damaged;
-                    }
-                }
-                else if (lastLayerState == LastLayerState.Damaged)
-                {
-                    if (Random.value < damageChance)
-                    {
-                        lastLayerState = LastLayerState.Destroyed;
-                        DestroyLastLayer();
-                    }
-                }
-                break;
-        }
+        // Unificar daño: aplicar daño genérico por impacto
+        ApplyGenericDamage(damagePerImpact);
     }
 
     public void ApplyHeat()

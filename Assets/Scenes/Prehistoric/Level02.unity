@@ -880,7 +880,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: 'specificQuadrants.Array.data[0]'
@@ -7235,6 +7235,34 @@ MonoBehaviour:
   - {fileID: 580002472}
   triggersDerrotaPersonalizados:
   - {fileID: 658206065}
+--- !u!1 &1368280620 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6463523087166466162, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+  m_PrefabInstance: {fileID: 1410363237}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1368280622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368280620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b229e8593002c4498132eaf58556ea7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  quadrantSO: {fileID: 11400000, guid: 77890f5d67c601246b7fb7adfcc8ff49, type: 2}
+  targetRenderers: []
+  baseDamagedColor: {r: 1, g: 0.5801887, b: 0.5801887, a: 1}
+  fullRedColor: {r: 1, g: 0, b: 0, a: 1}
+  colorPropertyName: _BaseColor
+  intensityAt30: 0.8
+  intensityAt20: 0.9
+  intensityAt10: 1
+  intensityScale: 2
+  autoFindLastLayerRenderers: 1
+  logMissing: 0
 --- !u!1 &1370127015
 GameObject:
   m_ObjectHideFlags: 0
@@ -7620,7 +7648,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 201285140784237310, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 286669504}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6463523087166466162, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1368280622}
   m_SourcePrefab: {fileID: 100100000, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
 --- !u!114 &1410363238 stripped
 MonoBehaviour:
@@ -9726,7 +9757,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].nombreRonda
-      value: Ronda 3
+      value: Ronda 1
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[2].nombreRonda
@@ -9746,7 +9777,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].cantidadAutos
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[2].cantidadAutos
@@ -9786,7 +9817,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].tiempoEntreAutos
-      value: 10
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[2].tiempoEntreAutos
@@ -9826,7 +9857,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].tiposVehiculoPorAuto.Array.size
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[2].tiposVehiculoPorAuto.Array.size
@@ -9846,15 +9877,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[0].tiposVehiculoPorAuto.Array.data[2]'
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[0].tiposVehiculoPorAuto.Array.data[3]'
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].posicionesCarrilPorAuto.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[1].tiposVehiculoPorAuto.Array.data[1]'
@@ -9930,23 +9961,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[0].posicionesCarrilPorAuto.Array.data[1]'
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[0].posicionesCarrilPorAuto.Array.data[2]'
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[0].posicionesCarrilPorAuto.Array.data[3]'
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[1].posicionesCarrilPorAuto.Array.data[0]'
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[1].posicionesCarrilPorAuto.Array.data[1]'
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[1].posicionesCarrilPorAuto.Array.data[2]'
@@ -10961,7 +10992,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8360299195911474682, guid: d43cbed232d4a69409dc812f6f2c5dba, type: 3}
       propertyPath: buildUpToLayer
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -8360299195911474682, guid: d43cbed232d4a69409dc812f6f2c5dba, type: 3}
       propertyPath: infiniteLifetime

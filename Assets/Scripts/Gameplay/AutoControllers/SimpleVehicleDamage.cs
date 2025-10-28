@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class SimpleVehicleDamage : MonoBehaviour
 {
@@ -12,7 +13,8 @@ public class SimpleVehicleDamage : MonoBehaviour
     [SerializeField] private bool debugMode = true;
 
     [Header("Damage")]
-    [SerializeField] private float futuristicDamageAmount = 1f;
+    [FormerlySerializedAs("futuristicDamageAmount")]
+    [SerializeField] private float damageAmount = 1f;
 
     private readonly Collider[] overlap = new Collider[32];
     private readonly HashSet<string> damagedQuadrants = new HashSet<string>();
@@ -51,33 +53,29 @@ public class SimpleVehicleDamage : MonoBehaviour
             if (!string.IsNullOrEmpty(bridgeQuadrantTag) && !col.CompareTag(bridgeQuadrantTag))
                 continue;
 
-            // Intentar primero con BridgeQuadrantInstance (para futurista)
+            // Preferir BridgeQuadrantInstance para daño directo unificado
             BridgeQuadrantInstance quadrantInstance = col.GetComponent<BridgeQuadrantInstance>();
             if (quadrantInstance != null && quadrantInstance.quadrantSO != null)
             {
                 string key = $"{quadrantInstance.GetInstanceID()}";
-                
+
                 if (!damagedQuadrants.Contains(key))
                 {
-                    if (quadrantInstance.quadrantSO.era == BridgeQuadrantSO.EraType.Futuristic)
-                    {
-                        // Daño directo a batteryLife para futurista
-                        quadrantInstance.quadrantSO.batteryLife -= futuristicDamageAmount;
-                        
-                        if (debugMode)
-                            Debug.Log($"[SimpleVehicleDamage] Daño aplicado a cuadrante futurista. Vida restante: {quadrantInstance.quadrantSO.batteryLife}");
-                    }
-                    
+                    quadrantInstance.quadrantSO.ApplyGenericDamage(damageAmount);
+
+                    if (debugMode)
+                        Debug.Log($"[SimpleVehicleDamage] Daño {damageAmount} aplicado (era {quadrantInstance.quadrantSO.era})");
+
                     damagedQuadrants.Add(key);
                 }
                 continue;
             }
 
-            // Si no es BridgeQuadrantInstance, usar método antiguo con BridgeConstructionGrid
+            // Fallback: usar BridgeConstructionGrid
             if (TryGetQuadrantInfo(col, out BridgeConstructionGrid grid, out int x, out int z))
             {
                 string key = $"{grid.GetInstanceID()}_{x}_{z}";
-                
+
                 if (!damagedQuadrants.Contains(key))
                 {
                     ApplyDamageToQuadrant(grid, x, z);

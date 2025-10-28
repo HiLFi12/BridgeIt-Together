@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8982840b44f663240a2ed9271433f8cc, type: 3}
   m_Name: PrehistoricBridgeQuadrant
   m_EditorClassIdentifier: 
-  era: 4
+  era: 0
   requiredLayers:
   - layerName: 0
     visualPrefab: {fileID: 403930078715100155, guid: b124f5f4f0c417046a45f06f89866b9f, type: 3}
@@ -28,7 +28,7 @@ MonoBehaviour:
     isCompleted: 0
   hasCollision: 1
   lastLayerState: 0
-  maxUsesBeforeDamage: 1
+  maxUsesBeforeDamage: 5
   currentUses: 0
   maxTemperature: 100
   currentTemperature: 100
@@ -46,3 +46,7 @@ MonoBehaviour:
   damageSound: {fileID: 0}
   destructionSound: {fileID: 0}
   repairSound: {fileID: 0}
+  maxLife: 100
+  currentLife: 100
+  damagedThreshold01: 0.4
+  damagePerImpact: 0
