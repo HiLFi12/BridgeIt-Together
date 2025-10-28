@@ -33,6 +33,12 @@ public class PlayerBridgeInteraction : MonoBehaviour
     // Event fired when TryBuildBridge is executed
     public event Action OnTryBuildAttempt;
 
+    // Event fired when a build attempt finishes: bool indicates success
+    public event Action<bool> OnBuildResult;
+
+    // Event fired when a repair attempt finishes: bool indicates success
+    public event Action<bool> OnRepairResult;
+
     private void Start()
     {
         objectHolder = GetComponent<PlayerObjectHolder>();
@@ -133,6 +139,17 @@ public class PlayerBridgeInteraction : MonoBehaviour
                     {
                         Debug.LogWarning("No se pudo reparar el cuadrante con este material de superficie.");
                     }
+
+                    // Notify listeners about the repair result
+                    try
+                    {
+                        OnRepairResult?.Invoke(repairSuccess);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogWarning($"OnRepairResult listener threw an exception: {ex}");
+                    }
+
                     return; // reparación ya manejada (éxito o fallo)
                 }
             }
@@ -198,6 +215,16 @@ public class PlayerBridgeInteraction : MonoBehaviour
         else
         {
             Debug.LogWarning($"No se pudo construir en [{targetX},{targetZ}] capa {correctLayerIndex}");
+        }
+
+        // Notify listeners about the build result
+        try
+        {
+            OnBuildResult?.Invoke(success);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"OnBuildResult listener threw an exception: {ex}");
         }
     }
     
