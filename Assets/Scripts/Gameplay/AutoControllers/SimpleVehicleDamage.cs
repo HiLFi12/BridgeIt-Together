@@ -10,7 +10,6 @@ public class SimpleVehicleDamage : MonoBehaviour
     [SerializeField] private string bridgeQuadrantTag = "BridgeQuadrant";
     [SerializeField] private LayerMask bridgeLayer;
     [SerializeField] private string vehicleTag = "Vehicle";
-    [SerializeField] private bool debugMode = true;
 
     [Header("Damage")]
     [FormerlySerializedAs("futuristicDamageAmount")]
@@ -63,8 +62,7 @@ public class SimpleVehicleDamage : MonoBehaviour
                 {
                     quadrantInstance.quadrantSO.ApplyGenericDamage(damageAmount);
 
-                    if (debugMode)
-                        Debug.Log($"[SimpleVehicleDamage] Daño {damageAmount} aplicado (era {quadrantInstance.quadrantSO.era})");
+                    Debug.Log($"[SimpleVehicleDamage] Daño {damageAmount} aplicado (era {quadrantInstance.quadrantSO.era})");
 
                     damagedQuadrants.Add(key);
                 }
@@ -125,15 +123,13 @@ public class SimpleVehicleDamage : MonoBehaviour
 
         if (x < 0 || x >= grid.gridWidth || z < 0 || z >= grid.gridLength)
         {
-            if (debugMode)
-                Debug.LogWarning($"[SimpleVehicleDamage] Cuadrante [{x},{z}] fuera de límites");
+            Debug.LogWarning($"[SimpleVehicleDamage] Cuadrante [{x},{z}] fuera de límites");
             return;
         }
 
         grid.OnVehicleImpact(x, z);
 
-        if (debugMode)
-            Debug.Log($"[SimpleVehicleDamage] Daño aplicado al cuadrante [{x},{z}] en {grid.name}");
+        Debug.Log($"[SimpleVehicleDamage] Daño aplicado al cuadrante [{x},{z}] en {grid.name}");
     }
 
     private bool IsVehicle()
