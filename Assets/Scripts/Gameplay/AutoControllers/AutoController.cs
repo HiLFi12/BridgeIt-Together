@@ -148,14 +148,15 @@ namespace BridgeItTogether.Gameplay.AutoControllers
 
                 bool shouldDestroy = false;
 
-                if (layers != null && layers.Length >= 2)
+                if (layers != null && layers.Length >= 1)
                 {
                     bool layer0Done = layers[0].isCompleted;
-                    bool layer1Done = layers[1].isCompleted;
+                    // consider layer2 as the "top" layer; if it doesn't exist treat as not completed
                     bool layer2Done = (layers.Length > 2) ? layers[2].isCompleted : false;
 
-                    // Only destroy when layer0 and layer1 are built and layer2 is NOT built
-                    shouldDestroy = layer0Done && layer1Done && !layer2Done;
+                    // Destroy when base (layer0) is present and the top layer is NOT present.
+                    // This covers both: layer1 missing (layer0 built) and layer1 present but layer2 missing.
+                    shouldDestroy = layer0Done && !layer2Done;
                 }
                 else
                 {
@@ -175,7 +176,7 @@ namespace BridgeItTogether.Gameplay.AutoControllers
                     return true;
                 }
 
-                // If conditions not met (e.g. layer2 already completed), do not destroy and allow normal pass-through
+                // If conditions not met (e.g. top layer already completed), do not destroy and allow normal pass-through
                 return false;
             }
 
@@ -355,3 +356,4 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         }
     }
 }
+
