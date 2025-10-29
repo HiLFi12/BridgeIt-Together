@@ -905,19 +905,7 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2738599022493519098}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: OnMove
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_ActionId: 6848c454-3b8f-4b03-b6a2-7ef718db92f0
     m_ActionName: 'Player/Movement[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d,/SwitchProControllerHID/leftStick/up,/SwitchProControllerHID/leftStick/down,/SwitchProControllerHID/leftStick/left,/SwitchProControllerHID/leftStick/right]'
   - m_PersistentCalls:
@@ -941,7 +929,19 @@ MonoBehaviour:
     m_ActionId: 06247e1c-8c08-4b8c-8a5e-5a38d87814c7
     m_ActionName: 'Player/Pause[/SwitchProControllerHID/start]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2738599022493519098}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: a791d02c-d788-4cab-800a-7500e9e478f4
     m_ActionName: 'Player1/Movement[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d,/SwitchProControllerHID/leftStick/up,/SwitchProControllerHID/leftStick/down,/SwitchProControllerHID/leftStick/left,/SwitchProControllerHID/leftStick/right]'
   - m_PersistentCalls:
@@ -966,7 +966,7 @@ MonoBehaviour:
     m_ActionName: 'Player1/Pause[/SwitchProControllerHID/start]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: Player
+  m_DefaultActionMap: Player1
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!143 &6369323925721158302
@@ -1117,7 +1117,7 @@ MonoBehaviour:
   interactKey: 112
   dropKey: 111
   buildKey: 108
-  dashKey: 304
+  dashKey: 109
   dashDistance: 5
   dashDuration: 0.2
   dashCooldown: 1
@@ -1149,8 +1149,10 @@ MonoBehaviour:
   dashOnlyWhenGrounded: 1
   dashEffectPrefab: {fileID: 6813416509558619124, guid: 2f22f3b25344a8643834d3b0dee65aaa, type: 3}
   dashSpawn: {fileID: 2334024462413089595}
-  interactionUIImage: {fileID: 72354806700128345}
-  buildUIImage: {fileID: 3963145369089011317}
+  interactionKeyUI: {fileID: 72354806700128345}
+  interactionPadUI: {fileID: 0}
+  buildKeyUI: {fileID: 3963145369089011317}
+  buildPadUI: {fileID: 0}
   enableFillBridgeHotkey: 0
   fillBridgeKey: 103
   bridgeGrid: {fileID: 0}
@@ -1199,20 +1201,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiGroups:
   - name: Material 1
-    playerUI: {fileID: 1026175404045682361}
+    playerUI: {fileID: 0}
     othersUI: []
     useBridgeQuadrants: 1
     bridgeLayer: 0
     registeredQuadrants: []
   - name: Material 2
-    playerUI: {fileID: 1026175404045682361}
+    playerUI: {fileID: 0}
     othersUI: []
     useBridgeQuadrants: 1
     bridgeLayer: 1
     registeredQuadrants: []
   - name: Material 3
-    playerUI: {fileID: 1026175404045682361}
+    playerUI: {fileID: 0}
     othersUI: []
+    useBridgeQuadrants: 1
+    bridgeLayer: 2
+    registeredQuadrants: []
+  - name: Antorcha Apagada
+    playerUI: {fileID: 0}
+    othersUI:
+    - {fileID: 0}
+    useBridgeQuadrants: 1
+    bridgeLayer: 2
+    registeredQuadrants: []
+  - name: Antorcha Encendida
+    playerUI: {fileID: 0}
+    othersUI:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
     useBridgeQuadrants: 1
     bridgeLayer: 2
     registeredQuadrants: []
