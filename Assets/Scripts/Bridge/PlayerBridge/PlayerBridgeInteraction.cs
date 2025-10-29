@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -373,17 +371,32 @@ public class PlayerBridgeInteraction : MonoBehaviour
 
         if (bridgeGrids == null || bridgeGrids.Length == 0) return false;
 
-        // 1) Intento por raycast directo al layer del puente
-        if (Physics.Raycast(position, Vector3.down, out var hit, interactionRange, bridgeLayer))
+        // Parámetros para mejorar la tolerancia en bordes
+        const float epsilon = 0.001f;
+        const float spherecastRadius = 0.12f; // pequeño radio para ampliar la detección sobre bordes
+
+        // 1) Intento con SphereCast hacia abajo para mayor robustez en bordes
+        if (Physics.SphereCast(position, spherecastRadius, Vector3.down, out var hit, interactionRange, bridgeLayer))
         {
             var hitGrid = hit.collider.GetComponentInParent<BridgeConstructionGrid>();
             if (hitGrid != null)
             {
+                // Convertir a espacio local de la grilla y clamping para evitar problemas en los bordes
                 Vector3 localPos = hit.point - hitGrid.transform.position;
+                float maxX = Mathf.Max(0f, hitGrid.gridWidth * hitGrid.quadrantSize - epsilon);
+                float maxZ = Mathf.Max(0f, hitGrid.gridLength * hitGrid.quadrantSize - epsilon);
+                localPos.x = Mathf.Clamp(localPos.x, 0f, maxX);
+                localPos.z = Mathf.Clamp(localPos.z, 0f, maxZ);
+
                 int xi = Mathf.FloorToInt(localPos.x / hitGrid.quadrantSize);
                 int zi = Mathf.FloorToInt(localPos.z / hitGrid.quadrantSize);
 
-                if (xi >= 0 && xi < hitGrid.gridWidth && zi >= 0 && zi < hitGrid.gridLength)
+                xi = Mathf.Clamp(xi, 0, hitGrid.gridWidth - 1);
+                zi = Mathf.Clamp(zi, 0, hitGrid.gridLength - 1);
+
+                // Usar el centro del cuadrante para la comprobación de distancia (reduce sesgo lateral)
+                Vector3 center = hitGrid.transform.position + new Vector3((xi + 0.5f) * hitGrid.quadrantSize, 0f, (zi + 0.5f) * hitGrid.quadrantSize);
+                if (Vector3.Distance(position, center) <= interactionRange + 0.01f)
                 {
                     grid = hitGrid;
                     xSel = xi;
@@ -393,7 +406,7 @@ public class PlayerBridgeInteraction : MonoBehaviour
             }
         }
 
-        // 2) Fallback: búsqueda por proximidad en todos los grids
+        // 2) Fallback: búsqueda por proximidad usando centros de cuadrante (más simétrico que usar esquinas)
         float minDistance = float.MaxValue;
         bool found = false;
 
@@ -405,9 +418,9 @@ public class PlayerBridgeInteraction : MonoBehaviour
             {
                 for (int z = 0; z < g.gridLength; z++)
                 {
-                    Vector3 quadrantPos = g.transform.position + new Vector3(x * g.quadrantSize, 0, z * g.quadrantSize);
-                    float distance = Vector3.Distance(position, quadrantPos);
-                    if (distance < interactionRange && distance < minDistance)
+                    Vector3 center = g.transform.position + new Vector3((x + 0.5f) * g.quadrantSize, 0f, (z + 0.5f) * g.quadrantSize);
+                    float distance = Vector3.Distance(position, center);
+                    if (distance <= interactionRange && distance < minDistance)
                     {
                         minDistance = distance;
                         grid = g;

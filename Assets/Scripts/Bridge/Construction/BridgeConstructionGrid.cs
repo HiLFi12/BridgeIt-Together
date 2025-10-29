@@ -1068,32 +1068,34 @@ public class BridgeConstructionGrid : MonoBehaviour
         return null;
     }
 
+    // C#
     public bool IsQuadrantReachable(int x, int z)
     {
-        if (x == 0 || x == gridWidth - 1) return true;
-        return IsQuadrantComplete(x - 1, z) || IsQuadrantComplete(x + 1, z);
+        if (!IsValidQuadrant(x, z)) return false;
+
+        // Edge rows/columns are always reachable
+        if (x == 0 || x == gridWidth - 1 || z == 0 || z == gridLength - 1)
+            return true;
+
+        // Reachable if any orthogonal neighbor is complete
+        return IsQuadrantComplete(x - 1, z) ||
+               IsQuadrantComplete(x + 1, z) ||
+               IsQuadrantComplete(x, z - 1) ||
+               IsQuadrantComplete(x, z + 1);
     }
 
     private bool IsQuadrantComplete(int x, int z)
     {
-        if (constructionGrid[x, z] == null || constructionGrid[x, z].quadrantSO == null) return false;
-        // Assuming complete if layer 2 is completed
-        return constructionGrid[x, z].quadrantSO.requiredLayers[2].isCompleted;
-    }    [Header("Debug Tools")]
-    [SerializeField] private bool showDebugTools = false;    /// <summary>
-    /// Configura alturas predefinidas para un puente bajo y compacto
-    /// </summary>
-    [ContextMenu("Preset: Puente Bajo")]
-    public void SetLowBridgeHeights()
-    {
-        layerHeights = new float[] { 0.0f, 0.3f, 0.9f };
-        layerScales = new Vector3[] { 
-            new Vector3(1.0f, 0.8f, 1.0f),  // Base: más aplastada
-            new Vector3(0.9f, 1.0f, 0.9f),  // Soporte: ligeramente más pequeño
-            new Vector3(1.1f, 0.5f, 1.1f)   // Superficie: más ancha pero baja
-        };
-        Debug.Log("Configurado puente bajo: alturas compactas y escalas optimizadas");
+        if (!IsValidQuadrant(x, z)) return false;
+        var info = constructionGrid[x, z];
+        if (info == null || info.quadrantSO == null) return false;
+        var layers = info.quadrantSO.requiredLayers;
+        if (layers == null || layers.Length == 0) return false;
+
+        // Consider quadrant complete if its last required layer is completed
+        return layers[layers.Length - 1].isCompleted;
     }
+
 
     /// <summary>
     /// Configura alturas predefinidas para un puente estándar
