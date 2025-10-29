@@ -479,6 +479,16 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     }
 
     /// <summary>
+    /// Forzar la destrucción completa del cuadrante desde código externo (ej. vehículo).
+    /// Envuelve el método privado DestroyQuadrant para que otros componentes puedan invocarlo.
+    /// </summary>
+    public void ForceDestroyQuadrant()
+    {
+        Debug.Log($"[BridgeQuadrantSO] ForceDestroyQuadrant called on '{name}'");
+        DestroyQuadrant();
+    }
+
+    /// <summary>
     /// Verifica si el cuadrante está dañado
     /// </summary>
     /// <returns>True si está dañado</returns>
@@ -535,3 +545,4 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         return false;
     }
 }
+

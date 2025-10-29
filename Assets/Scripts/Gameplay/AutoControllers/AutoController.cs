@@ -122,13 +122,32 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         private void OnCollisionEnter(Collision collision)
         {
             if (!isInitialized) return;
+
+            if (TryHandleQuadrantCollision(collision.collider)) return;
             TryLaunchHitable(collision.collider);
         }
 
         private void OnTriggerEnter(Collider other)
         {
             if (!isInitialized) return;
+
+            if (TryHandleQuadrantCollision(other)) return;
             TryLaunchHitable(other);
+        }
+        
+        private bool TryHandleQuadrantCollision(Collider col)
+        {
+            if (col == null) return false;
+
+            var quadrantInst = col.GetComponentInParent<BridgeQuadrantInstance>();
+            if (quadrantInst != null && quadrantInst.quadrantSO != null)
+            {
+                quadrantInst.quadrantSO.ForceDestroyQuadrant();
+                Debug.Log($"[AutoController] Forced destroy quadrant on '{quadrantInst.name}' due to vehicle collision.");
+                return true;
+            }
+
+            return false;
         }
 
         private void TryLaunchHitable(Collider col)
