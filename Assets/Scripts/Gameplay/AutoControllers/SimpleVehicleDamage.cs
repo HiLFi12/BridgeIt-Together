@@ -143,6 +143,11 @@ public class SimpleVehicleDamage : MonoBehaviour
         return false;
     }
 
+    public void Reset()
+    {
+        damagedQuadrants.Clear();
+    }
+
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
