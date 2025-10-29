@@ -81,11 +81,25 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     public Material destroyedMaterial;
     public GameObject destructionEffectPrefab;
 
-    [Header("Sonidos")]
-    public AudioClip constructionSound;
-    public AudioClip damageSound;
-    public AudioClip destructionSound;
-    public AudioClip repairSound;
+    [Header("Audio - Construcción (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir al completar la capa 0 (Base). -1 desactiva.")]
+    [SerializeField] private int buildLayer0SfxIndex = -1;
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir al completar la capa 1 (Soporte). -1 desactiva.")]
+    [SerializeField] private int buildLayer1SfxIndex = -1;
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir al completar la capa 2 (Superficie/Estructura). -1 desactiva.")]
+    [SerializeField] private int buildLayer2SfxIndex = -1;
+
+    [Header("Audio - Reparación (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir cuando se repara un cuadrante dañado. -1 desactiva.")]
+    [SerializeField] private int repairSfxIndex = -1;
+
+    [Header("Audio - Destrucción (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir cuando el cuadrante se destruye. -1 desactiva.")]
+    [SerializeField] private int destroySfxIndex = -1;
+
+    [Header("Audio - Daño (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir cuando el cuadrante queda dañado. -1 desactiva.")]
+    [SerializeField] private int damageSfxIndex = -1;
 
     [Header("Vida Unificada")]
     [Tooltip("Vida máxima normalizada (default 100). Para Futurista/Industrial se mapea a battery/temperature.")]
@@ -237,6 +251,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
                 Debug.Log($"Reparando última capa dañada (capa {layerIndex})");
                 lastLayerState = LastLayerState.Complete;
                 ResetEraSpecificState();
+                PlayRepairSfx();
                 return true;
             }
             
@@ -278,6 +293,9 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         requiredLayers[layerIndex].isCompleted = true;
         Debug.Log($"ÉXITO: Capa {layerIndex} marcada como completada.");
 
+    // Reproducir SFX de construcción para esta capa (vía AudioManager, como en Campfire)
+    PlayBuildSfxForLayer(layerIndex);
+
         CheckIfAllLayersCompleted();
 
         string estadoPosterior = "";
@@ -288,6 +306,45 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         Debug.Log($"[TryAddLayer] Estado posterior: {estadoPosterior}");
         
         return true;
+    }
+
+    private void PlayBuildSfxForLayer(int layerIndex)
+    {
+        int sfxIndex = -1;
+        switch (layerIndex)
+        {
+            case 0: sfxIndex = buildLayer0SfxIndex; break;
+            case 1: sfxIndex = buildLayer1SfxIndex; break;
+            case 2: sfxIndex = buildLayer2SfxIndex; break;
+        }
+
+        if (sfxIndex < 0) return; // desactivado
+
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(sfxIndex);
+        }
+    }
+
+    private void PlayRepairSfx()
+    {
+        if (repairSfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(repairSfxIndex);
+        }
+    }
+
+    private void PlayDestroySfx()
+    {
+        if (destroySfxIndex < 0) return; // desactivado
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(destroySfxIndex);
+        }
     }
 
     private void CheckIfAllLayersCompleted()
@@ -452,6 +509,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         {
             batteryLife = 100f;
             lastLayerState = LastLayerState.Complete;
+            PlayRepairSfx();
         }
     }
 
@@ -467,12 +525,18 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
 
     private void DestroyQuadrant()
     {
+        bool wasAlreadyDestroyed = lastLayerState == LastLayerState.Destroyed;
         foreach (var layer in requiredLayers)
         {
             layer.isCompleted = false;
         }
         hasCollision = false;
         lastLayerState = LastLayerState.Destroyed;
+        
+        if (!wasAlreadyDestroyed)
+        {
+            PlayDestroySfx();
+        }
         
         if (destructionEffectPrefab != null)
         {
@@ -531,6 +595,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
             Debug.Log($"Reparando con material adoquín - cantidad: {cantidad}");
             lastLayerState = LastLayerState.Complete;
             ResetEraSpecificState();
+            PlayRepairSfx();
             return true;
         }
 

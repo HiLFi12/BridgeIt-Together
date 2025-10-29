@@ -15,6 +15,14 @@ public class PlayerObjectHolder : MonoBehaviour
     [Header("UI Manager")]
     [SerializeField] private PlayerUIManager playerUIManager;
 
+    [Header("Audio - Pick Up (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir al recoger un objeto. -1 desactiva.")]
+    [SerializeField] private int pickUpSfxIndex = -1;
+
+    [Header("Audio - Drop (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir al soltar un objeto. -1 desactiva.")]
+    [SerializeField] private int dropSfxIndex = -1;
+
     private GameObject heldObject;
     private Rigidbody heldRigidbody;
     private int lastUIIndex = -1;
@@ -69,6 +77,9 @@ public class PlayerObjectHolder : MonoBehaviour
         {
             lastUIIndex = uiActivatable.UIIndex;
         }
+
+        // Reproducir SFX de pick-up (vía AudioManager, como Campfire)
+        PlayPickUpSfx();
     }
 
     public void PickUpExistingInstance(GameObject objectInstance) => PickUp(objectInstance);
@@ -88,6 +99,8 @@ public class PlayerObjectHolder : MonoBehaviour
             heldRigidbody.useGravity = true;
             heldRigidbody = null;
         }
+        // Reproducir SFX de drop (vía AudioManager)
+        PlayDropSfx();
         heldObject = null;
     }
     
@@ -171,4 +184,24 @@ public class PlayerObjectHolder : MonoBehaviour
     }
 
     public GameObject GetHeldObjectLegacy() => heldObject;
+
+    private void PlayPickUpSfx()
+    {
+        if (pickUpSfxIndex < 0) return; // desactivado
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(pickUpSfxIndex);
+        }
+    }
+
+    private void PlayDropSfx()
+    {
+        if (dropSfxIndex < 0) return; // desactivado
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(dropSfxIndex);
+        }
+    }
 }

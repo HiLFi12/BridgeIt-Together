@@ -976,42 +976,82 @@ public class BridgeConstructionGrid : MonoBehaviour
     // Métodos para reproducir sonidos
     private void PlayConstructionSound(int x, int z)
     {
-        if (!IsValidQuadrant(x, z) || constructionGrid[x, z].quadrantSO == null ||
-            constructionGrid[x, z].quadrantSO.constructionSound == null)
+        if (!IsValidQuadrant(x, z) || constructionGrid[x, z].quadrantSO == null)
             return;
 
-        AudioSource.PlayClipAtPoint(constructionGrid[x, z].quadrantSO.constructionSound,
-            constructionGrid[x, z].worldPosition);
+        var so = constructionGrid[x, z].quadrantSO;
+
+        // Inferir la última capa construida: es la inmediatamente anterior a la primera incompleta
+        int firstIncomplete = -1;
+        for (int i = 0; i < so.requiredLayers.Length; i++)
+        {
+            if (!so.requiredLayers[i].isCompleted)
+            {
+                firstIncomplete = i;
+                break;
+            }
+        }
+        int builtLayer = (firstIncomplete == -1) ? so.requiredLayers.Length - 1 : firstIncomplete - 1;
+        if (builtLayer < 0) return;
+
+        int sfxIndex = -1;
+        switch (builtLayer)
+        {
+            case 0: sfxIndex = (int)typeof(BridgeQuadrantSO)
+                .GetField("buildLayer0SfxIndex", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .GetValue(so); break;
+            case 1: sfxIndex = (int)typeof(BridgeQuadrantSO)
+                .GetField("buildLayer1SfxIndex", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .GetValue(so); break;
+            default: sfxIndex = (int)typeof(BridgeQuadrantSO)
+                .GetField("buildLayer2SfxIndex", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                .GetValue(so); break;
+        }
+
+        if (sfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null) audio.PlaySFX(sfxIndex);
     }
 
     private void PlayDamageSound(int x, int z)
     {
-        if (!IsValidQuadrant(x, z) || constructionGrid[x, z].quadrantSO == null ||
-            constructionGrid[x, z].quadrantSO.damageSound == null)
+        if (!IsValidQuadrant(x, z) || constructionGrid[x, z].quadrantSO == null)
             return;
 
-        AudioSource.PlayClipAtPoint(constructionGrid[x, z].quadrantSO.damageSound,
-            constructionGrid[x, z].worldPosition);
+        var so = constructionGrid[x, z].quadrantSO;
+        // Acceso al índice serializado privado via reflexión para evitar cambiar su visibilidad
+        int sfxIndex = (int)typeof(BridgeQuadrantSO)
+            .GetField("damageSfxIndex", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .GetValue(so);
+        if (sfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null) audio.PlaySFX(sfxIndex);
     }
 
     private void PlayDestructionSound(int x, int z)
     {
-        if (!IsValidQuadrant(x, z) || constructionGrid[x, z].quadrantSO == null ||
-            constructionGrid[x, z].quadrantSO.destructionSound == null)
+        if (!IsValidQuadrant(x, z) || constructionGrid[x, z].quadrantSO == null)
             return;
-
-        AudioSource.PlayClipAtPoint(constructionGrid[x, z].quadrantSO.destructionSound,
-            constructionGrid[x, z].worldPosition);
+        var so = constructionGrid[x, z].quadrantSO;
+        int sfxIndex = (int)typeof(BridgeQuadrantSO)
+            .GetField("destroySfxIndex", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .GetValue(so);
+        if (sfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null) audio.PlaySFX(sfxIndex);
     }
 
     private void PlayRepairSound(int x, int z)
     {
-        if (!IsValidQuadrant(x, z) || constructionGrid[x, z].quadrantSO == null ||
-            constructionGrid[x, z].quadrantSO.repairSound == null)
+        if (!IsValidQuadrant(x, z) || constructionGrid[x, z].quadrantSO == null)
             return;
-
-        AudioSource.PlayClipAtPoint(constructionGrid[x, z].quadrantSO.repairSound,
-            constructionGrid[x, z].worldPosition);
+        var so = constructionGrid[x, z].quadrantSO;
+        int sfxIndex = (int)typeof(BridgeQuadrantSO)
+            .GetField("repairSfxIndex", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .GetValue(so);
+        if (sfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null) audio.PlaySFX(sfxIndex);
     }
 
     // Método público para obtener el ScriptableObject de un cuadrante

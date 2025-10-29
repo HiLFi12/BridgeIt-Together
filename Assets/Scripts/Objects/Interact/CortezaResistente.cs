@@ -15,6 +15,10 @@ public class CortezaResistente : MonoBehaviour, IInteractable
     [SerializeField] private float tiempoRecarga = 3.0f; // Tiempo antes de poder generar otra resina
     [SerializeField] private Transform puntoSpawn; // Punto donde aparecerá la resina
     
+    [Header("Audio - Resina (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir al spawnear la resina. -1 desactiva.")]
+    [SerializeField] private int resinSpawnSfxIndex = -1;
+    
     private bool enRecarga = false;
     
     // Event fired when resin is successfully extracted from this bark
@@ -97,6 +101,9 @@ public class CortezaResistente : MonoBehaviour, IInteractable
             // Instanciar la resina
             GameObject resina = Instantiate(resinaPrefab, posicionResina, Quaternion.identity);
             
+            // Reproducir SFX de spawn de resina (AudioManager)
+            PlayResinSpawnSfx();
+            
             // Opcional: Añadir efectos visuales o sonidos
             ProducirEfectos();
         }
@@ -121,5 +128,15 @@ public class CortezaResistente : MonoBehaviour, IInteractable
     {
         // TODO: Reproducir efectos visuales o sonidos
         // Por ejemplo, partículas de resina cayendo, sonido de goteo, etc.
+    }
+
+    private void PlayResinSpawnSfx()
+    {
+        if (resinSpawnSfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(resinSpawnSfxIndex);
+        }
     }
 }
