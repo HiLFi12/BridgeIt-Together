@@ -23,6 +23,12 @@ public class SimpleVehicleDamage : MonoBehaviour
         if (!detectionPoint) detectionPoint = transform;
     }
 
+    private void OnEnable()
+    {
+        // Asegurarnos de resetear el estado al activarse (útil con pooling)
+        Reset();
+    }
+
     private void OnValidate()
     {
         if (!detectionPoint) detectionPoint = transform;
@@ -56,13 +62,30 @@ public class SimpleVehicleDamage : MonoBehaviour
             BridgeQuadrantInstance quadrantInstance = col.GetComponent<BridgeQuadrantInstance>();
             if (quadrantInstance != null && quadrantInstance.quadrantSO != null)
             {
-                string key = $"{quadrantInstance.GetInstanceID()}";
+                // Intentar obtener coordenadas legibles (grid+x+z) para crear una clave consistente
+                var info = quadrantInstance.GetComponent<BridgeQuadrantInfo>() ?? quadrantInstance.GetComponentInParent<BridgeQuadrantInfo>();
+                string key;
+                if (info != null && info.grid != null)
+                {
+                    key = $"{info.grid.GetInstanceID()}_{info.x}_{info.z}";
+                }
+                else
+                {
+                    // Fallback a usar el InstanceID del componente si no hay BridgeQuadrantInfo
+                    key = $"{quadrantInstance.GetInstanceID()}";
+                }
 
                 if (!damagedQuadrants.Contains(key))
                 {
                     quadrantInstance.quadrantSO.ApplyGenericDamage(damageAmount);
 
-                    Debug.Log($"[SimpleVehicleDamage] Daño {damageAmount} aplicado (era {quadrantInstance.quadrantSO.era})");
+                    Debug.Log($"[SimpleVehicleDamage] Daño {damageAmount} aplicado (era {quadrantInstance.quadrantSO.era}) - key={key}");
+
+                    // Forzar actualización visual del cuadrante en la grilla si está disponible
+                    if (info != null && info.grid != null)
+                    {
+                        info.grid.RefreshQuadrantVisuals(info.x, info.z);
+                    }
 
                     damagedQuadrants.Add(key);
                 }

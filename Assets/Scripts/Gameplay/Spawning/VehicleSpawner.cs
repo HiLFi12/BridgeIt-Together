@@ -113,10 +113,13 @@ namespace BridgeItTogether.Gameplay.Spawning
             if (auto == null) return null;
 
             // Limpieza del estado de daño si el vehículo tiene SimpleVehicleDamage
-            var simpleDamage = auto.GetComponent<SimpleVehicleDamage>();
-            if (simpleDamage != null)
+            var damages = auto.GetComponentsInChildren<SimpleVehicleDamage>(true);
+            if (damages != null && damages.Length > 0)
             {
-                simpleDamage.Reset();
+                for (int d = 0; d < damages.Length; d++)
+                {
+                    if (damages[d] != null) damages[d].Reset();
+                }
             }
 
             // Renombrar la instancia según el prefab elegido (soporta Random)

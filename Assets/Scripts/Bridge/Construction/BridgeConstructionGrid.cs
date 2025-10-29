@@ -641,6 +641,13 @@ public class BridgeConstructionGrid : MonoBehaviour
         }
     }
 
+    // Método público para que otros sistemas puedan solicitar la actualización de visuales de un cuadrante
+    public void RefreshQuadrantVisuals(int x, int z)
+    {
+        if (!IsValidQuadrant(x, z)) return;
+        UpdateQuadrantVisuals(x, z);
+    }
+
     // Actualizar los aspectos visuales de un cuadrante
     private void UpdateQuadrantVisuals(int x, int z)
     {
@@ -1371,4 +1378,3 @@ public class BridgeConstructionGrid : MonoBehaviour
     // var vis = lastLayerRoot.GetComponent<QuadrantDamageVisualizer>();
     // if (vis != null) vis.Bind(quadrantSO, lastLayerRoot.GetComponentsInChildren<Renderer>(true));
 }
-
