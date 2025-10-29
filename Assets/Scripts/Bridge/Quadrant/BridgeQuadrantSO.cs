@@ -199,7 +199,8 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         if (r <= 0f)
         {
             lastLayerState = LastLayerState.Destroyed;
-            DestroyLastLayer();
+            // Si la vida llega a 0, destruir todo el cuadrante por completo
+            DestroyQuadrant();
             return;
         }
 
@@ -365,7 +366,8 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
                         if (batteryLife <= 0f)
                         {
                             lastLayerState = LastLayerState.Destroyed;
-                            DestroyLastLayer();
+                            // Al agotarse la batería, destruir todo el cuadrante
+                            DestroyQuadrant();
                         }
                     }
                 }
