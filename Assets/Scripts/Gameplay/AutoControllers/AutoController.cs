@@ -135,6 +135,7 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             TryLaunchHitable(other);
         }
         
+        // csharp
         private bool TryHandleQuadrantCollision(Collider col)
         {
             if (col == null) return false;
@@ -142,13 +143,45 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             var quadrantInst = col.GetComponentInParent<BridgeQuadrantInstance>();
             if (quadrantInst != null && quadrantInst.quadrantSO != null)
             {
-                quadrantInst.quadrantSO.ForceDestroyQuadrant();
-                Debug.Log($"[AutoController] Forced destroy quadrant on '{quadrantInst.name}' due to vehicle collision.");
-                return true;
+                var so = quadrantInst.quadrantSO;
+                var layers = so.requiredLayers;
+
+                bool shouldDestroy = false;
+
+                if (layers != null && layers.Length >= 2)
+                {
+                    bool layer0Done = layers[0].isCompleted;
+                    bool layer1Done = layers[1].isCompleted;
+                    bool layer2Done = (layers.Length > 2) ? layers[2].isCompleted : false;
+
+                    // Only destroy when layer0 and layer1 are built and layer2 is NOT built
+                    shouldDestroy = layer0Done && layer1Done && !layer2Done;
+                }
+                else
+                {
+                    // Fallback: require first layer completed and last layer not completed
+                    if (layers != null && layers.Length > 0)
+                    {
+                        bool firstDone = layers[0].isCompleted;
+                        bool lastDone = layers[layers.Length - 1].isCompleted;
+                        shouldDestroy = firstDone && !lastDone;
+                    }
+                }
+
+                if (shouldDestroy)
+                {
+                    so.ForceDestroyQuadrant();
+                    Debug.Log($"[AutoController] Forced destroy quadrant on '{quadrantInst.name}' due to vehicle collision.");
+                    return true;
+                }
+
+                // If conditions not met (e.g. layer2 already completed), do not destroy and allow normal pass-through
+                return false;
             }
 
             return false;
         }
+
 
         private void TryLaunchHitable(Collider col)
         {
