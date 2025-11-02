@@ -72,7 +72,8 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
             Activar();
     }
 
-    public bool IsReady => isReady;
+    public bool StartedReady => startReady;
+    
     public void ActivateMaterial()
     {
         if (!isReady)

@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class PowerUpMotivacionEstatua : PowerUpBase
 {
+    // Evento estático para notificar cuando el power-up es activado
+    public static event System.Action<PowerUpMotivacionEstatua> OnEstatuaActivated;
+    
     [Header("Referencias Específicas")]
     public GameObject statueObject;
     public Transform destinationPoint;
@@ -79,5 +82,13 @@ public class PowerUpMotivacionEstatua : PowerUpBase
     {
         if (isActive) return;
         TryActivate(arrow);
+    }
+
+    public override void TryActivate(GameObject activator)
+    {
+        base.TryActivate(activator);
+        
+        // Notificar que la estatua fue activada (para tutoriales)
+        OnEstatuaActivated?.Invoke(this);
     }
 } 

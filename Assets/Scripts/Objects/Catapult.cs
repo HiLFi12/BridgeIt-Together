@@ -5,6 +5,9 @@ using BridgeItTogether.Gameplay.Abstractions;
 
 public class Catapult : MonoBehaviour, IInteractable
 {
+    // Evento estático para notificar cuando cualquier catapulta es usada
+    public static event System.Action<Catapult> OnCatapultUsed;
+    
     [Header("Launch Settings")]
     [SerializeField] private Transform launchPoint;
     [SerializeField] private Transform targetPoint;
@@ -57,6 +60,9 @@ public class Catapult : MonoBehaviour, IInteractable
         if (currentOperation != null)
             StopCoroutine(currentOperation);
         currentOperation = StartCoroutine(LaunchSequence());
+        
+        // Notificar que la catapulta fue usada (para tutoriales)
+        OnCatapultUsed?.Invoke(this);
     }
 
     private IEnumerator LaunchSequence()
