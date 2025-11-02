@@ -35,10 +35,15 @@ public class Player : MonoBehaviour, IHitable
     [Header("Build UI")]
     [SerializeField] private Image buildKeyUI;
     [SerializeField] private Image buildPadUI;
-    
+
+    [Header("Dash UI")]
+    [SerializeField] private Image dashKeyUI;
+    [SerializeField] private Image dashPadUI;
+
     private bool usePadUI = false;
     private Image CurrentInteractionUI => usePadUI ? interactionPadUI : interactionKeyUI;
     private Image CurrentBuildUI => usePadUI ? buildPadUI : buildKeyUI;
+    private Image CurrentDashUI => usePadUI ? dashPadUI : dashKeyUI;
 
     private GameConditionManager gameConditionManager;
     private PlayerObjectHolder objectHolder;
@@ -105,9 +110,39 @@ public class Player : MonoBehaviour, IHitable
         if (!canDash)
         {
             dashCooldownTimer -= Time.deltaTime;
+            
             if (dashCooldownTimer <= 0f)
             {
                 canDash = true;
+            }
+        }
+
+        // Mostrar/ocultar UI del dash según estado del cooldown
+        if (!canDash && CurrentDashUI != null)
+        {
+            // Mostrar UI y actualizar progreso durante cooldown
+            if (!CurrentDashUI.gameObject.activeInHierarchy)
+                CurrentDashUI.gameObject.SetActive(true);
+
+            float fill = 0f;
+            if (dashCooldown > 0f)
+            {
+                fill = 1f - Mathf.Clamp01(dashCooldownTimer / dashCooldown);
+            }
+            CurrentDashUI.fillAmount = fill;
+        }
+        else
+        {
+            // Ocultar ambas UIs cuando el dash está listo
+            if (dashKeyUI != null && dashKeyUI.gameObject.activeInHierarchy)
+            {
+                dashKeyUI.gameObject.SetActive(false);
+                dashKeyUI.fillAmount = 0f;
+            }
+            if (dashPadUI != null && dashPadUI.gameObject.activeInHierarchy)
+            {
+                dashPadUI.gameObject.SetActive(false);
+                dashPadUI.fillAmount = 0f;
             }
         }
 
@@ -477,5 +512,9 @@ public class Player : MonoBehaviour, IHitable
         if (interactionPadUI != null) interactionPadUI.gameObject.SetActive(usePad);
         if (buildKeyUI != null) buildKeyUI.gameObject.SetActive(!usePad);
         if (buildPadUI != null) buildPadUI.gameObject.SetActive(usePad);
+
+        // Dash UI
+        if (dashKeyUI != null) dashKeyUI.gameObject.SetActive(!usePad);
+        if (dashPadUI != null) dashPadUI.gameObject.SetActive(usePad);
     }
 }
