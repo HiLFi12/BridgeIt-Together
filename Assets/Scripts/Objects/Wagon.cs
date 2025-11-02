@@ -1,23 +1,11 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Wagon: vagon que se mueve entre dos puntos (A <-> B) usando Translate.
-/// Requiere: 
-/// - Dos referencias Transform (pointA, pointB) asignadas en el inspector (empty objects en la escena).
-/// - Implementa IInteractable: el jugador lo inicia (toggle de viaje) solo si hay calor activo (isTurned==true).
-/// - Implementa ITurnable: encendido/apagado controlado por HeatSphere. Si se apaga durante el trayecto, completa el tramo actual y luego se queda inactivo hasta que vuelva a haber calor.
-/// - Posee un simple holder para un único item (similar a PlayerObjectHolder) para colocar/quitar un objeto con la misma tecla de interacción.
-/// Flujo:
-///   1) Idle en punto actual (comienza en pointA o en su posición inicial más cercana a A/B).
-///   2) Jugador interactúa (Interact) -> si isTurned && !viajando inicia viaje hacia el otro punto.
-///   3) Durante el viaje si Heat se pierde (TurnOff) se marca flag heatLostDuringTrip. El movimiento NO se cancela: termina el tramo.
-///   4) Al llegar: si heatLostDuringTrip == true el vagón queda inactivo (requiere que HeatSphere vuelva a activarlo para poder iniciar el viaje inverso).
-///   5) Si el jugador interactúa mientras sostiene un objeto y el vagón no tiene uno -> lo coloca. Si el vagón tiene y el jugador está libre -> se lo da.
-/// Priorización de interacción configurable.
-/// </summary>
 public class Wagon : MonoBehaviour, IInteractable, ITurnable
 {
+    // Evento estático para notificar cuando un jugador interactúa con el vagón
+    public static event System.Action<Wagon, GameObject> OnWagonInteracted;
+    
     [Header("Puntos de Movimiento")]
     [SerializeField] private Transform pointA;
     [SerializeField] private Transform pointB;
@@ -93,6 +81,9 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
 
     public void Interact(GameObject interactor)
     {
+        // Notificar que el jugador interactuó con el vagón (para tutoriales)
+        OnWagonInteracted?.Invoke(this, interactor);
+        
         // 1. Intentar intercambio de objeto de carga primero
         var playerHolder = interactor.GetComponent<PlayerObjectHolder>();
         if (playerHolder != null)

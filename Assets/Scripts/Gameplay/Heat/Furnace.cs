@@ -3,6 +3,12 @@ using System.Collections;
 
 public class Furnace : MonoBehaviour, IInteractable
 {
+    // Evento estático para notificar cuando un jugador agrega carbón exitosamente
+    public static event System.Action<Furnace, GameObject> OnCoalAdded;
+    
+    // Evento estático para notificar cuando un jugador activa el horno (TurnOn es llamado)
+    public static event System.Action<Furnace, GameObject> OnFurnaceTurnedOn;
+    
     [SerializeField] private InteractPriority interactPriority = InteractPriority.High;
 
     [Header("Carbón")]
@@ -68,28 +74,6 @@ public class Furnace : MonoBehaviour, IInteractable
         // Es carbón: intentar agregar
         TryAddCoal(interactor);
     }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!autoAcceptCoalOnTrigger) return;
-        if (reloadTimer > 0f) return;
-        var holder = other.GetComponentInParent<PlayerObjectHolder>();
-        if (holder != null && currentCoal < maxCoal)
-        {
-            TryAddCoal(holder.gameObject);
-        }
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (!autoAcceptCoalOnTrigger) return;
-        if (reloadTimer > 0f) return;
-        var holder = other.GetComponentInParent<PlayerObjectHolder>();
-        if (holder != null && currentCoal < maxCoal)
-        {
-            TryAddCoal(holder.gameObject);
-        }
-    }
     
     public bool TryAddCoal(GameObject interactor)
     {
@@ -124,10 +108,23 @@ public class Furnace : MonoBehaviour, IInteractable
         {
             currentCoal++;
             holder.UseHeldObject();
+            
+            bool justTurnedOn = false;
             if (currentCoal >= maxCoal)
             {
                 TurnOn();
+                justTurnedOn = true;
             }
+            
+            // Notificar que el jugador agregó carbón exitosamente
+            OnCoalAdded?.Invoke(this, interactor);
+            
+            // Notificar si el horno fue activado (TurnOn fue llamado)
+            if (justTurnedOn)
+            {
+                OnFurnaceTurnedOn?.Invoke(this, interactor);
+            }
+            
             return true;
         }
         // If furnace is full and heat is active, allow reload and reset cooldown
@@ -136,6 +133,9 @@ public class Furnace : MonoBehaviour, IInteractable
             holder.UseHeldObject();
             heatSphere.ResetCooldown();
             Debug.Log("[Furnace] Coal added while active, cooldown reset.");
+            
+            // Notificar que el jugador agregó carbón exitosamente
+            OnCoalAdded?.Invoke(this, interactor);
             return true;
         }
         else

@@ -2,13 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// PowerUp "Calor Humano": requiere solo cargar carbón (similar a Furnace).
-/// Al llenarse: busca HeatSphere en jugadores, los enciende y refresca su cooldown periódicamente durante effectDuration.
-/// No modifica HeatSphere; usa ResetCooldown() y SetActive(true) para mantenerlos encendidos.
-/// </summary>
 public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
 {
+    // Evento estático para notificar cuando el PowerUp es activado (TurnOn llamado)
+    public static event System.Action<PowerUpCalorHumano> OnCalorHumanoActivated;
+    
     [Header("Requerimientos de Activación (Carbón)")]
     [Tooltip("Cantidad de carbones necesarios para activar el power up.")]
     public int carbonesNecesarios = 3;
@@ -123,6 +121,10 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
         internalTurnOffRequest = false;
         if (lifeCoroutine != null) StopCoroutine(lifeCoroutine);
         if (debugLogs) Debug.Log("[CalorHumano] TurnOn() -> iniciando efecto válido.", this);
+        
+        // Notificar que el PowerUp fue activado (para tutoriales)
+        OnCalorHumanoActivated?.Invoke(this);
+        
         StartCoroutine(RunHeatEffect());
     }
 

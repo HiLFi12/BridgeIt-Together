@@ -5,6 +5,9 @@ using UnityEngine;
 /// </summary>
 public class WagonLeverInteractable : MonoBehaviour, IInteractable
 {
+    // Evento estático para notificar cuando un jugador interactúa con la palanca
+    public static event System.Action<WagonLeverInteractable, GameObject> OnLeverInteracted;
+    
     [SerializeField] private Wagon targetWagon;
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private bool requirePlayerHasNoObject = false;
@@ -13,6 +16,9 @@ public class WagonLeverInteractable : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
+        // Notificar que el jugador interactuó con la palanca (para tutoriales)
+        OnLeverInteracted?.Invoke(this, interactor);
+        
         if (targetWagon == null)
         {
             Debug.LogWarning("WagonLeverInteractable: no hay Wagon asignado.");

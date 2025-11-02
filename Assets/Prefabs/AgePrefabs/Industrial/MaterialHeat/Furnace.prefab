@@ -172,56 +172,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &5478420741491688486
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2711692952627664793}
-  - component: {fileID: 4000171977197734064}
-  m_Layer: 0
-  m_Name: Coal
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2711692952627664793
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5478420741491688486}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2659040544581919185}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4000171977197734064
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5478420741491688486}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd23c4b6a0be996479134e95ff89b0d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactPriority: 0
-  maxCoal: 3
-  heatSphere: {fileID: 2923221507408702265}
-  resetCoalWhenHeatEnds: 1
-  reloadDelay: 0.2
-  autoAcceptCoalOnTrigger: 1
 --- !u!1 &7222709542027270583
 GameObject:
   m_ObjectHideFlags: 0
@@ -263,7 +213,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2659040544581919185}
   - component: {fileID: 2812501365257972867}
-  - component: {fileID: 7486524007603785303}
+  - component: {fileID: 8664183486946364396}
   m_Layer: 3
   m_Name: Furnace
   m_TagString: Untagged
@@ -285,8 +235,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2931959147357797925}
-  - {fileID: 2711692952627664793}
-  - {fileID: 6253319418552398910}
   - {fileID: 257807861821201948}
   - {fileID: 7706952830628347488}
   - {fileID: 360147558181995681}
@@ -314,7 +262,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 5.044607, y: 2.404969, z: 2.9464176}
   m_Center: {x: -0.9428047, y: 1.1992531, z: -0.0071487427}
---- !u!114 &7486524007603785303
+--- !u!114 &8664183486946364396
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -323,67 +271,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 7365677886697753464}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d96b31a903b3d0418177283864b165d, type: 3}
+  m_Script: {fileID: 11500000, guid: fd23c4b6a0be996479134e95ff89b0d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactPriority: 4
-  furnace: {fileID: 4000171977197734064}
-  furnaceCook: {fileID: 476138415681873736}
-  delayColocacion: 0
---- !u!1 &8910669598436633134
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6253319418552398910}
-  - component: {fileID: 476138415681873736}
-  m_Layer: 0
-  m_Name: Cook
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6253319418552398910
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8910669598436633134}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2659040544581919185}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &476138415681873736
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8910669598436633134}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b97ae6930bee4a6429e2a5c7fb460e12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  materialPrefabsSO: {fileID: 11400000, guid: 7567e59779a33e64da8bee3decc6056b, type: 2}
-  era: 2
-  interactPriority: 0
-  tiempoCoccion: 1.5
-  slotVisualTipo1: {fileID: 7706952830628347488}
-  slotVisualTipo2: {fileID: 360147558181995681}
-  resultadoSpawnPoint: {fileID: 6095405892930611666}
-  usarRotacionSpawnPoint: 1
-  tiempoMantenerE: 1.5
-  heatSphere: {fileID: 7569543140812505582}
+  interactPriority: 3
+  maxCoal: 3
+  heatSphere: {fileID: 2923221507408702265}
+  resetCoalWhenHeatEnds: 1
+  reloadDelay: 0.2
+  autoAcceptCoalOnTrigger: 1
 --- !u!1001 &3403261381809183182
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -545,14 +441,9 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -2268587322027479302, guid: f1a54fef54b4b694c920d8f150cabf8e, type: 3}
   m_PrefabInstance: {fileID: 5194063933156640195}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7569543140812505582}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4c5ea817ee12ad43b191c03e3525182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &7569543140812505582 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2385059253286569005, guid: f1a54fef54b4b694c920d8f150cabf8e, type: 3}
-  m_PrefabInstance: {fileID: 5194063933156640195}
-  m_PrefabAsset: {fileID: 0}
