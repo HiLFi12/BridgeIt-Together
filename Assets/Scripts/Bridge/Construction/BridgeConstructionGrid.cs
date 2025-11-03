@@ -795,58 +795,37 @@ public class BridgeConstructionGrid : MonoBehaviour
             }
             // Ya no hay ramas para capas incompletas aquí, se limpian al inicio del ciclo
 
-            // Si es la última capa, aplicar el material según el estado
+            // Si es la última capa, aplicar visual según el estado
             if (i == info.quadrantSO.requiredLayers.Length - 1 && info.layerRenderers[i] != null)
             {
                 switch (info.quadrantSO.lastLayerState)
                 {
                     case BridgeQuadrantSO.LastLayerState.Complete:
-                        // Restaurar material de la capa final
+                        // Restaurar material base de la capa final
                         info.layerRenderers[i].material = info.quadrantSO.requiredLayers[i].material;
-                        // Asegurar shaker presente y bindeado
+                        // Asegurar shaker presente y bindeado y desactivar todas las grietas
                         {
                             string nombreCapa = $"Layer_{i}_{info.quadrantSO.requiredLayers[i].layerName}";
                             var lastLayerRoot = info.quadrantObject.transform.Find(nombreCapa)?.gameObject;
-                            if (lastLayerRoot != null) BindLastLayerShaker(lastLayerRoot, info.quadrantSO);
+                            if (lastLayerRoot != null)
+                            {
+                                BindLastLayerShaker(lastLayerRoot, info.quadrantSO);
+                                ToggleCracks(lastLayerRoot, 0); // 0 = todas desactivadas
+                            }
                         }
                         break;
 
                     case BridgeQuadrantSO.LastLayerState.Damaged:
-                        // NUEVO: asignar material según vida (tres bandas)
+                        // NUEVO: no cambiar materiales; mostrar grietas según la "vida" discretizada (3,2,1)
                         {
-                            float life = Mathf.Clamp01(info.quadrantSO.GetLifeRatio());
-                            float thr = info.quadrantSO.damagedThreshold01; // ~0.40
-                            float a = Mathf.Max(0f, thr - 0.10f); // ~0.30
-                            float c = Mathf.Max(0f, thr - 0.30f); // ~0.10
-
-                            Material targetMat = null;
-                            if (life >= a)
-                            {
-                                targetMat = info.quadrantSO.damageMaterial_30to40;
-                            }
-                            else if (life > c)
-                            {
-                                targetMat = info.quadrantSO.damageMaterial_20to30;
-                            }
-                            else
-                            {
-                                targetMat = info.quadrantSO.damageMaterial_0to10;
-                            }
-
-                            // Fallback: si no hay material configurado, usar el material base
-                            if (targetMat == null)
-                            {
-                                targetMat = info.quadrantSO.requiredLayers[i].material;
-                                // Opcional: Debug.LogWarning una sola vez si se desea.
-                            }
-
-                            // Asignar material
-                            info.layerRenderers[i].sharedMaterial = targetMat;
-
-                            // Asegurar shaker presente y bindeado
                             string nombreCapa = $"Layer_{i}_{info.quadrantSO.requiredLayers[i].layerName}";
                             var lastLayerRoot = info.quadrantObject.transform.Find(nombreCapa)?.gameObject;
-                            if (lastLayerRoot != null) BindLastLayerShaker(lastLayerRoot, info.quadrantSO);
+                            if (lastLayerRoot != null)
+                            {
+                                BindLastLayerShaker(lastLayerRoot, info.quadrantSO);
+                                int crackLevel = DetermineCrackLevel(info.quadrantSO);
+                                ToggleCracks(lastLayerRoot, crackLevel);
+                            }
                         }
                         break;
 
@@ -1505,5 +1484,47 @@ public class BridgeConstructionGrid : MonoBehaviour
         box.center = localBounds.center;
         box.isTrigger = false;
         box.enabled = true;
+    }
+
+    // === NUEVO: Utilidades para alternar grietas según "vida" ===
+    // crackLevel: 0 = todas OFF, 1 = grieta3 ON, 2 = grieta2 ON, 3 = grieta1 ON
+    private void ToggleCracks(GameObject lastLayerRoot, int crackLevel)
+    {
+        if (lastLayerRoot == null) return;
+
+        Transform c1 = FindDirectChildIgnoreCase(lastLayerRoot.transform, "grieta1");
+        Transform c2 = FindDirectChildIgnoreCase(lastLayerRoot.transform, "grieta2");
+        Transform c3 = FindDirectChildIgnoreCase(lastLayerRoot.transform, "grieta3");
+
+        if (c1 != null) c1.gameObject.SetActive(crackLevel == 3);
+        if (c2 != null) c2.gameObject.SetActive(crackLevel == 2);
+        if (c3 != null) c3.gameObject.SetActive(crackLevel == 1);
+    }
+
+    private Transform FindDirectChildIgnoreCase(Transform parent, string childNameLower)
+    {
+        if (parent == null) return null;
+        string target = childNameLower.ToLowerInvariant();
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            var ch = parent.GetChild(i);
+            if (ch != null && ch.name != null && ch.name.ToLowerInvariant() == target)
+                return ch;
+        }
+        return null;
+    }
+
+    // Determina 3, 2 o 1 según bandas de vida relativas al umbral de daño
+    private int DetermineCrackLevel(BridgeQuadrantSO so)
+    {
+        if (so == null) return 0;
+        float life = Mathf.Clamp01(so.GetLifeRatio());
+        float thr = so.damagedThreshold01; // ~0.40
+        float a = Mathf.Max(0f, thr - 0.10f); // ~0.30 → nivel 3
+        float c = Mathf.Max(0f, thr - 0.30f); // ~0.10 → nivel 1
+
+        if (life >= a) return 3;
+        if (life > c) return 2;
+        return 1;
     }
 }
