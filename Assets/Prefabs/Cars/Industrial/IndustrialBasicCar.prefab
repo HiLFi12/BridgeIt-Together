@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 7269658524915195505}
   - component: {fileID: 8551482216539278869}
   - component: {fileID: 5010841045342427424}
-  - component: {fileID: 8158330371517495356}
   m_Layer: 13
   m_Name: IndustrialBasicCar
   m_TagString: Vehicle
@@ -109,23 +108,6 @@ MonoBehaviour:
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
---- !u!114 &8158330371517495356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2948579226618137670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b12ab0ba3d6466f4383281d7105b242c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bridgeQuadrantTag: BridgeQuadrant
-  vehicleTag: Vehicle
-  debugMode: 1
-  collisionCooldown: 1
-  bridgeGrid: {fileID: 0}
 --- !u!1 &8444443851282445424
 GameObject:
   m_ObjectHideFlags: 0
@@ -172,12 +154,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 220878117883223575}
   detectionRadius: 1.5
+  bridgeQuadrantTag: BridgeQuadrant
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 320
-  bridgeQuadrantTag: BridgeQuadrant
   vehicleTag: Vehicle
-  debugMode: 1
+  damageAmount: 1
 --- !u!1001 &8785205114256151422
 PrefabInstance:
   m_ObjectHideFlags: 0

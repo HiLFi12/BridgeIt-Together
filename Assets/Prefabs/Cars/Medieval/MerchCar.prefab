@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3520341992789812808}
   - component: {fileID: 5786666951659194499}
   - component: {fileID: 7534566590204756760}
-  - component: {fileID: 3931132891816429880}
   - component: {fileID: 7236148492619856147}
   m_Layer: 13
   m_Name: MerchCar
@@ -112,23 +111,6 @@ MonoBehaviour:
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
---- !u!114 &3931132891816429880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 248325544060308125}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b12ab0ba3d6466f4383281d7105b242c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bridgeQuadrantTag: BridgeQuadrant
-  vehicleTag: Vehicle
-  debugMode: 1
-  collisionCooldown: 1
-  bridgeGrid: {fileID: 0}
 --- !u!114 &7236148492619856147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,12 +182,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 2436991230228347010}
   detectionRadius: 1.5
+  bridgeQuadrantTag: BridgeQuadrant
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 320
-  bridgeQuadrantTag: BridgeQuadrant
   vehicleTag: Vehicle
-  debugMode: 1
+  damageAmount: 1
 --- !u!1 &8490103600940127588
 GameObject:
   m_ObjectHideFlags: 0
@@ -355,6 +337,7 @@ MonoBehaviour:
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 0
+  medievalDamageAmount: 10
 --- !u!4 &8724069432829763031 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7627049233474902318, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}

@@ -99,12 +99,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 5171120324177091084}
   detectionRadius: 1
+  bridgeQuadrantTag: BridgeQuadrant
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 320
-  bridgeQuadrantTag: BridgeQuadrant
   vehicleTag: Vehicle
-  debugMode: 1
+  damageAmount: 1
 --- !u!1001 &2811264965323538623
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -232,9 +232,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7167bbaf81337464b8dd7472cb4f6f83, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2537041265372285719}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7167bbaf81337464b8dd7472cb4f6f83, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6452560074881119414}
   m_SourcePrefab: {fileID: 100100000, guid: 7167bbaf81337464b8dd7472cb4f6f83, type: 3}
 --- !u!4 &2344448967621814100 stripped
 Transform:
@@ -308,7 +305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e1f80dd6b15c344f9c53705331b6de6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidadBase: 2
+  velocidadBase: 5
   direccionInicial: {x: 1, y: 0, z: 0}
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
@@ -331,23 +328,6 @@ MonoBehaviour:
   isWalkingParam: IsWalking
   isFlyingParam: IsFlying
   drawFeetGizmos: 1
---- !u!114 &6452560074881119414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3153354572346523118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b12ab0ba3d6466f4383281d7105b242c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bridgeQuadrantTag: BridgeQuadrant
-  vehicleTag: Vehicle
-  debugMode: 1
-  collisionCooldown: 1
-  bridgeGrid: {fileID: 0}
 --- !u!95 &8532363332636441902 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 7167bbaf81337464b8dd7472cb4f6f83, type: 3}
