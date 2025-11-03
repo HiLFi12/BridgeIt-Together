@@ -12520,6 +12520,34 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 987827251}
   m_SourcePrefab: {fileID: 100100000, guid: 9772c1baa136c534093b0f903b312e3c, type: 3}
+--- !u!1 &1871245700 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6463523087166466162, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+  m_PrefabInstance: {fileID: 5555816822871206170}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1871245702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1871245700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b229e8593002c4498132eaf58556ea7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  quadrantSO: {fileID: 11400000, guid: 77890f5d67c601246b7fb7adfcc8ff49, type: 2}
+  targetRenderers: []
+  baseDamagedColor: {r: 1, g: 1, b: 1, a: 1}
+  fullRedColor: {r: 1, g: 0, b: 0, a: 1}
+  colorPropertyName: _BaseColor
+  intensityAt30: 0.1
+  intensityAt20: 0.2
+  intensityAt10: 1
+  intensityScale: 1
+  autoFindLastLayerRenderers: 1
+  logMissing: 0
 --- !u!1001 &1872927395
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13858,7 +13886,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: 'specificQuadrants.Array.data[0]'
@@ -14363,7 +14391,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6463523087166466162, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1871245702}
   m_SourcePrefab: {fileID: 100100000, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
 --- !u!1001 &5851938101292595811
 PrefabInstance:

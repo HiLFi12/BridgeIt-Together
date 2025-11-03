@@ -81,6 +81,14 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     public Material destroyedMaterial;
     public GameObject destructionEffectPrefab;
 
+    [Header("Nuevos Materiales de Daño (por vida)")]
+    [Tooltip("Material para daño leve: vida entre ~30% y ~40%.")]
+    public Material damageMaterial_30to40;
+    [Tooltip("Material para daño medio: vida entre ~20% y ~30%.")]
+    public Material damageMaterial_20to30;
+    [Tooltip("Material para daño severo: vida en ~10% o menos.")]
+    public Material damageMaterial_0to10;
+
     [Header("Audio - Construcción (AudioManager)")]
     [Tooltip("Índice en AudioManager.soundEffects para reproducir al completar la capa 0 (Base). -1 desactiva.")]
     [SerializeField] private int buildLayer0SfxIndex = -1;

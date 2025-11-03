@@ -765,13 +765,8 @@ public class BridgeConstructionGrid : MonoBehaviour
                         }
                         box.enabled = true;
                         box.isTrigger = false;
-                        Vector3 currentSize = box.size;
-                        if (currentSize == Vector3.zero)
-                        {
-                            currentSize = new Vector3(1f, 0.1f, 1f);
-                        }
-                        box.size = new Vector3(quadrantSize, currentSize.y, quadrantSize);
-                        box.center = Vector3.zero;
+                        // Ajustar tamaño del collider proporcional al tamaño visual de la capa
+                        FitBoxColliderToRenderers(layerObj);
 
                         foreach (var vc in visualColliders)
                         {
@@ -780,9 +775,8 @@ public class BridgeConstructionGrid : MonoBehaviour
                                 vc.enabled = false;
                             }
                         }
-
-                        // NUEVO: bindeo del visualizador de daño en la última capa al instanciarla
-                        BindQuadrantDamageVisualizer(layerObj, info.quadrantSO);
+                        // Vincular shaker de última capa (no afecta colliders; agita solo visuals)
+                        BindLastLayerShaker(layerObj, info.quadrantSO);
                     }
 
                     if (info.layerRenderers[i] == null)
@@ -809,21 +803,50 @@ public class BridgeConstructionGrid : MonoBehaviour
                     case BridgeQuadrantSO.LastLayerState.Complete:
                         // Restaurar material de la capa final
                         info.layerRenderers[i].material = info.quadrantSO.requiredLayers[i].material;
-
-                        // Asegurar que el visualizador esté bindeado (por si ya existía la capa)
+                        // Asegurar shaker presente y bindeado
                         {
                             string nombreCapa = $"Layer_{i}_{info.quadrantSO.requiredLayers[i].layerName}";
                             var lastLayerRoot = info.quadrantObject.transform.Find(nombreCapa)?.gameObject;
-                            if (lastLayerRoot != null) BindQuadrantDamageVisualizer(lastLayerRoot, info.quadrantSO);
+                            if (lastLayerRoot != null) BindLastLayerShaker(lastLayerRoot, info.quadrantSO);
                         }
                         break;
 
                     case BridgeQuadrantSO.LastLayerState.Damaged:
-                        // NUEVO: no cambiamos material; tintamos por instancia con el visualizador
+                        // NUEVO: asignar material según vida (tres bandas)
                         {
+                            float life = Mathf.Clamp01(info.quadrantSO.GetLifeRatio());
+                            float thr = info.quadrantSO.damagedThreshold01; // ~0.40
+                            float a = Mathf.Max(0f, thr - 0.10f); // ~0.30
+                            float c = Mathf.Max(0f, thr - 0.30f); // ~0.10
+
+                            Material targetMat = null;
+                            if (life >= a)
+                            {
+                                targetMat = info.quadrantSO.damageMaterial_30to40;
+                            }
+                            else if (life > c)
+                            {
+                                targetMat = info.quadrantSO.damageMaterial_20to30;
+                            }
+                            else
+                            {
+                                targetMat = info.quadrantSO.damageMaterial_0to10;
+                            }
+
+                            // Fallback: si no hay material configurado, usar el material base
+                            if (targetMat == null)
+                            {
+                                targetMat = info.quadrantSO.requiredLayers[i].material;
+                                // Opcional: Debug.LogWarning una sola vez si se desea.
+                            }
+
+                            // Asignar material
+                            info.layerRenderers[i].sharedMaterial = targetMat;
+
+                            // Asegurar shaker presente y bindeado
                             string nombreCapa = $"Layer_{i}_{info.quadrantSO.requiredLayers[i].layerName}";
                             var lastLayerRoot = info.quadrantObject.transform.Find(nombreCapa)?.gameObject;
-                            ApplyDamagedVisualToLastLayer(lastLayerRoot, info.quadrantSO);
+                            if (lastLayerRoot != null) BindLastLayerShaker(lastLayerRoot, info.quadrantSO);
                         }
                         break;
 
@@ -844,20 +867,11 @@ public class BridgeConstructionGrid : MonoBehaviour
                     GameObject lastLayerObj = info.layerRenderers[i].gameObject;
                     if (lastLayerObj != null)
                     {
-                        BoxCollider box = lastLayerObj.GetComponent<BoxCollider>();
-                        if (box == null)
-                        {
-                            box = lastLayerObj.AddComponent<BoxCollider>();
-                        }
+                        // Asegurar collider y ajustarlo al tamaño visual actual
+                        var box = lastLayerObj.GetComponent<BoxCollider>() ?? lastLayerObj.AddComponent<BoxCollider>();
                         box.enabled = true;
                         box.isTrigger = false;
-                        Vector3 currentSize = box.size;
-                        if (currentSize == Vector3.zero)
-                        {
-                            currentSize = new Vector3(1f, 0.1f, 1f);
-                        }
-                        box.size = new Vector3(quadrantSize, currentSize.y, quadrantSize);
-                        box.center = Vector3.zero;
+                        FitBoxColliderToRenderers(lastLayerObj);
                     }
                 }
             }
@@ -1261,12 +1275,11 @@ public class BridgeConstructionGrid : MonoBehaviour
                                 : layerScale;
                             layerObj.transform.localScale = finalScale;
 
-                            // Ajustar colliders de la capa
-                            Collider layerCollider = layerObj.GetComponent<Collider>();
-                            if (layerCollider is BoxCollider layerBoxCol)
+                            // Ajustar collider de última capa proporcional al tamaño visual
+                            var so = constructionGrid[x, z].quadrantSO;
+                            if (so != null && i == so.requiredLayers.Length - 1)
                             {
-                                Vector3 originalSize = layerBoxCol.size;
-                                layerBoxCol.size = new Vector3(quadrantSize, originalSize.y, quadrantSize);
+                                FitBoxColliderToRenderers(layerObj);
                             }
                         }
                     }
@@ -1419,4 +1432,78 @@ public class BridgeConstructionGrid : MonoBehaviour
     // Para estado “reparado/complete”, podés opcionalmente restaurar el color base así:
     // var vis = lastLayerRoot.GetComponent<QuadrantDamageVisualizer>();
     // if (vis != null) vis.Bind(quadrantSO, lastLayerRoot.GetComponentsInChildren<Renderer>(true));
+    // Bindeo del shaker de última capa usando reflexión (evita dependencia de ensamblado)
+    private void BindLastLayerShaker(GameObject lastLayerRoot, BridgeQuadrantSO so)
+    {
+        if (lastLayerRoot == null || so == null) return;
+
+        // Recolectar transforms de renderers hijos (no mover colliders del root)
+        var renderers = lastLayerRoot.GetComponentsInChildren<Renderer>(true);
+        Transform[] targets = null;
+        if (renderers != null && renderers.Length > 0)
+        {
+            targets = new Transform[renderers.Length];
+            for (int i = 0; i < renderers.Length; i++) targets[i] = renderers[i].transform;
+        }
+
+        var type = System.Type.GetType("QuadrantLastLayerShaker") ?? System.Type.GetType("QuadrantLastLayerShaker, Assembly-CSharp");
+        if (type == null) return;
+
+        var comp = lastLayerRoot.GetComponent(type) ?? lastLayerRoot.AddComponent(type);
+        var bind = type.GetMethod("Bind", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        if (bind != null)
+        {
+            bind.Invoke(comp, new object[] { so, targets });
+        }
+    }
+
+    // Ajusta un BoxCollider en 'layerObj' para que coincida (aprox.) con los bounds de los renderers hijos
+    // Mantiene un grosor mínimo en Y para evitar colisiones inestables.
+    private void FitBoxColliderToRenderers(GameObject layerObj, float minY = 0.05f)
+    {
+        if (layerObj == null) return;
+        var renderers = layerObj.GetComponentsInChildren<Renderer>(true);
+        if (renderers == null || renderers.Length == 0) return;
+
+        // Encapsular bounds en espacio MUNDO
+        Bounds worldBounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            if (renderers[i] == null) continue;
+            worldBounds.Encapsulate(renderers[i].bounds);
+        }
+
+        // Convertir a un bounds en espacio LOCAL del layerObj
+        var t = layerObj.transform;
+        // Tomar las 8 esquinas del bounds mundial y traerlas a local, luego encapsular
+        Vector3 ext = worldBounds.extents;
+        Vector3 c = worldBounds.center;
+        Vector3[] corners = new Vector3[8]
+        {
+            new Vector3(c.x - ext.x, c.y - ext.y, c.z - ext.z),
+            new Vector3(c.x + ext.x, c.y - ext.y, c.z - ext.z),
+            new Vector3(c.x - ext.x, c.y + ext.y, c.z - ext.z),
+            new Vector3(c.x + ext.x, c.y + ext.y, c.z - ext.z),
+            new Vector3(c.x - ext.x, c.y - ext.y, c.z + ext.z),
+            new Vector3(c.x + ext.x, c.y - ext.y, c.z + ext.z),
+            new Vector3(c.x - ext.x, c.y + ext.y, c.z + ext.z),
+            new Vector3(c.x + ext.x, c.y + ext.y, c.z + ext.z)
+        };
+        // Inicializar bounds local con la primera esquina
+        Bounds localBounds = new Bounds(t.InverseTransformPoint(corners[0]), Vector3.zero);
+        for (int i = 1; i < corners.Length; i++)
+        {
+            localBounds.Encapsulate(t.InverseTransformPoint(corners[i]));
+        }
+
+        var box = layerObj.GetComponent<BoxCollider>();
+        if (box == null) box = layerObj.AddComponent<BoxCollider>();
+        // Y mínimo para estabilidad; si el mesh es muy plano, evita tamaño Y ≈ 0
+        Vector3 size = localBounds.size;
+        size.y = Mathf.Max(size.y, minY);
+        box.size = size;
+        box.center = localBounds.center;
+        box.isTrigger = false;
+        box.enabled = true;
+    }
 }
