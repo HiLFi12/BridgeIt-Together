@@ -21,6 +21,8 @@ public class QuadrantLastLayerShaker : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool autoFromRenderers = true;
     [SerializeField] private bool drawGizmos = false;
+    [Tooltip("Si está activo, al pausar (timeScale=0) se detiene el temblor y se restauran las poses base.")]
+    [SerializeField] private bool stopWhenPaused = true;
 
     private Vector3[] _baseLocalPos;
     private Quaternion[] _baseLocalRot;
@@ -48,6 +50,13 @@ public class QuadrantLastLayerShaker : MonoBehaviour
         if (quadrantSO == null || targetTransforms == null || targetTransforms.Length == 0)
             return;
 
+        // Evitar artefactos cuando el juego está pausado: restaurar y no aplicar offsets
+        if (stopWhenPaused && Mathf.Approximately(Time.timeScale, 0f))
+        {
+            RestoreBases();
+            return;
+        }
+
         // Solo temblar si la última capa está construida y la vida es muy baja (<= 1 punto)
         int lastIdx = (quadrantSO.requiredLayers != null && quadrantSO.requiredLayers.Length > 0)
             ? quadrantSO.requiredLayers.Length - 1 : 2;
@@ -65,6 +74,7 @@ public class QuadrantLastLayerShaker : MonoBehaviour
 
         if (!_initialized) CaptureBases();
 
+        // Usar tiempo escalado normal; si quisieras animar aún en pausa, cambia a Time.unscaledTime
         float t = Time.time;
         for (int i = 0; i < targetTransforms.Length; i++)
         {
@@ -80,9 +90,9 @@ public class QuadrantLastLayerShaker : MonoBehaviour
             Vector3 offset = new Vector3(s1, 0.35f * s2, -0.8f * s1) * positionAmplitude;
             tf.localPosition = _baseLocalPos[i] + offset;
 
-            // Rotación: leve oscilación
+            // Rotación: leve oscilación (componer sobre la base para evitar drift de euler)
             Vector3 eulerOffset = new Vector3(0.35f * s2, 0.0f, 1.0f * s1) * rotationAmplitudeDeg;
-            tf.localRotation = Quaternion.Euler(_baseLocalRot[i].eulerAngles + eulerOffset);
+            tf.localRotation = _baseLocalRot[i] * Quaternion.Euler(eulerOffset);
         }
     }
 
