@@ -464,6 +464,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Pause
       objectReference: {fileID: 0}
+    - target: {fileID: 5524551637765155606, guid: 947f1f1c597e67a418c08825a4260044, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8770997650618494536, guid: 947f1f1c597e67a418c08825a4260044, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -2061,6 +2065,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 509289667}
   m_CullTransparentMesh: 1
+--- !u!1001 &559617016
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7522123118662820849, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -250.28
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522123118662820849, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 229.84001
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522123118662820849, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 251.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522123118662820849, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522123118662820849, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522123118662820849, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522123118662820849, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522123118662820849, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522123118662820849, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 7522123118662820849, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8709062679644081020, guid: b62904682d590e24280205b00c7182d3, type: 3}
+      propertyPath: m_Name
+      value: WoodenPlate (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b62904682d590e24280205b00c7182d3, type: 3}
 --- !u!1001 &571757501
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7416,8 +7477,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1388354392}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: tiempoEsperaInicial
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaEntreRondas
-      value: 60
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.size
@@ -7481,15 +7546,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[0].tiempoEntreAutos
-      value: 30
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].tiempoEntreAutos
-      value: 30
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[2].tiempoEntreAutos
-      value: 30
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[3].tiempoEntreAutos
@@ -8015,7 +8080,7 @@ PrefabInstance:
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9041,6 +9106,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Defeat
       objectReference: {fileID: 0}
+    - target: {fileID: 2622838488500824100, guid: 5fbee28b0aae9034997db87d82217882, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7911639512240943524, guid: 5fbee28b0aae9034997db87d82217882, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -9844,7 +9913,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 19713107625836913, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 38.729996
+      value: 37.96
       objectReference: {fileID: 0}
     - target: {fileID: 166189021200613936, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_Name
@@ -9924,7 +9993,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9024051469694973598, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 38.73
+      value: 39.31
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10269,6 +10338,7 @@ SceneRoots:
   - {fileID: 134148837}
   - {fileID: 1083209665}
   - {fileID: 1001452390}
+  - {fileID: 559617016}
   - {fileID: 335951548}
   - {fileID: 467639783}
   - {fileID: 662616024}

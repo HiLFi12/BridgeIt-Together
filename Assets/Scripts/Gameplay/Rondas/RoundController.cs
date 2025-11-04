@@ -15,6 +15,7 @@ namespace BridgeItTogether.Gameplay.Rondas
     {
         [Header("Rondas")]
         [SerializeField] private bool usarSistemaRondas = true;
+    [SerializeField, Tooltip("Tiempo de espera solo antes de iniciar la Ronda 1")] private float tiempoEsperaInicial = 0f;
         [SerializeField] private float tiempoEsperaEntreRondas = 3f;
         [SerializeField] private BridgeItTogether.Gameplay.Rondas.RondaConfig[] configuracionRondas = new BridgeItTogether.Gameplay.Rondas.RondaConfig[0];
         [SerializeField] private bool loopearRondas = true;
@@ -77,17 +78,19 @@ namespace BridgeItTogether.Gameplay.Rondas
             {
                 if (esperandoInicioDeRonda)
                 {
-                    if (tiempoEsperaEntreRondas > 0)
+                    // Usar espera inicial solo antes de la primera ronda; luego, la espera estándar entre rondas
+                    float espera = (rondaActual == 0) ? tiempoEsperaInicial : tiempoEsperaEntreRondas;
+                    if (espera > 0)
                     {
                         mostrandoTimerEntreRondas = true;
-                        tiempoRestanteEntreRondas = Mathf.CeilToInt(tiempoEsperaEntreRondas);
+                        tiempoRestanteEntreRondas = Mathf.CeilToInt(espera);
                         
                         // Countdown timer
                         float tiempoTranscurrido = 0f;
-                        while (tiempoTranscurrido < tiempoEsperaEntreRondas)
+                        while (tiempoTranscurrido < espera)
                         {
                             tiempoTranscurrido += Time.deltaTime;
-                            tiempoRestanteEntreRondas = Mathf.CeilToInt(tiempoEsperaEntreRondas - tiempoTranscurrido);
+                            tiempoRestanteEntreRondas = Mathf.CeilToInt(espera - tiempoTranscurrido);
                             yield return null;
                         }
                         
