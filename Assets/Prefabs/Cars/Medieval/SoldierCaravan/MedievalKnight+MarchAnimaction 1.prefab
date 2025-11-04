@@ -62,6 +62,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5171120324177091084}
+  - component: {fileID: 9149179940369571990}
   m_Layer: 0
   m_Name: DMGDealer
   m_TagString: Untagged
@@ -84,6 +85,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2344448967621814100}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9149179940369571990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7827258134071200852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50591d1da50494347ac7fb29e4cad991, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionPoint: {fileID: 5171120324177091084}
+  detectionRadius: 1.5
+  bridgeQuadrantTag: BridgeQuadrant
+  bridgeLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  vehicleTag: Vehicle
+  damageAmount: 1
 --- !u!1001 &2811264965323538623
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -282,16 +303,6 @@ MonoBehaviour:
   direccionInicial: {x: 1, y: 0, z: 0}
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
-  bridgeQuadrantTag: BridgeQuadrant
-  interactionPoint: {fileID: 5171120324177091084}
-  interactionRadius: 1
-  bridgeLayer:
-    serializedVersion: 2
-    m_Bits: 320
-  interactAuto: 1
-  oneInteractPerCollider: 1
-  onlyOnEnter: 1
-  debugInteract: 0
   safeZoneTag: SafeZone
   launchAngleDeg: 45
   launchSpeed: 12

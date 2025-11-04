@@ -33,6 +33,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4905251158842020762}
+  - {fileID: 789399517228649566}
   - {fileID: 5242597575706875192}
   - {fileID: 6820142271937426092}
   m_Father: {fileID: 0}
@@ -109,6 +110,58 @@ MonoBehaviour:
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
+--- !u!1 &1035723051881866574
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 789399517228649566}
+  - component: {fileID: 4750910674377297200}
+  m_Layer: 0
+  m_Name: DMGDealer (2)
+  m_TagString: Vehicle
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &789399517228649566
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035723051881866574}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.97, z: -2.39}
+  m_LocalScale: {x: 1.68801, y: 1.4153999, z: 1.4153999}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7406070707420810659}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4750910674377297200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035723051881866574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50591d1da50494347ac7fb29e4cad991, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionPoint: {fileID: 789399517228649566}
+  detectionRadius: 1
+  bridgeQuadrantTag: BridgeQuadrant
+  bridgeLayer:
+    serializedVersion: 2
+    m_Bits: 320
+  vehicleTag: Vehicle
+  damageAmount: 1
 --- !u!1 &6349472892928355490
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,7 +329,9 @@ PrefabInstance:
     - {fileID: 7752612744390885691, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
     - {fileID: 3788985385089196769, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
     - {fileID: 5632972374863158592, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6825988952242272729, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
+    - {fileID: 8863170351165564322, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
