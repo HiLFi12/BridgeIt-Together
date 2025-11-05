@@ -373,17 +373,6 @@ Transform:
   - {fileID: 242626194}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &51021964 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7009591107654030413, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
-  m_PrefabInstance: {fileID: 4116812497726793921}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &66092098
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2948,6 +2937,10 @@ PrefabInstance:
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[2].tipoCarrilRonda
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[2].tiempoEntreAutos
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[2].sobrescribirTipoCarril
@@ -9441,19 +9434,23 @@ PrefabInstance:
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: constructAllQuadrants
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: specificQuadrants.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: 'specificQuadrants.Array.data[0]'
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: 'specificQuadrants.Array.data[1]'
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: 'specificQuadrants.Array.data[2]'
@@ -9851,17 +9848,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5665233298331183193, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
   m_PrefabInstance: {fileID: 4116812497726793921}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4116812497726793923 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4265782683987362170, guid: 46bb8e963f86133498c1f4dae3b3f135, type: 3}
-  m_PrefabInstance: {fileID: 4116812497726793921}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4116812497726793931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9875,18 +9861,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   holdAnchor: {fileID: 0}
-  objectLocalPosition: {x: 0, y: 0, z: 0.3}
   objectLocalRotation: {x: 0, y: 0, z: 0}
-  paloIgnifugoPosition: {x: 0.25, y: 0.05, z: 0.4}
   paloIgnifugoRotation: {x: 15, y: 20, z: -45}
-  material1Position: {x: -1.054, y: 0.149, z: 0.543}
   material1Rotation: {x: 0, y: 0, z: -90}
-  minDropForward: 1.2
-  dropUpOffset: 0.1
-  freezeAfterDrop: 1
-  settleSpeedThreshold: 0.05
-  settleStableTime: 0.3
-  settleMaxTime: 2
+  playerUIManager: {fileID: 0}
+  pickUpSfxIndex: -1
+  dropSfxIndex: -1
 --- !u!114 &4116812497726793939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9899,7 +9879,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a89a314affe1e14caaeb8335510ea0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bridgeGrid: {fileID: 985317586}
+  bridgeGrids: []
+  autoFindBridgeGrids: 1
   buildPoint: {fileID: 2109101784}
   interactionRange: 3
   bridgeLayer:
@@ -9925,8 +9906,44 @@ MonoBehaviour:
   interactKey: 112
   dropKey: 111
   buildKey: 108
-  interactionUIImage: {fileID: 51021964}
-  buildUIImage: {fileID: 4116812497726793923}
+  dashKey: 304
+  dashDistance: 5
+  dashDuration: 0.2
+  dashCooldown: 1
+  dashCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  requireMovementForDash: 1
+  dashOnlyWhenGrounded: 1
+  dashEffectPrefab: {fileID: 0}
+  dashSpawn: {fileID: 0}
+  interactionKeyUI: {fileID: 0}
+  interactionPadUI: {fileID: 0}
+  buildKeyUI: {fileID: 0}
+  buildPadUI: {fileID: 0}
+  dashKeyUI: {fileID: 0}
+  dashPadUI: {fileID: 0}
   enableFillBridgeHotkey: 0
   fillBridgeKey: 103
   bridgeGrid: {fileID: 0}
@@ -10082,7 +10099,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 201285140784237310, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.5395508
+      value: -1.26
       objectReference: {fileID: 0}
     - target: {fileID: 201285140784237310, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       propertyPath: m_LocalRotation.w
@@ -10111,6 +10128,18 @@ PrefabInstance:
     - target: {fileID: 201285140784237310, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+      propertyPath: gridWidth
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+      propertyPath: gridLength
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+      propertyPath: quadrantSize
+      value: 5.34
       objectReference: {fileID: 0}
     - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       propertyPath: quadrantPrefab

@@ -42,7 +42,7 @@ public class IncompleteQuadrantWallsManager : MonoBehaviour
 
     // Mapa de paredes por grid
     private readonly Dictionary<BridgeConstructionGrid, GameObject[,]> wallsByGrid = new();
-    private readonly Dictionary<BridgeConstructionGrid, float> lastSizeByGrid = new();
+    private readonly Dictionary<BridgeConstructionGrid, Vector2> lastStepsByGrid = new();
 
     private int wallLayerIndex = -1;
     private float evalTimer;
@@ -114,8 +114,8 @@ public class IncompleteQuadrantWallsManager : MonoBehaviour
             }
         }
 
-        wallsByGrid[grid] = map;
-        lastSizeByGrid[grid] = grid.quadrantSize;
+    wallsByGrid[grid] = map;
+    lastStepsByGrid[grid] = new Vector2(grid.QuadrantStepX, grid.QuadrantStepZ);
 
         // Ajustar tamaños al tamaño actual del cuadrante
         ResizeWallsForGrid(grid);
@@ -140,11 +140,13 @@ public class IncompleteQuadrantWallsManager : MonoBehaviour
         {
             if (grid == null) continue;
 
-            // Si cambió el tamaño de cuadrante, re-posicionar y re-escalar
-            if (!Mathf.Approximately(lastSizeByGrid.GetValueOrDefault(grid, grid.quadrantSize), grid.quadrantSize))
+            // Si cambió el tamaño por eje del cuadrante, re-posicionar y re-escalar
+            Vector2 current = new Vector2(grid.QuadrantStepX, grid.QuadrantStepZ);
+            Vector2 last = lastStepsByGrid.ContainsKey(grid) ? lastStepsByGrid[grid] : new Vector2(float.NaN, float.NaN);
+            if (float.IsNaN(last.x) || Mathf.Abs(current.x - last.x) > 0.0005f || Mathf.Abs(current.y - last.y) > 0.0005f)
             {
                 ResizeWallsForGrid(grid);
-                lastSizeByGrid[grid] = grid.quadrantSize;
+                lastStepsByGrid[grid] = current;
             }
 
             UpdateGridWallsActivity(grid);
@@ -170,8 +172,9 @@ public class IncompleteQuadrantWallsManager : MonoBehaviour
                 var box = wall.GetComponent<BoxCollider>();
                 if (box != null)
                 {
-                    float size = Mathf.Max(0.01f, grid.quadrantSize - shrinkMargin);
-                    box.size = new Vector3(size, wallHeight, size);
+                    float sizeX = Mathf.Max(0.01f, grid.QuadrantStepX - shrinkMargin);
+                    float sizeZ = Mathf.Max(0.01f, grid.QuadrantStepZ - shrinkMargin);
+                    box.size = new Vector3(sizeX, wallHeight, sizeZ);
                     box.center = new Vector3(0f, 0f, 0f); // usar transform.position como centro
                 }
             }
@@ -212,9 +215,11 @@ public class IncompleteQuadrantWallsManager : MonoBehaviour
 
     private static Vector3 GetQuadrantCenter(BridgeConstructionGrid grid, int x, int z)
     {
-        // Mismo cálculo que usa el grid para posicionar cuadrantes
-        Vector3 basePos = grid.transform.position + new Vector3(x * grid.quadrantSize, 0f, z * grid.quadrantSize);
-        return basePos + new Vector3(grid.quadrantSize * 0.5f, 0f, grid.quadrantSize * 0.5f);
+        // Mismo cálculo que usa el grid para posicionar cuadrantes, soportando tamaño por eje
+        float sx = grid.QuadrantStepX;
+        float sz = grid.QuadrantStepZ;
+        Vector3 basePos = grid.transform.position + new Vector3(x * sx, 0f, z * sz);
+        return basePos + new Vector3(sx * 0.5f, 0f, sz * 0.5f);
     }
 
 #if UNITY_EDITOR
@@ -232,7 +237,7 @@ public class IncompleteQuadrantWallsManager : MonoBehaviour
                 for (int z = 0; z < l; z++)
                 {
                     var center = GetQuadrantCenter(grid, x, z);
-                    Vector3 size = new Vector3(Mathf.Max(0.01f, grid.quadrantSize - shrinkMargin), wallHeight, Mathf.Max(0.01f, grid.quadrantSize - shrinkMargin));
+                    Vector3 size = new Vector3(Mathf.Max(0.01f, grid.QuadrantStepX - shrinkMargin), wallHeight, Mathf.Max(0.01f, grid.QuadrantStepZ - shrinkMargin));
                     Gizmos.DrawCube(new Vector3(center.x, wallCenterYOffset, center.z), size);
                 }
             }

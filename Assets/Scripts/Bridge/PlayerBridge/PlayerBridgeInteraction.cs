@@ -16,6 +16,12 @@ public class PlayerBridgeInteraction : MonoBehaviour
     [Header("Configuración")]
     public float interactionRange = 2f;
     public LayerMask bridgeLayer;
+    [Tooltip("Radio del SphereCast vertical para detectar cuadrantes por física.")]
+    [SerializeField] private float spherecastRadius = 0.22f;
+    [Tooltip("Offset hacia arriba para iniciar el SphereCast (evita false negatives por contacto con el suelo/cuerpo).")]
+    [SerializeField] private float spherecastUpOffset = 0.3f;
+    [Tooltip("Extra de alcance vertical del SphereCast por diferencias de altura.")]
+    [SerializeField] private float spherecastExtraDistance = 1.0f;
     
     // Referencias internas
     private PlayerObjectHolder objectHolder;
@@ -373,30 +379,37 @@ public class PlayerBridgeInteraction : MonoBehaviour
 
         // Parámetros para mejorar la tolerancia en bordes
         const float epsilon = 0.001f;
-        const float spherecastRadius = 0.12f; // pequeño radio para ampliar la detección sobre bordes
+
+        // 0) Mapeo directo por coordenadas XZ (no depende de colliders). Priorizar este camino.
+        if (TryDirectMap(position, out grid, out xSel, out zSel))
+        {
+            return true;
+        }
 
         // 1) Intento con SphereCast hacia abajo para mayor robustez en bordes
-        if (Physics.SphereCast(position, spherecastRadius, Vector3.down, out var hit, interactionRange, bridgeLayer))
+        Vector3 castOrigin = position + Vector3.up * Mathf.Max(0f, spherecastUpOffset);
+        float castDistance = interactionRange + Mathf.Max(0f, spherecastExtraDistance);
+        if (Physics.SphereCast(castOrigin, Mathf.Max(0.01f, spherecastRadius), Vector3.down, out var hit, castDistance, bridgeLayer))
         {
             var hitGrid = hit.collider.GetComponentInParent<BridgeConstructionGrid>();
             if (hitGrid != null)
             {
                 // Convertir a espacio local de la grilla y clamping para evitar problemas en los bordes
                 Vector3 localPos = hit.point - hitGrid.transform.position;
-                float maxX = Mathf.Max(0f, hitGrid.gridWidth * hitGrid.quadrantSize - epsilon);
-                float maxZ = Mathf.Max(0f, hitGrid.gridLength * hitGrid.quadrantSize - epsilon);
+                float maxX = Mathf.Max(0f, hitGrid.gridWidth * hitGrid.QuadrantStepX - epsilon);
+                float maxZ = Mathf.Max(0f, hitGrid.gridLength * hitGrid.QuadrantStepZ - epsilon);
                 localPos.x = Mathf.Clamp(localPos.x, 0f, maxX);
                 localPos.z = Mathf.Clamp(localPos.z, 0f, maxZ);
 
-                int xi = Mathf.FloorToInt(localPos.x / hitGrid.quadrantSize);
-                int zi = Mathf.FloorToInt(localPos.z / hitGrid.quadrantSize);
+                int xi = Mathf.FloorToInt(localPos.x / hitGrid.QuadrantStepX);
+                int zi = Mathf.FloorToInt(localPos.z / hitGrid.QuadrantStepZ);
 
                 xi = Mathf.Clamp(xi, 0, hitGrid.gridWidth - 1);
                 zi = Mathf.Clamp(zi, 0, hitGrid.gridLength - 1);
 
                 // Usar el centro del cuadrante para la comprobación de distancia (reduce sesgo lateral)
-                Vector3 center = hitGrid.transform.position + new Vector3((xi + 0.5f) * hitGrid.quadrantSize, 0f, (zi + 0.5f) * hitGrid.quadrantSize);
-                if (Vector3.Distance(position, center) <= interactionRange + 0.01f)
+                Vector3 center = hitGrid.transform.position + new Vector3((xi + 0.5f) * hitGrid.QuadrantStepX, 0f, (zi + 0.5f) * hitGrid.QuadrantStepZ);
+                if (DistanceXZ(position, center) <= interactionRange + 0.1f)
                 {
                     grid = hitGrid;
                     xSel = xi;
@@ -418,9 +431,9 @@ public class PlayerBridgeInteraction : MonoBehaviour
             {
                 for (int z = 0; z < g.gridLength; z++)
                 {
-                    Vector3 center = g.transform.position + new Vector3((x + 0.5f) * g.quadrantSize, 0f, (z + 0.5f) * g.quadrantSize);
-                    float distance = Vector3.Distance(position, center);
-                    if (distance <= interactionRange && distance < minDistance)
+                    Vector3 center = g.transform.position + new Vector3((x + 0.5f) * g.QuadrantStepX, 0f, (z + 0.5f) * g.QuadrantStepZ);
+                    float distance = DistanceXZ(position, center);
+                    if (distance <= interactionRange + 0.1f && distance < minDistance)
                     {
                         minDistance = distance;
                         grid = g;
@@ -434,6 +447,43 @@ public class PlayerBridgeInteraction : MonoBehaviour
 
         return found;
     }
+
+    // Distancia en plano XZ (ignora diferencias de altura para una detección simétrica)
+    private static float DistanceXZ(Vector3 a, Vector3 b)
+    {
+        return Vector2.Distance(new Vector2(a.x, a.z), new Vector2(b.x, b.z));
+    }
+
+    // Mapeo directo: convierte la posición al cuadrante por coordenadas, sin depender de colliders
+    private bool TryDirectMap(Vector3 position, out BridgeConstructionGrid gSel, out int xiSel, out int ziSel)
+    {
+        gSel = null; xiSel = -1; ziSel = -1;
+        float best = float.MaxValue;
+
+        foreach (var g in bridgeGrids)
+        {
+            if (g == null) continue;
+
+            Vector3 local = position - g.transform.position;
+            // Fuera de la proyección de la grilla
+            if (local.x < 0f || local.z < 0f) continue;
+            float maxX = g.gridWidth * g.QuadrantStepX;
+            float maxZ = g.gridLength * g.QuadrantStepZ;
+            if (local.x >= maxX || local.z >= maxZ) continue;
+
+            int xi = Mathf.Clamp(Mathf.FloorToInt(local.x / g.QuadrantStepX), 0, g.gridWidth - 1);
+            int zi = Mathf.Clamp(Mathf.FloorToInt(local.z / g.QuadrantStepZ), 0, g.gridLength - 1);
+
+            Vector3 center = g.transform.position + new Vector3((xi + 0.5f) * g.QuadrantStepX, 0f, (zi + 0.5f) * g.QuadrantStepZ);
+            float d = DistanceXZ(position, center);
+            if (d <= interactionRange + 0.1f && d < best)
+            {
+                best = d; gSel = g; xiSel = xi; ziSel = zi;
+            }
+        }
+
+        return gSel != null;
+    }
     
     // Gizmos: usa el grid seleccionado
     private void OnDrawGizmos()
@@ -441,11 +491,11 @@ public class PlayerBridgeInteraction : MonoBehaviour
         if (currentTargetGrid != null && targetX >= 0 && targetZ >= 0)
         {
             Vector3 targetPos = currentTargetGrid.transform.position +
-                                new Vector3(targetX * currentTargetGrid.quadrantSize, 0.1f, targetZ * currentTargetGrid.quadrantSize);
+                                new Vector3(targetX * currentTargetGrid.QuadrantStepX, 0.1f, targetZ * currentTargetGrid.QuadrantStepZ);
             
             Gizmos.color = Color.blue;
-            Gizmos.DrawWireCube(targetPos + new Vector3(currentTargetGrid.quadrantSize/2, 0, currentTargetGrid.quadrantSize/2),
-                                new Vector3(currentTargetGrid.quadrantSize, 0.2f, currentTargetGrid.quadrantSize));
+            Gizmos.DrawWireCube(targetPos + new Vector3(currentTargetGrid.QuadrantStepX/2, 0, currentTargetGrid.QuadrantStepZ/2),
+                                new Vector3(currentTargetGrid.QuadrantStepX, 0.2f, currentTargetGrid.QuadrantStepZ));
         }
 
         if (buildPoint != null)

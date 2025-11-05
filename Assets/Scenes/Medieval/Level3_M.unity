@@ -1258,8 +1258,12 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: 'configuracionRondas.Array.data[1].tiposVehiculoPorAuto.Array.data[1]'
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[1].tiposVehiculoPorAuto.Array.data[2]'
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[1].tiposVehiculoPorAuto.Array.data[3]'
@@ -1279,7 +1283,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[2].tiposVehiculoPorAuto.Array.data[3]'
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[3].posicionesCarrilPorAuto.Array.size
@@ -1606,7 +1610,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5416675929637556784, guid: 3a11afef08372e04394d5b33181b28f4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -221.18
+      value: -224.56
       objectReference: {fileID: 0}
     - target: {fileID: 5416675929637556784, guid: 3a11afef08372e04394d5b33181b28f4, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2160,7 +2164,7 @@ Transform:
   m_GameObject: {fileID: 172255967}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -22.5, y: 5.280319, z: 11.86}
+  m_LocalPosition: {x: -22.5, y: 5.280319, z: 12.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5369,7 +5373,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 325173211593773506, guid: 59014cbb95242cb41b98430bd4870eda, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 243.60297
+      value: 244.52
       objectReference: {fileID: 0}
     - target: {fileID: 325173211593773506, guid: 59014cbb95242cb41b98430bd4870eda, type: 3}
       propertyPath: m_LocalRotation.w
@@ -8533,7 +8537,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -311.1
+      value: -313.23
       objectReference: {fileID: 0}
     - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -9826,12 +9830,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1fd4ef5223b7b1479cbcbd141b043b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridWidth: 5
-  gridLength: 4
-  quadrantSize: 1.9
+  gridWidth: 3
+  gridLength: 2
+  quadrantSize: 2.5
+  "usarTama\xF1oPorEje": 1
+  quadrantSizeX: 3.25
+  quadrantSizeY: 1
+  quadrantSizeZ: 3.5
   defaultQuadrantSO: {fileID: 11400000, guid: dc289388ff952494da534bf59c75595b, type: 2}
   quadrantPrefab: {fileID: 1437374063}
-  quadrantParent: {fileID: 2091871643}
+  quadrantParent: {fileID: 140439016}
   layerHeights:
   - -1.6
   - -0.1
@@ -12120,9 +12128,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1fd4ef5223b7b1479cbcbd141b043b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridWidth: 5
-  gridLength: 4
-  quadrantSize: 1.9
+  gridWidth: 3
+  gridLength: 2
+  quadrantSize: 2.5
+  "usarTama\xF1oPorEje": 1
+  quadrantSizeX: 3
+  quadrantSizeY: 1
+  quadrantSizeZ: 3.5
   defaultQuadrantSO: {fileID: 11400000, guid: dc289388ff952494da534bf59c75595b, type: 2}
   quadrantPrefab: {fileID: 1437374063}
   quadrantParent: {fileID: 140439016}
@@ -22018,7 +22030,7 @@ PrefabInstance:
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

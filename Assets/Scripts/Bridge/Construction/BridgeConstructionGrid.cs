@@ -8,6 +8,14 @@ public class BridgeConstructionGrid : MonoBehaviour
     public int gridWidth = 5;
     public int gridLength = 10;
     public float quadrantSize = 1f;
+    [Tooltip("Usar tamaños independientes por eje (X/Y/Z). Si está activo, 'quadrantSize' actúa como valor legacy.")]
+    public bool usarTamañoPorEje = false;
+    [Tooltip("Paso del cuadrante en X (ancho entre columnas)")]
+    public float quadrantSizeX = 1f;
+    [Tooltip("Escala vertical base del cuadrante (afecta colliders y escala relativa)")]
+    public float quadrantSizeY = 1f;
+    [Tooltip("Paso del cuadrante en Z (profundidad entre filas)")]
+    public float quadrantSizeZ = 1f;
 
     [Header("Referencias")]
     public BridgeQuadrantSO defaultQuadrantSO;
@@ -265,7 +273,7 @@ public class BridgeConstructionGrid : MonoBehaviour
         {
             for (int z = 0; z < gridLength; z++)
             {
-                Vector3 position = transform.position + new Vector3(x * quadrantSize, 0, z * quadrantSize);
+                Vector3 position = transform.position + new Vector3(x * (usarTamañoPorEje ? quadrantSizeX : quadrantSize), 0, z * (usarTamañoPorEje ? quadrantSizeZ : quadrantSize));
 
                 constructionGrid[x, z] = new QuadrantInfo();
                 constructionGrid[x, z].worldPosition = position;
@@ -313,8 +321,11 @@ public class BridgeConstructionGrid : MonoBehaviour
                             BoxCollider boxCol = constructionGrid[x, z].quadrantCollider as BoxCollider;
                             if (boxCol != null)
                             {
-                                boxCol.size = new Vector3(quadrantSize, 0.5f, quadrantSize);
-                                boxCol.center = new Vector3(quadrantSize / 2, 0.25f, quadrantSize / 2);
+                                float sizeX = usarTamañoPorEje ? quadrantSizeX : quadrantSize;
+                                float sizeZ = usarTamañoPorEje ? quadrantSizeZ : quadrantSize;
+                                float sizeY = Mathf.Max(0.05f, 0.5f * (usarTamañoPorEje ? quadrantSizeY : 1f));
+                                boxCol.size = new Vector3(sizeX, sizeY, sizeZ);
+                                boxCol.center = new Vector3(sizeX / 2f, sizeY * 0.5f, sizeZ / 2f);
                             }
                         }
                         else
@@ -324,8 +335,11 @@ public class BridgeConstructionGrid : MonoBehaviour
                             constructionGrid[x, z].quadrantCollider = boxCol;
                             constructionGrid[x, z].quadrantCollider.enabled = false;
                             boxCol.isTrigger = false;
-                            boxCol.size = new Vector3(quadrantSize, 0.5f, quadrantSize);
-                            boxCol.center = new Vector3(quadrantSize / 2, 0.25f, quadrantSize / 2);
+                            float sizeX2 = usarTamañoPorEje ? quadrantSizeX : quadrantSize;
+                            float sizeZ2 = usarTamañoPorEje ? quadrantSizeZ : quadrantSize;
+                            float sizeY2 = Mathf.Max(0.05f, 0.5f * (usarTamañoPorEje ? quadrantSizeY : 1f));
+                            boxCol.size = new Vector3(sizeX2, sizeY2, sizeZ2);
+                            boxCol.center = new Vector3(sizeX2 / 2f, sizeY2 * 0.5f, sizeZ2 / 2f);
                         }
 
                         // Preparar los contenedores para los renderizadores de las capas
@@ -372,15 +386,19 @@ public class BridgeConstructionGrid : MonoBehaviour
                             if (layerTransform != null)
                             {
                                 Vector3 layerScale = (i < layerScales.Length) ? layerScales[i] : Vector3.one;
+                                Vector3 baseScaleCfg = usarTamañoPorEje ? new Vector3(quadrantSizeX, quadrantSizeY, quadrantSizeZ)
+                                                                        : new Vector3(quadrantSize, 1f, quadrantSize);
                                 Vector3 finalScale = layerScaleMode == LayerScaleMode.RelativeToQuadrantSize
-                                    ? Vector3.Scale(new Vector3(quadrantSize, 1f, quadrantSize), layerScale)
+                                    ? Vector3.Scale(baseScaleCfg, layerScale)
                                     : layerScale;
 
                                 layerTransform.localScale = finalScale;
 
                                 float layerHeight = (i < layerHeights.Length) ? layerHeights[i] : (0.5f * i);
+                                float cx = usarTamañoPorEje ? quadrantSizeX : quadrantSize;
+                                float cz = usarTamañoPorEje ? quadrantSizeZ : quadrantSize;
                                 Vector3 posicionCorrecta = constructionGrid[x, z].worldPosition + new Vector3(
-                                    quadrantSize / 2, layerHeight, quadrantSize / 2
+                                    cx / 2, layerHeight, cz / 2
                                 );
                                 layerTransform.position = posicionCorrecta;
                                 // Nota: aquí ya no tocamos la rotación para respetar la del prefab
@@ -581,7 +599,9 @@ public class BridgeConstructionGrid : MonoBehaviour
             // Si el cuadrante estaba incompleto y se destruyó, reproducir efecto de colapso
             if (!estabaCompleto && constructionGrid[x, z].quadrantSO.destructionEffectPrefab != null)
             {
-                Vector3 posicionEfecto = constructionGrid[x, z].worldPosition + new Vector3(quadrantSize / 2, 0, quadrantSize / 2);
+                float cx = usarTamañoPorEje ? quadrantSizeX : quadrantSize;
+                float cz = usarTamañoPorEje ? quadrantSizeZ : quadrantSize;
+                Vector3 posicionEfecto = constructionGrid[x, z].worldPosition + new Vector3(cx / 2, 0, cz / 2);
                 Instantiate(constructionGrid[x, z].quadrantSO.destructionEffectPrefab, posicionEfecto, Quaternion.identity);
                 PlayDestructionSound(x, z);
             }
@@ -707,10 +727,12 @@ public class BridgeConstructionGrid : MonoBehaviour
                 {
                     // Calcular la posición correcta para la visualización usando las alturas configurables
                     float layerHeight = (i < layerHeights.Length) ? layerHeights[i] : (0.5f * i);
+                    float cx = usarTamañoPorEje ? quadrantSizeX : quadrantSize;
+                    float cz = usarTamañoPorEje ? quadrantSizeZ : quadrantSize;
                     Vector3 posicionCorrecta = info.worldPosition + new Vector3(
-                        quadrantSize / 2,  // Centrado en X
+                        cx / 2,  // Centrado en X
                         layerHeight,       // Altura específica para esta capa
-                        quadrantSize / 2   // Centrado en Z
+                        cz / 2   // Centrado en Z
                     );
 
                     // Verificar si hay algún objeto antiguo de la misma capa y destruirlo
@@ -733,7 +755,8 @@ public class BridgeConstructionGrid : MonoBehaviour
                     Vector3 layerScale = (i < layerScales.Length) ? layerScales[i] : Vector3.one;
                     if (layerScaleMode == LayerScaleMode.RelativeToQuadrantSize)
                     {
-                        Vector3 baseScale = new Vector3(quadrantSize, 1f, quadrantSize);
+                        Vector3 baseScale = usarTamañoPorEje ? new Vector3(quadrantSizeX, quadrantSizeY, quadrantSizeZ)
+                                                             : new Vector3(quadrantSize, 1f, quadrantSize);
                         finalScale = Vector3.Scale(baseScale, layerScale);
                     }
                     else
@@ -870,11 +893,11 @@ public class BridgeConstructionGrid : MonoBehaviour
             {
                 for (int z = 0; z < gridLength; z++)
                 {
-                    Vector3 position = transform.position + new Vector3(x * quadrantSize, 0, z * quadrantSize);
-                    Vector3 center = position + new Vector3(quadrantSize / 2, 0, quadrantSize / 2);
+                    Vector3 position = transform.position + new Vector3(x * (usarTamañoPorEje ? quadrantSizeX : quadrantSize), 0, z * (usarTamañoPorEje ? quadrantSizeZ : quadrantSize));
+                    Vector3 center = position + new Vector3((usarTamañoPorEje ? quadrantSizeX : quadrantSize) / 2, 0, (usarTamañoPorEje ? quadrantSizeZ : quadrantSize) / 2);
 
                     // Dibujar el wireframe del cuadrante
-                    Gizmos.DrawWireCube(center, new Vector3(quadrantSize, 0.1f, quadrantSize));
+                    Gizmos.DrawWireCube(center, new Vector3((usarTamañoPorEje ? quadrantSizeX : quadrantSize), 0.1f, (usarTamañoPorEje ? quadrantSizeZ : quadrantSize)));
 
                     // Dibujar un punto en la posición de origen (esquina) del cuadrante
                     Gizmos.color = Color.red;
@@ -917,10 +940,10 @@ public class BridgeConstructionGrid : MonoBehaviour
 
                     // Obtener la posición del cuadrante
                     Vector3 position = constructionGrid[x, z].worldPosition;
-                    Vector3 center = position + new Vector3(quadrantSize / 2, 0, quadrantSize / 2);
+                    Vector3 center = position + new Vector3((usarTamañoPorEje ? quadrantSizeX : quadrantSize) / 2, 0, (usarTamañoPorEje ? quadrantSizeZ : quadrantSize) / 2);
 
                     // Dibujar el wireframe del cuadrante con el color según su estado
-                    Gizmos.DrawWireCube(center, new Vector3(quadrantSize, 0.1f, quadrantSize));
+                    Gizmos.DrawWireCube(center, new Vector3((usarTamañoPorEje ? quadrantSizeX : quadrantSize), 0.1f, (usarTamañoPorEje ? quadrantSizeZ : quadrantSize)));
 
                     // Dibujar puntos para visualizar mejor las posiciones
                     Gizmos.color = Color.red;
@@ -1211,7 +1234,7 @@ public class BridgeConstructionGrid : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Reescalando grilla con nuevo quadrantSize: {quadrantSize}");
+    Debug.Log($"Reescalando grilla con nuevo tamaño: {(usarTamañoPorEje ? $"X={quadrantSizeX}, Y={quadrantSizeY}, Z={quadrantSizeZ}" : quadrantSize.ToString())}");
 
         for (int x = 0; x < gridWidth; x++)
         {
@@ -1220,15 +1243,18 @@ public class BridgeConstructionGrid : MonoBehaviour
                 if (constructionGrid[x, z] != null && constructionGrid[x, z].quadrantObject != null)
                 {
                     // Actualizar posición del cuadrante
-                    Vector3 newPosition = transform.position + new Vector3(x * quadrantSize, 0, z * quadrantSize);
+                    Vector3 newPosition = transform.position + new Vector3(x * (usarTamañoPorEje ? quadrantSizeX : quadrantSize), 0, z * (usarTamañoPorEje ? quadrantSizeZ : quadrantSize));
                     constructionGrid[x, z].quadrantObject.transform.position = newPosition;
                     constructionGrid[x, z].worldPosition = newPosition;
 
                     // Reescalar el collider del cuadrante principal
                     if (constructionGrid[x, z].quadrantCollider is BoxCollider quadrantBoxCol)
                     {
-                        quadrantBoxCol.size = new Vector3(quadrantSize, quadrantBoxCol.size.y, quadrantSize);
-                        quadrantBoxCol.center = new Vector3(quadrantSize / 2, quadrantBoxCol.center.y, quadrantSize / 2);
+                        float sizeX = usarTamañoPorEje ? quadrantSizeX : quadrantSize;
+                        float sizeZ = usarTamañoPorEje ? quadrantSizeZ : quadrantSize;
+                        float sizeY = Mathf.Max(0.05f, 0.5f * (usarTamañoPorEje ? quadrantSizeY : 1f));
+                        quadrantBoxCol.size = new Vector3(sizeX, sizeY, sizeZ);
+                        quadrantBoxCol.center = new Vector3(sizeX / 2, sizeY * 0.5f, sizeZ / 2);
                     }
 
                     // Reescalar todas las capas visuales existentes
@@ -1241,16 +1267,18 @@ public class BridgeConstructionGrid : MonoBehaviour
                             // Reposicionar la capa usando las alturas configurables
                             float layerHeight = (i < layerHeights.Length) ? layerHeights[i] : (0.5f * i);
                             Vector3 newLayerPosition = newPosition + new Vector3(
-                                quadrantSize / 2,  // Centrado en X
+                                (usarTamañoPorEje ? quadrantSizeX : quadrantSize) / 2,  // Centrado en X
                                 layerHeight,       // Altura específica para esta capa
-                                quadrantSize / 2   // Centrado en Z
+                                (usarTamañoPorEje ? quadrantSizeZ : quadrantSize) / 2   // Centrado en Z
                             );
                             layerObj.transform.position = newLayerPosition;
 
                             // Reescalar la capa usando escalas configurables y respetando el modo de escala
                             Vector3 layerScale = (i < layerScales.Length) ? layerScales[i] : Vector3.one;
+                            Vector3 baseScale = usarTamañoPorEje ? new Vector3(quadrantSizeX, quadrantSizeY, quadrantSizeZ)
+                                                                : new Vector3(quadrantSize, 1f, quadrantSize);
                             Vector3 finalScale = layerScaleMode == LayerScaleMode.RelativeToQuadrantSize
-                                ? Vector3.Scale(new Vector3(quadrantSize, 1f, quadrantSize), layerScale)
+                                ? Vector3.Scale(baseScale, layerScale)
                                 : layerScale;
                             layerObj.transform.localScale = finalScale;
 
@@ -1527,4 +1555,9 @@ public class BridgeConstructionGrid : MonoBehaviour
         if (life > c) return 2;
         return 1;
     }
+
+    // Helpers de paso por eje
+    public float QuadrantStepX => usarTamañoPorEje ? quadrantSizeX : quadrantSize;
+    public float QuadrantStepY => usarTamañoPorEje ? quadrantSizeY : 1f;
+    public float QuadrantStepZ => usarTamañoPorEje ? quadrantSizeZ : quadrantSize;
 }
