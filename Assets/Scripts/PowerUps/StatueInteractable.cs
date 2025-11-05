@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class StatueInteractable : MonoBehaviour, IInteractable
+public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
 {
     public PowerUpMotivacionEstatua powerUp;
     public Transform destinationPoint;
@@ -17,6 +17,11 @@ public class StatueInteractable : MonoBehaviour, IInteractable
     [Header("Motivación")]
     [Tooltip("Duración en segundos del efecto de motivación cuando la estatua es impactada por una flecha.")]
     public float motivationDuration = 20f;
+    
+    [Header("UI Configuration")]
+    [SerializeField] private int uiIndex = 3;
+    
+    public int UIIndex => uiIndex;
 
     private float lifeTimer;
     private bool isDead = false;
@@ -36,6 +41,11 @@ public class StatueInteractable : MonoBehaviour, IInteractable
             isCarried = true;
             // Feedback visual/sonoro opcional aquí
         }
+    }
+    
+    public void SetUIIndex(int index)
+    {
+        uiIndex = index;
     }
 
     private void Update()
