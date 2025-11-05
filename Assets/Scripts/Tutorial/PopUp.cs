@@ -59,7 +59,7 @@ public class TutorialPopup : MonoBehaviour
         {
             TMP_Text btnTxt = botonSiguiente.GetComponentInChildren<TMP_Text>();
             if (btnTxt != null)
-                btnTxt.text = (paginaActual == paginas.Length - 1) ? "Cerrar" : "Siguiente";
+                btnTxt.text = (paginaActual == paginas.Length - 1) ? "Close" : "Next";
         }
     }
 
