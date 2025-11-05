@@ -3940,6 +3940,10 @@ PrefabInstance:
       propertyPath: m_WarningMessage
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 25939703546535242, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 59a555863f5457245997196f7f40a406, type: 3}
     - target: {fileID: 124070237574347097, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
       propertyPath: raycastDistance
       value: 8.41
@@ -3960,6 +3964,38 @@ PrefabInstance:
       propertyPath: walkableSurfaceLayer.m_Bits
       value: 128
       objectReference: {fileID: 0}
+    - target: {fileID: 642243233456435620, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: uiGroups.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 642243233456435620, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: uiGroups.Array.data[3].name
+      value: Ballista
+      objectReference: {fileID: 0}
+    - target: {fileID: 642243233456435620, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: uiGroups.Array.data[3].playerUI
+      value: 
+      objectReference: {fileID: 2048280648}
+    - target: {fileID: 642243233456435620, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: uiGroups.Array.data[3].useBridgeQuadrants
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 642243233456435620, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: uiGroups.Array.data[3].othersUI.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 839766116430469514, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_Name
+      value: BallistaFrame
+      objectReference: {fileID: 0}
+    - target: {fileID: 839766116430469514, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1007729738214095365, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 213387469d4ff1449818fd1556ef279b, type: 3}
     - target: {fileID: 2856538213267233155, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -275.94
@@ -4000,13 +4036,41 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5451715618356970701, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 121.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5451715618356970701, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 121.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5451715618356970701, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.3059
+      objectReference: {fileID: 0}
+    - target: {fileID: 5451715618356970701, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.00065351
+      objectReference: {fileID: 0}
+    - target: {fileID: 5451715618356970701, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 7.1
+      objectReference: {fileID: 0}
     - target: {fileID: 6088676284936252209, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
       value: 25
       objectReference: {fileID: 0}
+    - target: {fileID: 6571502649486386924, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_Name
+      value: BallistaFrame
+      objectReference: {fileID: 0}
     - target: {fileID: 7187154040181281835, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
       propertyPath: m_Name
       value: Player1 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8057055485120305817, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -5356,6 +5420,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8866885434129864236, guid: a645fe26fc2858b4c8b8a23b0b6bce7b, type: 3}
   m_PrefabInstance: {fileID: 6425212395872978577}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2048280648 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5977390123653253286, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
+  m_PrefabInstance: {fileID: 1368947417}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2072203488
 PrefabInstance:
   m_ObjectHideFlags: 0

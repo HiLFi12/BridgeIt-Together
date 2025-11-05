@@ -8,7 +8,7 @@ public class MaterialTipo2Base : MaterialBaseInteractable, IUIActivatable
 {
     [Header("UI Configuration")]
     [SerializeField] private int uiIndex = 0;
-    public int UIIndex => uiIndex;
+    public virtual int UIIndex => uiIndex;
 
     protected override int LayerIndex => 1; 
 
