@@ -10,6 +10,15 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
     [SerializeField, Tooltip("Inicializa el material como listo. Si se desactiva, requiere flecha.")] private bool startReady = false;
     public override bool PuedeConstruirse => base.PuedeConstruirse; // la base ya combina isReady
 
+    [Header("UI Configuration")]
+    [SerializeField] private int notReadyUIIndex = -1;
+    [SerializeField] private int readyUIIndex = 1;
+    
+    // Override UIIndex para devolver el índice correcto según el estado de isReady
+    public override int UIIndex => isReady ? readyUIIndex : notReadyUIIndex;
+
+    private PlayerUIManager playerUIManager;
+
     protected override void Awake()
     {
         base.Awake();
@@ -18,6 +27,11 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
         isReady = startReady; // usar campo heredado
         AutoVincularMeshesSiFaltan();
         AplicarEstadoVisual();
+    }
+
+    private void Start()
+    {
+        playerUIManager = FindFirstObjectByType<PlayerUIManager>();
     }
 
     protected override void PostEnsure()
@@ -61,9 +75,15 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
 
     protected virtual void Activar()
     {
-    if (isReady) return;
-    isReady = true; // heredado
-    AplicarEstadoVisual();
+        if (isReady) return;
+        isReady = true; // heredado
+        AplicarEstadoVisual();
+        
+        // Notificar al PlayerUIManager sobre el cambio de estado
+        if (playerUIManager != null)
+        {
+            playerUIManager.RefreshHeldObjectUI(UIIndex);
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -80,6 +100,12 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
         {
             SetReady(true);
             AplicarEstadoVisual();
+            
+            // Notificar al PlayerUIManager sobre el cambio de estado
+            if (playerUIManager != null)
+            {
+                playerUIManager.RefreshHeldObjectUI(UIIndex);
+            }
         }
     }
 }
