@@ -1,4 +1,6 @@
 using UnityEngine;
+using BridgeItTogether.Gameplay.Rondas;          // + RoundController
+using BridgeItTogether.Gameplay.Spawning;        // + VehicleReturnNotifier
 
 /// <summary>
 /// Coloca este script en un GameObject con un Collider marcado como Trigger.
@@ -31,6 +33,12 @@ public class GuardDestroyTrigger : MonoBehaviour
 
         GameObject toDestroy = destroyRoot ? guard.transform.root.gameObject : guard.gameObject;
 
+        // 1) Si tiene VehicleReturnNotifier en él o en su raíz, desactivar para que OnDisable notifique al RoundController
+        if (TryReturnViaNotifier(toDestroy)) return;
+
+        // 2) Fallback: notificar manualmente al RoundController y destruir
+        NotifyRoundControllerManual(toDestroy);
+
         if (debugLogs)
             Debug.Log($"[GuardDestroyTrigger] Destruyendo '{toDestroy.name}' (delay={destroyDelay}).", toDestroy);
 
@@ -38,5 +46,43 @@ public class GuardDestroyTrigger : MonoBehaviour
             Destroy(toDestroy);
         else
             Destroy(toDestroy, destroyDelay);
+    }
+
+    private bool TryReturnViaNotifier(GameObject go)
+    {
+        if (!go) return false;
+
+        // Buscar un VehicleReturnNotifier en el objeto o en su raíz
+        var notifier = go.GetComponentInParent<VehicleReturnNotifier>();
+        if (notifier != null)
+        {
+            if (debugLogs)
+                Debug.Log($"[GuardDestroyTrigger] Desactivando '{go.name}' para retorno vía VehicleReturnNotifier.", go);
+
+            // Desactivar para disparar OnDisable en el notifier (notifica al RoundController)
+            go.SetActive(false);
+            return true;
+        }
+        return false;
+    }
+
+    private void NotifyRoundControllerManual(GameObject go)
+    {
+        // Intentar encontrar el RoundController en la escena
+#if UNITY_2023_1_OR_NEWER
+        var rc = Object.FindFirstObjectByType<RoundController>();
+#else
+        var rc = Object.FindObjectOfType<RoundController>();
+#endif
+        if (rc != null)
+        {
+            if (debugLogs)
+                Debug.Log($"[GuardDestroyTrigger] Notificando retorno manual de '{go.name}' al RoundController.", go);
+            rc.NotificarAutoDevueltoAlPool(go);
+        }
+        else if (debugLogs)
+        {
+            Debug.LogWarning("[GuardDestroyTrigger] RoundController no encontrado para notificar retorno manual.");
+        }
     }
 }

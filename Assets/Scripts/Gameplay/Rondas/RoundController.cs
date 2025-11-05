@@ -33,7 +33,7 @@ namespace BridgeItTogether.Gameplay.Rondas
         private bool esperandoFinDeRonda = false;
         private bool esperandoInicioDeRonda = false;
         private Coroutine corrutina;
-        private float timeoutRonda = 60f;
+        private float timeoutRonda = 15f;
         private PosicionCarril ultimoCarrilUsado = PosicionCarril.Inferior;
 
         // Timer para UI
