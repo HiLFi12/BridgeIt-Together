@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using BridgeItTogether.Gameplay.Abstractions;
 
-public class MaterialTipo3 : MonoBehaviour, IHitable
+public class MaterialTipo3 : MonoBehaviour, IHitable, IUIActivatable
 {
     [Header("Configuración del material")]
     [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;
+    
+    [Header("UI Configuration")]
+    [SerializeField] private int uiIndex = 0;
+    
+    public int UIIndex => uiIndex;
     
     private void Start()
     {
@@ -27,6 +32,11 @@ public class MaterialTipo3 : MonoBehaviour, IHitable
         materialInfo.materialType = BridgeQuadrantSO.MaterialType.Metal; // MaterialTipo3 es metal
         
         gameObject.tag = "BridgeLayer2";
+    }
+
+    public void SetUIIndex(int index)
+    {
+        uiIndex = index;
     }
 
     public void OnLaunched(Vector3 targetPosition)
