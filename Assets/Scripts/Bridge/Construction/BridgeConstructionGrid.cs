@@ -1089,16 +1089,20 @@ public class BridgeConstructionGrid : MonoBehaviour
     {
         if (!IsValidQuadrant(x, z)) return false;
 
-        // Edge rows/columns are always reachable
-        if (x == 0 || x == gridWidth - 1 || z == 0 || z == gridLength - 1)
+        // Solo los extremos laterales (columnas izquierda y derecha) son puntos de entrada
+        bool isLateralEdge = x == 0 || x == gridWidth - 1;
+
+        // Los extremos laterales SIEMPRE son alcanzables (para permitir construcción en ambos lados simultáneamente)
+        if (isLateralEdge)
             return true;
 
-        // Reachable if any orthogonal neighbor is complete
+        // Cuadrantes internos: alcanzables si tienen un vecino completo
         return IsQuadrantComplete(x - 1, z) ||
                IsQuadrantComplete(x + 1, z) ||
                IsQuadrantComplete(x, z - 1) ||
                IsQuadrantComplete(x, z + 1);
     }
+
 
     private bool IsQuadrantComplete(int x, int z)
     {
