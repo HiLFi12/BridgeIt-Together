@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using BridgeItTogether.Gameplay.Abstractions;
+using UnityEngine.UI;
 
 public class Ballista : MonoBehaviour, IInteractable
 {
@@ -17,6 +18,10 @@ public class Ballista : MonoBehaviour, IInteractable
     [Header("Reload Settings")]
     [SerializeField, Min(0.1f)] private float arrowMoveSpeed = 2f;
     [SerializeField, Min(0.1f)] private float reloadDelay = 1f;
+
+    // Reload UI (barra de carga) -> ahora es una Image con Image.Type = Filled
+    [Header("UI")]
+    [SerializeField] private Image reloadImage;
     
     [Header("Interaction")]
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
@@ -25,6 +30,9 @@ public class Ballista : MonoBehaviour, IInteractable
     private GameObject currentArrow;
     private GameObject currentSmokeEffect;
     private Coroutine reloadCoroutine;
+    
+    // UI coroutine ref
+    private Coroutine reloadUIUpdateCoroutine;
     
     public InteractPriority InteractPriority => interactPriority;
 
@@ -89,6 +97,13 @@ public class Ballista : MonoBehaviour, IInteractable
             currentSmokeEffect = null;
         }
 
+        // Calcular duración de movimiento de la flecha (estimada)
+        float moveDistance = Vector3.Distance(spawnPoint.position, shootPoint.position);
+        float moveDuration = moveDistance / Mathf.Max(0.0001f, arrowMoveSpeed);
+
+        // Iniciar la barra de recarga (delay + movimiento)
+        StartReloadUI(reloadDelay + moveDuration);
+
         // Iniciar recarga después del delay
         if (reloadCoroutine != null)
             StopCoroutine(reloadCoroutine);
@@ -124,6 +139,13 @@ public class Ballista : MonoBehaviour, IInteractable
             currentSmokeEffect.transform.SetParent(transform, true);
         }
         
+        // Calcular duración del movimiento y, si no hay ya una barra en marcha, iniciar la UI
+        float moveDistance = Vector3.Distance(spawnPoint.position, shootPoint.position);
+        float moveDuration = moveDistance / Mathf.Max(0.0001f, arrowMoveSpeed);
+
+        if (reloadUIUpdateCoroutine == null)
+            StartReloadUI(moveDuration);
+        
         // Iniciar movimiento de la flecha
         if (reloadCoroutine != null)
             StopCoroutine(reloadCoroutine);
@@ -157,6 +179,57 @@ public class Ballista : MonoBehaviour, IInteractable
             currentArrow.transform.position = shootPoint.position;
             currentArrow.transform.rotation = shootPoint.rotation;
             isReady = true;
+        }
+
+        // Asegurar que la barra llega al máximo y se oculta
+        StopAndHideReloadUI();
+    }
+
+    // Inicia la UI de recarga con una duración total (segundos). Reemplaza cualquier UI en curso.
+    private void StartReloadUI(float totalDuration)
+    {
+        if (reloadImage == null || totalDuration <= 0f) return;
+
+        if (reloadUIUpdateCoroutine != null)
+        {
+            StopCoroutine(reloadUIUpdateCoroutine);
+            reloadUIUpdateCoroutine = null;
+        }
+
+        reloadUIUpdateCoroutine = StartCoroutine(UpdateReloadBar(totalDuration));
+    }
+
+    private IEnumerator UpdateReloadBar(float totalDuration)
+    {
+        if (reloadImage == null) yield break;
+
+        reloadImage.gameObject.SetActive(true);
+        reloadImage.fillAmount = 0f;
+
+        float elapsed = 0f;
+        while (elapsed < totalDuration)
+        {
+            elapsed += Time.deltaTime;
+            reloadImage.fillAmount = Mathf.Clamp01(elapsed / totalDuration);
+            yield return null;
+        }
+
+        reloadImage.fillAmount = 1f;
+
+        reloadUIUpdateCoroutine = null;
+    }
+
+    private void StopAndHideReloadUI()
+    {
+        if (reloadUIUpdateCoroutine != null)
+        {
+            StopCoroutine(reloadUIUpdateCoroutine);
+            reloadUIUpdateCoroutine = null;
+        }
+
+        if (reloadImage)
+        {
+            reloadImage.fillAmount = 1f;
         }
     }
 
