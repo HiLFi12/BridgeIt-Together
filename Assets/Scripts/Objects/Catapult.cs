@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using BridgeItTogether.Gameplay.Abstractions;
 
 public class Catapult : MonoBehaviour, IInteractable
@@ -28,11 +29,15 @@ public class Catapult : MonoBehaviour, IInteractable
     [Header("Interaction")]
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
 
+    [Header("UI")]
+    [SerializeField] private Image reloadImage;
+
     private readonly Dictionary<Transform, Coroutine> activeLaunches = new();
 
     [SerializeField] private bool isReady = true;
     private GameObject loadedObject;
     private Coroutine currentOperation;
+    private Coroutine reloadUIUpdateCoroutine;
 
     public InteractPriority InteractPriority => interactPriority;
 
@@ -67,6 +72,14 @@ public class Catapult : MonoBehaviour, IInteractable
 
     private IEnumerator LaunchSequence()
     {
+        // Calcular duración total de la secuencia para la barra de UI
+        float highRotationDuration = CalculateRotationDuration(lowAngle, highAngle, launchRotationSpeed);
+        float lowRotationDuration = CalculateRotationDuration(highAngle, lowAngle, reloadRotationSpeed);
+        float totalDuration = highRotationDuration + lowRotationDuration;
+        
+        // Iniciar la barra de recarga
+        StartReloadUI(totalDuration);
+
         yield return StartCoroutine(RotateToHighAngle());
 
         if (loadedObject && targetPoint)
@@ -131,6 +144,13 @@ public class Catapult : MonoBehaviour, IInteractable
         if (!launchPoint) launchPoint = transform;
         if (!rotatingArm) rotatingArm = transform;
         if (!launchSocket) launchSocket = rotatingArm;
+
+        // La barra de recarga permanece visible desde el inicio
+        if (reloadImage)
+        {
+            reloadImage.gameObject.SetActive(true);
+            reloadImage.fillAmount = 1f; // Comienza llena (catapulta lista)
+        }
     }
 
     private void OnValidate()
@@ -299,6 +319,71 @@ public class Catapult : MonoBehaviour, IInteractable
 
     public bool IsReady() => isReady;
     public bool HasLoadedObject() => loadedObject != null;
+
+    // Calcula la duración de una rotación dado el ángulo inicial, final y velocidad
+    private float CalculateRotationDuration(float startAngle, float targetAngle, float rotationSpeed)
+    {
+        // Normalizar ángulos al rango -180 a 180
+        if (startAngle > 180f) startAngle -= 360f;
+        if (targetAngle > 180f) targetAngle -= 360f;
+
+        // Calcular la diferencia y elegir el camino más corto
+        float diff = targetAngle - startAngle;
+        if (diff > 180f) diff -= 360f;
+        if (diff < -180f) diff += 360f;
+
+        return Mathf.Abs(diff) / Mathf.Max(0.1f, rotationSpeed);
+    }
+
+    // Inicia la UI de recarga con una duración total (segundos). Reemplaza cualquier UI en curso.
+    private void StartReloadUI(float totalDuration)
+    {
+        if (reloadImage == null || totalDuration <= 0f) return;
+
+        if (reloadUIUpdateCoroutine != null)
+        {
+            StopCoroutine(reloadUIUpdateCoroutine);
+            reloadUIUpdateCoroutine = null;
+        }
+
+        reloadUIUpdateCoroutine = StartCoroutine(UpdateReloadBar(totalDuration));
+    }
+
+    private IEnumerator UpdateReloadBar(float totalDuration)
+    {
+        if (reloadImage == null) yield break;
+
+        reloadImage.gameObject.SetActive(true);
+        reloadImage.fillAmount = 0f;
+
+        float elapsed = 0f;
+        while (elapsed < totalDuration)
+        {
+            elapsed += Time.deltaTime;
+            reloadImage.fillAmount = Mathf.Clamp01(elapsed / totalDuration);
+            yield return null;
+        }
+
+        reloadImage.fillAmount = 1f;
+        // La barra permanece visible y llena
+
+        reloadUIUpdateCoroutine = null;
+    }
+
+    private void StopAndHideReloadUI()
+    {
+        if (reloadUIUpdateCoroutine != null)
+        {
+            StopCoroutine(reloadUIUpdateCoroutine);
+            reloadUIUpdateCoroutine = null;
+        }
+
+        if (reloadImage)
+        {
+            reloadImage.fillAmount = 1f;
+            // La barra permanece visible
+        }
+    }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
