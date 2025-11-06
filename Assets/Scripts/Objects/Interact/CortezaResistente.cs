@@ -68,8 +68,8 @@ public class CortezaResistente : MonoBehaviour, IInteractable
             // Consumir el palo ignífugo
             playerObjectHolder.UseHeldObject();
             
-            // Generar resina (material tipo2)
-            GenerarResina();
+            // Generar resina (material tipo2) directamente en la mano del jugador
+            GenerarResina(playerObjectHolder);
             
             // Iniciar recarga
             StartCoroutine(Recargar());
@@ -86,20 +86,22 @@ public class CortezaResistente : MonoBehaviour, IInteractable
     }
     
     // Genera el material tipo2 (resina)
-    private void GenerarResina()
+    private void GenerarResina(PlayerObjectHolder holder)
     {
-        if (materialPrefabsSO == null) return;
+        if (materialPrefabsSO == null || holder == null) return;
+        if (holder.HasObjectInHand()) return; // por seguridad, debería estar libre tras consumir el palo
         
         // Obtener el prefab de la resina (material tipo2) para la era prehistórica
         GameObject resinaPrefab = materialPrefabsSO.GetMaterialPrefab(2, BridgeQuadrantSO.EraType.Prehistoric);
         
         if (resinaPrefab != null)
         {
-            // Calcular posición para la resina
-            Vector3 posicionResina = puntoSpawn.position + Vector3.down * 0.5f;
-            
-            // Instanciar la resina
-            GameObject resina = Instantiate(resinaPrefab, posicionResina, Quaternion.identity);
+            // Instanciar la resina cerca/de la mano del jugador (PickUp la re-posicionará en el ancla)
+            Vector3 spawnPos = holder.transform.position;
+            GameObject resina = Instantiate(resinaPrefab, spawnPos, Quaternion.identity);
+
+            // Entregar al holder del jugador
+            holder.PickUpExistingInstance(resina);
             
             // Reproducir SFX de spawn de resina (AudioManager)
             PlayResinSpawnSfx();
