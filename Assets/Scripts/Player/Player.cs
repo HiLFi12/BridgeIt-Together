@@ -14,8 +14,7 @@ public class Player : MonoBehaviour, IHitable
     [SerializeField] private LayerMask interactionLayer;
 
     [SerializeField] private KeyCode interactKey = KeyCode.E;
-    [SerializeField] private KeyCode dropKey = KeyCode.Q;
-    [SerializeField] private KeyCode buildKey = KeyCode.F;
+    // Nota: con el esquema unificado, Drop/Build no tienen teclas dedicadas; todo va con Interact
     
     [Header("Dash Settings")]
     [SerializeField] private KeyCode dashKey = KeyCode.LeftShift;
@@ -53,9 +52,9 @@ public class Player : MonoBehaviour, IHitable
     private PlayerController playerController;
     private PlayerInput playerInput;
     private InputAction interactAction;
-    private InputAction buildAction;
+    
     private InputAction dashAction;
-    private InputAction dropAction;
+    
     private InputAction pauseAction;
 
     // Dash state
@@ -91,9 +90,7 @@ public class Player : MonoBehaviour, IHitable
         if (playerInput != null)
         {
             interactAction = playerInput.actions.FindAction("Interact");
-            buildAction = playerInput.actions.FindAction("Build");
             dashAction = playerInput.actions.FindAction("Dash");
-            dropAction = playerInput.actions.FindAction("Drop");
             pauseAction = playerInput.actions.FindAction("Pause");
         }
         
@@ -161,26 +158,12 @@ public class Player : MonoBehaviour, IHitable
 
         TryInteract();
 
-        if (dropAction.triggered || Input.GetKeyDown(dropKey))
-        {
-            TryDropObject();
-        }
-
         if (pauseAction.triggered)
         {
             gameConditionManager.PauseGame();
         }
 
-        if ((buildAction.triggered || Input.GetKeyDown(buildKey)) && bridgeInteraction != null)
-        {
-            bridgeInteraction.TryInteractWithQuadrant();
-            
-            // Activar animación de construcción
-            if (playerAnimator != null)
-            {
-                playerAnimator.TriggerBuildAnimation();
-            }
-        }
+        // Nota: Build/Drop ahora se manejan dentro de TryInteract() como fallback del botón Interact
 
         // Mostrar/ocultar BuildUI según condiciones
         UpdateBuildUI();
@@ -393,6 +376,36 @@ public class Player : MonoBehaviour, IHitable
         else
         {
             HideInteractionUI();
+
+            // Fallback unificado al presionar el botón de Interact: intentar construir, si no, dropear
+            if (interactAction.triggered || Input.GetKeyDown(interactKey))
+            {
+                bool intentoHecho = false;
+
+                // 1) Intentar construir si hay cuadrante objetivo válido y tenemos material en mano
+                if (!intentoHecho && bridgeInteraction != null && objectHolder != null)
+                {
+                    bool hasObject = objectHolder.HasObjectInHand();
+                    bool targetInRange = bridgeInteraction.HasTargetQuadrantInRange();
+                    if (hasObject && targetInRange)
+                    {
+                        bridgeInteraction.TryInteractWithQuadrant();
+                        if (playerAnimator != null)
+                        {
+                            playerAnimator.TriggerBuildAnimation();
+                        }
+                        intentoHecho = true;
+                    }
+                }
+
+                // 2) Si no construyó y hay un objeto en mano, dropear
+                if (!intentoHecho && objectHolder != null && objectHolder.HasObjectInHand())
+                {
+                    TryDropObject();
+                    intentoHecho = true;
+                }
+                // 3) Si no hay nada en mano y no hubo interactables, no hacemos nada extra
+            }
         }
 
         // Remover de ignorados aquellos que salieron del rango
