@@ -367,10 +367,19 @@ public class Player : MonoBehaviour, IHitable
             if (interactAction.triggered || Input.GetKeyDown(interactKey))
             {
                 var seleccionado = candidatos[UnityEngine.Random.Range(0, candidatos.Count)];
-                seleccionado.Interact(this.gameObject);
+                // Si ya tengo un objeto en mano y el seleccionado es un pickup/generador, NO hacer nada
+                if (holder != null && holder.HasObjectInHand() && IsPickupLike(seleccionado))
+                {
+                    // Bloquea la acción para evitar spam de generación y dropeos implícitos
+                    Debug.Log("[Player] Interacción bloqueada: ya sostienes un objeto y el objetivo es un pickup/generador.");
+                }
+                else
+                {
+                    seleccionado.Interact(this.gameObject);
 
-                ignoredInteractables.Add(seleccionado);
-                OnPlayerInteracted?.Invoke();
+                    ignoredInteractables.Add(seleccionado);
+                    OnPlayerInteracted?.Invoke();
+                }
             }
         }
         else
@@ -416,6 +425,27 @@ public class Player : MonoBehaviour, IHitable
                 ignoredInteractables.Remove(ignored);
             }
         }
+    }
+
+    // Determina si la interacción corresponde a un pickup/generador de materiales (bloqueable si ya hay objeto en mano)
+    private bool IsPickupLike(IInteractable interactable)
+    {
+        if (interactable == null) return false;
+        var comp = interactable as Component;
+        if (comp == null) return false;
+        // Detectar explícitamente material pickups conocidos
+        if (comp.GetComponentInParent<BridgeMaterialPickup>() != null) return true;
+        // Heurística por nombre de tipo para otros generadores/spawners
+        var behaviours = comp.GetComponentsInParent<MonoBehaviour>(true);
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            var tname = behaviours[i].GetType().Name;
+            if (string.IsNullOrEmpty(tname)) continue;
+            string lname = tname.ToLowerInvariant();
+            if (lname.Contains("pickup") || lname.Contains("generator") || lname.Contains("spawner") || lname.Contains("spawn"))
+                return true;
+        }
+        return false;
     }
 
     private void ShowInteractionUI()
