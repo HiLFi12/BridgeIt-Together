@@ -12,15 +12,6 @@
             </PendingDiffInfo>
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/Assets/Scripts/Objects/Materials/MaterialTipo3.cs">
-          <value>
-            <PendingDiffInfo>
-              <option name="filePath" value="$PROJECT_DIR$/Assets/Scripts/Objects/Materials/MaterialTipo3.cs" />
-              <option name="originalContent" value="using System.Collections;&#10;using System.Collections.Generic;&#10;using UnityEngine;&#10;using BridgeItTogether.Gameplay.Abstractions;&#10;&#10;public class MaterialTipo3 : MonoBehaviour, IHitable&#10;{&#10;    [Header(&quot;Configuración del material&quot;)]&#10;    [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;&#10;    &#10;    private void Start()&#10;    {&#10;        EnsureBridgeMaterialInfo();&#10;&#10;    }&#10;    &#10;    private void EnsureBridgeMaterialInfo()&#10;    {&#10;        BridgeMaterialInfo materialInfo = GetComponent&lt;BridgeMaterialInfo&gt;();&#10;        if (materialInfo == null)&#10;        {&#10;            materialInfo = gameObject.AddComponent&lt;BridgeMaterialInfo&gt;();&#10;        }&#10;        &#10;        materialInfo.layerIndex = 2;&#10;        materialInfo.era = era;&#10;        materialInfo.materialType = BridgeQuadrantSO.MaterialType.Metal; // MaterialTipo3 es metal&#10;        &#10;        gameObject.tag = &quot;BridgeLayer2&quot;;&#10;    }&#10;&#10;    public void OnLaunched(Vector3 targetPosition)&#10;    {&#10;    }&#10;} " />
-              <option name="updatedContent" value="using System.Collections;&#10;using System.Collections.Generic;&#10;using UnityEngine;&#10;using BridgeItTogether.Gameplay.Abstractions;&#10;&#10;public class MaterialTipo3 : MonoBehaviour, IHitable, IUIActivatable&#10;{&#10;    [Header(&quot;Configuración del material&quot;)]&#10;    [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;&#10;    &#10;    [Header(&quot;UI Configuration&quot;)]&#10;    [SerializeField] private int uiIndex = 0;&#10;    &#10;    public int UIIndex =&gt; uiIndex;&#10;    &#10;    private void Start()&#10;    {&#10;        EnsureBridgeMaterialInfo();&#10;&#10;    }&#10;    &#10;    private void EnsureBridgeMaterialInfo()&#10;    {&#10;        BridgeMaterialInfo materialInfo = GetComponent&lt;BridgeMaterialInfo&gt;();&#10;        if (materialInfo == null)&#10;        {&#10;            materialInfo = gameObject.AddComponent&lt;BridgeMaterialInfo&gt;();&#10;        }&#10;        &#10;        materialInfo.layerIndex = 2;&#10;        materialInfo.era = era;&#10;        materialInfo.materialType = BridgeQuadrantSO.MaterialType.Metal; // MaterialTipo3 es metal&#10;        &#10;        gameObject.tag = &quot;BridgeLayer2&quot;;&#10;    }&#10;&#10;    public void SetUIIndex(int index)&#10;    {&#10;        uiIndex = index;&#10;    }&#10;&#10;    public void OnLaunched(Vector3 targetPosition)&#10;    {&#10;    }&#10;} " />
-            </PendingDiffInfo>
-          </value>
-        </entry>
       </map>
     </option>
   </component>
