@@ -132,8 +132,6 @@ public class SoldierCaravanProbabilitySkill : BaseProbabilitySkill
             {
                 if (debugLogs) Debug.Log($"[SoldierCaravanProbabilitySkill] Destruyendo caravan '{caravanObject.name}' (delay={destroyCaravanDelay}).", caravanObject);
                 if (destroyCaravanDelay <= 0f) Destroy(caravanObject); else Destroy(caravanObject, destroyCaravanDelay);
-                GameConditionManager gameManager = FindFirstObjectByType<GameConditionManager>();
-                gameManager.OnVehiculoPasaPuente(gameObject);
             }
             else if (destroySelfIfNoCaravan)
             {

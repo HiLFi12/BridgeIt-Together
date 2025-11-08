@@ -7,7 +7,11 @@ public class ChestProjectile : MonoBehaviour
     [SerializeField] private GameObject shaderPrefab;
     [SerializeField] private float detectionRadius = 1.5f;
     [SerializeField] private LayerMask bridgeLayer;
-    [SerializeField] private float medievalDamageAmount = 10f;
+    [Header("Damage")]
+    [Tooltip("Daño genérico aplicado al cuadrante, igual que SimpleVehicleDamage (ApplyGenericDamage).")]
+    [SerializeField] private float damageAmount = 1f;
+    [Tooltip("Si > 0, sobreescribe damageAmount SOLO para era Medieval.")]
+    [SerializeField] private float medievalDamageAmount = 0f;
 
     private readonly Collider[] overlap = new Collider[16];
     private readonly HashSet<string> damagedQuadrants = new();
@@ -29,19 +33,35 @@ public class ChestProjectile : MonoBehaviour
             if (!string.IsNullOrEmpty(bridgeQuadrantTag) && !col.CompareTag(bridgeQuadrantTag))
                 continue;
 
-            // Buscar BridgeQuadrantInstance (solo para medieval)
+            // Buscar BridgeQuadrantInstance (daño unificado como SimpleVehicleDamage)
             BridgeQuadrantInstance quadrantInstance = col.GetComponent<BridgeQuadrantInstance>();
             if (quadrantInstance != null && quadrantInstance.quadrantSO != null)
             {
-                string key = $"{quadrantInstance.GetInstanceID()}";
+                // Intentar usar BridgeQuadrantInfo para una clave consistente (grid+x+z) y refrescar visuales
+                var info = quadrantInstance.GetComponent<BridgeQuadrantInfo>() ?? quadrantInstance.GetComponentInParent<BridgeQuadrantInfo>();
+                string key;
+                if (info != null && info.grid != null)
+                {
+                    key = $"{info.grid.GetInstanceID()}_{info.x}_{info.z}";
+                }
+                else
+                {
+                    key = $"{quadrantInstance.GetInstanceID()}";
+                }
                 
                 if (!damagedQuadrants.Contains(key))
                 {
-                    // SOLO afecta a cuadrantes medievales
-                    if (quadrantInstance.quadrantSO.era == BridgeQuadrantSO.EraType.Medieval)
+                    // Seleccionar cantidad de daño (igual que SimpleVehicleDamage → ApplyGenericDamage)
+                    float amt = damageAmount;
+                    if (quadrantInstance.quadrantSO.era == BridgeQuadrantSO.EraType.Medieval && medievalDamageAmount > 0f)
+                        amt = medievalDamageAmount;
+
+                    quadrantInstance.quadrantSO.ApplyGenericDamage(amt);
+
+                    // Si tenemos info de grid, forzar refresco visual
+                    if (info != null && info.grid != null)
                     {
-                        // Daño directo a batteryLife para medieval
-                        quadrantInstance.quadrantSO.batteryLife -= medievalDamageAmount;
+                        info.grid.RefreshQuadrantVisuals(info.x, info.z);
                     }
                     
                     damagedQuadrants.Add(key);
@@ -92,9 +112,12 @@ public class ChestProjectile : MonoBehaviour
             ? col.bounds.center
             : collider.transform.position;
 
-        Vector3 localPos = grid.transform.InverseTransformPoint(worldPoint);
-        x = Mathf.FloorToInt(localPos.x / grid.quadrantSize);
-        z = Mathf.FloorToInt(localPos.z / grid.quadrantSize);
+    Vector3 localPos = grid.transform.InverseTransformPoint(worldPoint);
+    // Usar pasos por eje si están configurados en el grid (consistente con PlayerBridgeInteraction/SimpleVehicleDamage)
+    float stepX = grid.QuadrantStepX;
+    float stepZ = grid.QuadrantStepZ;
+    x = Mathf.FloorToInt(localPos.x / Mathf.Max(0.0001f, stepX));
+    z = Mathf.FloorToInt(localPos.z / Mathf.Max(0.0001f, stepZ));
 
         return true;
     }
