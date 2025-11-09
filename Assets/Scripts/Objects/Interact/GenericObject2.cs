@@ -50,7 +50,6 @@ public class GenericObject2 : MonoBehaviour, IInteractable, IHoldInteractable
             StartCoroutine(ProcesarMaterial());
         }
     }
-    
 
     public void Interact(GameObject interactor)
     {

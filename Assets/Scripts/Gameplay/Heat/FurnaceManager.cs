@@ -57,6 +57,11 @@ public class FurnaceManager : MonoBehaviour, IInteractable
                 break;
         }
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 
     private int DeterminarTipoItem(GameObject objeto)
     {

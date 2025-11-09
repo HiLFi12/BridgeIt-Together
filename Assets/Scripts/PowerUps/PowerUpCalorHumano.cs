@@ -213,4 +213,9 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
             hs.ResetCooldown(); // renueva el tiempo interno
         }
     }
+
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 }

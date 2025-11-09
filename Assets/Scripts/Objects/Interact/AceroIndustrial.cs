@@ -31,6 +31,11 @@ public class AceroIndustrial : MonoBehaviour, IInteractable
             puntoSpawn = transform;
         }
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 
     public void Interact(GameObject interactor)
     {

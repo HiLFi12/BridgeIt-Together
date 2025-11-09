@@ -42,6 +42,11 @@ public class CortezaResistente : MonoBehaviour, IInteractable
         }
     }
     
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
+    
     // Método llamado cuando un jugador interactúa con este objeto
     public void Interact(GameObject interactor)
     {

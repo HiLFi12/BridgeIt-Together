@@ -168,6 +168,11 @@ public class BridgeMaterialPickup : MonoBehaviour, IInteractable
         yield return new WaitForSeconds(respawnTime);
         EnablePickup();
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 
     // Para ayudar a visualizar en el editor
     private void OnDrawGizmos()

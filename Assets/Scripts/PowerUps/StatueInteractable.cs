@@ -123,4 +123,9 @@ public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
         }
         Die();
     }
+
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 } 

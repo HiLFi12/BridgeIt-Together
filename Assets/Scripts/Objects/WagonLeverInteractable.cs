@@ -39,4 +39,9 @@ public class WagonLeverInteractable : MonoBehaviour, IInteractable
             Debug.Log("WagonLever: viaje iniciado.");
         }
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 }

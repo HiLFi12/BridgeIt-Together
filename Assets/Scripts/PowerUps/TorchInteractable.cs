@@ -77,4 +77,9 @@ public class TorchInteractable : MonoBehaviour, IInteractable
         // Aquí se pueden añadir efectos visuales y sonoros adicionales
         // TODO: Añadir feedback audiovisual
     }
+
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 } 

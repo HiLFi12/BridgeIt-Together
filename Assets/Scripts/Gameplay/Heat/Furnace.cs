@@ -75,6 +75,11 @@ public class Furnace : MonoBehaviour, IInteractable
         TryAddCoal(interactor);
     }
     
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
+    
     public bool TryAddCoal(GameObject interactor)
     {
         if (reloadTimer > 0f) return false;

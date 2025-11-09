@@ -31,4 +31,9 @@ public class PlasterBucketSpawner : MonoBehaviour, IInteractable
         holder.PickUpExistingInstance(nuevoMaterial);
         Debug.Log("Material tipo 2 instanciado y entregado al jugador.");
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 }

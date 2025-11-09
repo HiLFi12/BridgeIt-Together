@@ -69,7 +69,12 @@ public class Catapult : MonoBehaviour, IInteractable
         // Notificar que la catapulta fue usada (para tutoriales)
         OnCatapultUsed?.Invoke(this);
     }
-
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
+    
     private IEnumerator LaunchSequence()
     {
         // Calcular duración total de la secuencia para la barra de UI

@@ -55,6 +55,11 @@ public class Ballista : MonoBehaviour, IInteractable
     {
         StartReload();
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 
     public void Interact(GameObject interactor)
     {

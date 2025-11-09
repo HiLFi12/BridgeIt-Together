@@ -30,4 +30,9 @@ public class Campfire : MonoBehaviour, IInteractable
             }
         }
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 }

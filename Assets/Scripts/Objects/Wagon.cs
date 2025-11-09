@@ -43,7 +43,6 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
     private GameObject heldObject; // único objeto
     private Rigidbody heldRigidbody;
 
-
     private Coroutine travelRoutine;
 
     private void Awake()
@@ -77,6 +76,11 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
                 atPointA = false;
             }
         }
+    }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
     }
 
     public void Interact(GameObject interactor)

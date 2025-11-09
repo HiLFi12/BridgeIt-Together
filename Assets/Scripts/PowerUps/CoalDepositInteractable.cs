@@ -11,4 +11,9 @@ public class CoalDepositInteractable : MonoBehaviour, IInteractable
         powerUp.InsertarCarbon();
         // Feedback visual/sonoro de inserción
     }
+
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 } 

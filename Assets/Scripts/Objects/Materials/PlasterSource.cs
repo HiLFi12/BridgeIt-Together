@@ -22,5 +22,10 @@
                 Debug.Log("MaterialTipo2Ready activado por PlasterSource");
             }
         }
+        
+        public void TurnOnShadow()
+        {
+            // TODO: Implementar visualización de sombra/highlight
+        }
     }
 }

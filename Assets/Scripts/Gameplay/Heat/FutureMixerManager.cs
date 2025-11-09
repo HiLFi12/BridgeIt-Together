@@ -70,6 +70,11 @@ public class FutureMixerManager : MonoBehaviour, IInteractable
     {
         ActualizarVisual();
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 
     private void ActualizarVisual()
     {

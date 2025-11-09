@@ -19,6 +19,11 @@ public class Item : MonoBehaviour, IInteractable, IGrababble
             player = playerComponent.transform;
         }
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 
     public void Interact(GameObject interactor)
     {

@@ -71,6 +71,7 @@ public class Player : MonoBehaviour, IHitable
     public event PlayerInteractedHandler OnPlayerInteracted;
 
     private HashSet<IInteractable> ignoredInteractables = new HashSet<IInteractable>();
+    private HashSet<IInteractable> activeShadows = new HashSet<IInteractable>(); // Rastrea qué sombras están activas
 
     [Header("Debug Bridge Hotkey")]
     [SerializeField] private bool enableFillBridgeHotkey = false;
@@ -304,6 +305,13 @@ public class Player : MonoBehaviour, IHitable
         {
             HideInteractionUI();
             ignoredInteractables.Clear();
+            
+            // Desactivar todas las sombras activas
+            foreach (var shadowActive in new List<IInteractable>(activeShadows))
+            {
+                ActivarSombra(shadowActive, false);
+            }
+            
             return;
         }
 
@@ -363,7 +371,13 @@ public class Player : MonoBehaviour, IHitable
         if (candidatos.Count > 0)
         {
             ShowInteractionUI();
-
+            
+            // Activar sombra de los interactables candidatos
+            foreach (var candidato in candidatos)
+            {
+                ActivarSombra(candidato, true);
+            }
+            
             if (interactAction.triggered || Input.GetKeyDown(interactKey))
             {
                 var seleccionado = candidatos[UnityEngine.Random.Range(0, candidatos.Count)];
@@ -423,6 +437,51 @@ public class Player : MonoBehaviour, IHitable
             if (!currentInRange.Contains(ignored))
             {
                 ignoredInteractables.Remove(ignored);
+            }
+        }
+        
+        // Desactivar sombras de interactables que ya no están en la lista de candidatos
+        foreach (var shadowActive in new List<IInteractable>(activeShadows))
+        {
+            if (!candidatos.Contains(shadowActive))
+            {
+                ActivarSombra(shadowActive, false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Busca y activa/desactiva automáticamente el GameObject 'shadow' en un interactable
+    /// </summary>
+    private void ActivarSombra(IInteractable interactable, bool activar)
+    {
+        if (interactable == null) return;
+        
+        var comp = interactable as Component;
+        if (comp == null) return;
+        
+        // Buscar el campo 'shadow' en el componente
+        var tipo = comp.GetType();
+        var campoShadow = tipo.GetField("shadow", System.Reflection.BindingFlags.Instance | 
+                                                    System.Reflection.BindingFlags.NonPublic | 
+                                                    System.Reflection.BindingFlags.Public);
+        
+        if (campoShadow != null && campoShadow.FieldType == typeof(GameObject))
+        {
+            var shadowObj = campoShadow.GetValue(comp) as GameObject;
+            if (shadowObj != null)
+            {
+                shadowObj.SetActive(activar);
+                
+                // Rastrea el estado de las sombras activas
+                if (activar)
+                {
+                    activeShadows.Add(interactable);
+                }
+                else
+                {
+                    activeShadows.Remove(interactable);
+                }
             }
         }
     }

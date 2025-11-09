@@ -13,6 +13,7 @@ public class GenericObject3 : MonoBehaviour, IInteractable, IHoldInteractable
     [SerializeField] private MaterialPrefabSO materialPrefabsSO; // Referencia al SO con los prefabs
     [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
+    [SerializeField] private GameObject shadow;
     
     [Header("Configuración de generación")]
     [SerializeField] private float tiempoPresionado = 1.0f; // Tiempo que hay que mantener presionado
@@ -34,6 +35,8 @@ public class GenericObject3 : MonoBehaviour, IInteractable, IHoldInteractable
         {
             Debug.LogError("No se ha asignado el MaterialPrefabSO en " + gameObject.name);
         }
+
+        shadow.SetActive(false);
     }
     
     private void Update()

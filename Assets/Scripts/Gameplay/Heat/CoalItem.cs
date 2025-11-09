@@ -52,6 +52,11 @@ public class CoalItem : MonoBehaviour, IInteractable, IHitable
 			if (debugLogs) Debug.Log("[CoalItem] No se pudo agregar carbón al Furnace (quizá está lleno o el objeto no era válido).", this);
 		}
 	}
+	
+	public void TurnOnShadow()
+	{
+		// TODO: Implementar visualización de sombra/highlight
+	}
 
 	private Furnace FindNearestFurnace()
 	{

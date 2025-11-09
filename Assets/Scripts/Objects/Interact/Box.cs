@@ -25,4 +25,9 @@ public class Box : MonoBehaviour, IInteractable
             Debug.Log("El interactor no tiene el componente PlayerObjectHolder.");
         }
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 }

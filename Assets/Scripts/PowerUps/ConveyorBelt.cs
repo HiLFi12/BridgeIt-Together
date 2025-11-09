@@ -58,5 +58,10 @@ namespace PowerUps
                 }
             }
         }
+
+        public void TurnOnShadow()
+        {
+            // TODO: Implementar visualización de sombra/highlight
+        }
     }
 }

@@ -137,4 +137,9 @@ public class BatterySystem : MonoBehaviour, IInteractable
         }
         return false;
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 }

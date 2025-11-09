@@ -16,4 +16,9 @@ public class BallistaInteractable : MonoBehaviour, IInteractable
             // Feedback visual/sonoro de disparo
         }
     }
+    
+    public void TurnOnShadow()
+    {
+        // TODO: Implementar visualización de sombra/highlight
+    }
 } 
