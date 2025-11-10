@@ -5017,20 +5017,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1fd4ef5223b7b1479cbcbd141b043b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridWidth: 6
-  gridLength: 4
+  gridWidth: 3
+  gridLength: 2
   quadrantSize: 1.8
+  "usarTama\xF1oPorEje": 1
+  quadrantSizeX: 3.6
+  quadrantSizeY: 1
+  quadrantSizeZ: 3.5
   defaultQuadrantSO: {fileID: 11400000, guid: b338c7d0318145546978c7258e063255, type: 2}
   quadrantPrefab: {fileID: 1437374063}
-  quadrantParent: {fileID: 1196880118}
+  quadrantParent: {fileID: 1822100795}
   layerHeights:
   - -2.5
   - -0.15
   - 0.4
   layerScales:
-  - {x: 0.018, y: 0.04, z: 0.04}
-  - {x: 50, y: 50, z: 50}
-  - {x: 1.5, y: 0.2, z: 1.5}
+  - {x: 0.018, y: 0.07, z: 0.07}
+  - {x: 130, y: 50, z: 130}
+  - {x: 3, y: 0.2, z: 3}
   layerScaleMode: 1
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
@@ -5040,7 +5044,6 @@ MonoBehaviour:
   lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
-  showDebugTools: 0
 --- !u!4 &985317587
 Transform:
   m_ObjectHideFlags: 0
@@ -5055,6 +5058,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1196880118}
+  - {fileID: 1822100795}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1007271695
@@ -9217,6 +9221,7 @@ MonoBehaviour:
   materialPrefabsSO: {fileID: 11400000, guid: 7567e59779a33e64da8bee3decc6056b, type: 2}
   era: 2
   interactPriority: 4
+  shadow: {fileID: 0}
   tiempoPresionado: 1
   tiempoRecarga: 2
 --- !u!4 &1664110244 stripped
@@ -10301,6 +10306,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 955028463}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1822100794
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1822100795}
+  m_Layer: 0
+  m_Name: QuadrantContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1822100795
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1822100794}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 985317587}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1822799326
 GameObject:
