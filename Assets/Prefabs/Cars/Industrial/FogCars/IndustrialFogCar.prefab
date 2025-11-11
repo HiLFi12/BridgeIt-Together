@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7470908911745804188}
   - component: {fileID: 7269658524915195505}
   - component: {fileID: 8551482216539278869}
-  - component: {fileID: 8158330371517495356}
   - component: {fileID: 1763032722423227207}
   - component: {fileID: -9196359997409664779}
   m_Layer: 13
@@ -91,23 +90,6 @@ CapsuleCollider:
   m_Height: 4.4192576
   m_Direction: 2
   m_Center: {x: -0.08002269, y: -0.51624084, z: 0.020881414}
---- !u!114 &8158330371517495356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2948579226618137670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b12ab0ba3d6466f4383281d7105b242c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bridgeQuadrantTag: BridgeQuadrant
-  vehicleTag: Vehicle
-  debugMode: 1
-  collisionCooldown: 1
-  bridgeGrid: {fileID: 0}
 --- !u!114 &1763032722423227207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,12 +183,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 1177990612582641589}
   detectionRadius: 1.5
+  bridgeQuadrantTag: BridgeQuadrant
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 320
-  bridgeQuadrantTag: BridgeQuadrant
   vehicleTag: Vehicle
-  debugMode: 1
+  damageAmount: 0
 --- !u!1 &5412072648001714427
 GameObject:
   m_ObjectHideFlags: 0
