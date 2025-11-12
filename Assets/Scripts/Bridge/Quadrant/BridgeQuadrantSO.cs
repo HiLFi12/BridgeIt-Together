@@ -296,6 +296,8 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         {
             Debug.Log("Reconstruyendo cuadrante después de destrucción. Reseteando estado.");
             lastLayerState = LastLayerState.Complete;
+            // Importante para Industrial/Futuristic: restaurar depósitos (temperatura/batería) y vida unificada
+            ResetEraSpecificState();
         }
 
         requiredLayers[layerIndex].isCompleted = true;
@@ -378,6 +380,19 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         }
     }
 
+    // Helper interno para saber si TODAS las capas (0..n-1) están construidas.
+    // Necesario para gating de sistemas de vida (Industrial) y otros efectos tras refactors.
+    private bool AllLayersBuilt()
+    {
+        if (requiredLayers == null || requiredLayers.Length == 0) return false;
+        for (int i = 0; i < requiredLayers.Length; i++)
+        {
+            var layer = requiredLayers[i];
+            if (layer == null || !layer.isCompleted) return false;
+        }
+        return true;
+    }
+
     public void UpdateQuadrantState(float deltaTime)
     {
         if (!hasCollision) return;
@@ -387,6 +402,12 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
             case EraType.Industrial:
                 if (lastLayerState != LastLayerState.Destroyed)
                 {
+                    // El sistema de vida industrial (temperatura) solo aplica cuando TODAS las capas están construidas
+                    if (!AllLayersBuilt())
+                    {
+                        break; // no decaer ni evaluar estados hasta tener la capa 2 completa
+                    }
+
                     if (!isTurned)
                     {
                         currentTemperature -= temperatureDecayRate * deltaTime;
