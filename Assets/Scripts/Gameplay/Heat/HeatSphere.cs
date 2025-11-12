@@ -5,6 +5,7 @@ public class HeatSphere : MonoBehaviour
 {
     [Header("Detection")]
     [SerializeField] private float detectionRadius = 3f;
+    [SerializeField] private float visualRadius = 0.2f;
     [SerializeField] private LayerMask detectionLayer = -1;
 
     [Header("Visual")]
@@ -30,7 +31,7 @@ public class HeatSphere : MonoBehaviour
         visualSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         visualSphere.transform.SetParent(transform);
         visualSphere.transform.localPosition = Vector3.zero;
-        visualSphere.transform.localScale = Vector3.one * (detectionRadius * 2f);
+        visualSphere.transform.localScale = Vector3.one * (visualRadius);
 
         var collider = visualSphere.GetComponent<Collider>();
         if (collider != null)

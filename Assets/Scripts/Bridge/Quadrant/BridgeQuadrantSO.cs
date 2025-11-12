@@ -462,6 +462,12 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         if (era == EraType.Industrial && lastLayerState != LastLayerState.Destroyed)
         {
             heatActive = true;
+            // Si la temperatura llegó a 0 previamente, al volver a aplicar calor
+            // restauramos a máximo para evitar destrucción inmediata al reconstruir
+            if (currentTemperature <= 0f)
+            {
+                currentTemperature = maxTemperature;
+            }
             RecalculateTurned();
         }
     }
