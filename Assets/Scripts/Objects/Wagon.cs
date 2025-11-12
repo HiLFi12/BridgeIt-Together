@@ -21,7 +21,7 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private KeyCode interactionKey = KeyCode.E; // por si se necesita referencia (no se usa directamente aquí)
     // El vagón ya no inicia viaje por interacción directa; se usa una palanca externa.
-
+    [SerializeField] private GameObject shadow;
 
     [Header("Holder del Vagón")]
     [SerializeField] private Transform holderAnchor;
@@ -56,6 +56,8 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
 
     private void Start()
     {
+        shadow.SetActive(false);
+        
         // Inicializar posición
         if (pointA != null && pointB != null)
         {

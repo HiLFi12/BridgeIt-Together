@@ -15,6 +15,7 @@ public class AceroIndustrial : MonoBehaviour, IInteractable
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private float tiempoRecarga = 2.0f; // Cooldown entre entregas
     [SerializeField] private Transform puntoSpawn; // Dónde aparece el material si no hay holder
+    [SerializeField] private GameObject shadow;
 
     private bool enRecarga = false;
 
@@ -22,6 +23,8 @@ public class AceroIndustrial : MonoBehaviour, IInteractable
 
     private void Start()
     {
+        shadow.SetActive(false);
+        
         if (materialPrefabsSO == null)
         {
             Debug.LogError("No se ha asignado MaterialPrefabSO en " + gameObject.name);

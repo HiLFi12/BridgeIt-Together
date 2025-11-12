@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections;
 
@@ -25,6 +26,7 @@ public class Furnace : MonoBehaviour, IInteractable
     [Header("Interacción Simple")]
     [Tooltip("Si está activo, al entrar un jugador con carbón en el trigger del horno, se consume automáticamente el carbón.")]
     [SerializeField] private bool autoAcceptCoalOnTrigger = false;
+    [SerializeField] private GameObject shadow;
 
     public InteractPriority InteractPriority => interactPriority;
 
@@ -37,6 +39,11 @@ public class Furnace : MonoBehaviour, IInteractable
             // No lo cambiamos automáticamente para no sorprender en el editor.
             // Debug.LogWarning("[Furnace] El collider está en modo Trigger pero 'autoAcceptCoalOnTrigger' está desactivado. Para horno sólido, desactiva IsTrigger.", this);
         }
+    }
+
+    private void Start()
+    {
+        shadow.SetActive(false);
     }
 
     public void Interact(GameObject interactor)

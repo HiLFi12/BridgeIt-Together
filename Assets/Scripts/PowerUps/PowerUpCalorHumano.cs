@@ -20,6 +20,7 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
     [SerializeField] private bool soloHeatDeJugadores = true;
     [Tooltip("Opcional: si no se encuentra componente Player se puede usar un tag para validar el HeatSphere.")]
     [SerializeField] private string playerRootTag = "Player";
+    [SerializeField] private GameObject shadow;
 
     [Header("Debug")]
     public bool debugLogs = false;
@@ -93,6 +94,11 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
             internalTurnOnRequest = true;
             TurnOn();
         }
+    }
+    
+    private void Start()
+    {
+        shadow.SetActive(false);
     }
 
     private void Update() { /* activación ahora sucede en TryAddCoal / InsertarCarbon */ }

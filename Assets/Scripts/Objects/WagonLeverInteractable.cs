@@ -11,12 +11,17 @@ public class WagonLeverInteractable : MonoBehaviour, IInteractable
     [SerializeField] private Wagon targetWagon;
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private bool requirePlayerHasNoObject = false;
+    [SerializeField] private GameObject shadow;
 
     public InteractPriority InteractPriority => interactPriority;
+    
+    private void Start()
+    {
+        shadow.SetActive(false);
+    }
 
     public void Interact(GameObject interactor)
     {
-        // Notificar que el jugador interactuó con la palanca (para tutoriales)
         OnLeverInteracted?.Invoke(this, interactor);
         
         if (targetWagon == null)
