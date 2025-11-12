@@ -19,9 +19,9 @@ public class Furnace : MonoBehaviour, IInteractable
     private int currentCoal = 0;
 
     [Header("UI")]
-    [SerializeField] private GameObject coalImage;
-    [SerializeField] private TextMeshProUGUI coalText;
-    [SerializeField] private Image heatImage;
+    [SerializeField] private GameObject[] coalImages;
+    [SerializeField] private TextMeshProUGUI[] coalTexts;
+    [SerializeField] private Image[] heatImages;
 
     [Header("Heat")]
     [SerializeField] private HeatSphere heatSphere;
@@ -224,32 +224,52 @@ public class Furnace : MonoBehaviour, IInteractable
 
     private void UpdateUI()
     {
-        // Actualizar texto del carbón
-        if (coalText != null)
+        // Actualizar textos del carbón
+        if (coalTexts != null)
         {
-            coalText.text = $"{currentCoal}/{maxCoal}";
+            foreach (var coalText in coalTexts)
+            {
+                if (coalText != null)
+                {
+                    coalText.text = $"{currentCoal}/{maxCoal}";
+                }
+            }
         }
 
         bool heatSphereActive = heatSphere != null && heatSphere.gameObject.activeSelf;
 
-        // Actualizar visibilidad de la imagen del carbón
-        // La imagen se muestra solo cuando la HeatSphere está desactivada
-        if (coalImage != null)
+        // Actualizar visibilidad de las imágenes del carbón
+        // Las imágenes se muestran solo cuando la HeatSphere está desactivada
+        if (coalImages != null)
         {
-            coalImage.gameObject.SetActive(!heatSphereActive);
+            foreach (var coalImage in coalImages)
+            {
+                if (coalImage != null)
+                {
+                    coalImage.gameObject.SetActive(!heatSphereActive);
+                }
+            }
         }
 
-        // Actualizar visibilidad y fillAmount de la imagen de calor
-        // La imagen se muestra solo cuando la HeatSphere está activada
-        if (heatImage != null)
+        // Actualizar visibilidad y fillAmount de las imágenes de calor
+        // Las imágenes se muestran solo cuando la HeatSphere está activada
+        if (heatImages != null)
         {
-            heatImage.gameObject.SetActive(heatSphereActive);
+            float cooldownProgress = heatSphereActive ? heatSphere.GetCooldownProgress() : 0f;
             
-            if (heatSphereActive)
+            foreach (var heatImage in heatImages)
             {
-                // Actualizar el fillAmount basado en el cooldown
-                // GetCooldownProgress retorna 1 cuando recién inicia y 0 cuando termina
-                heatImage.fillAmount = heatSphere.GetCooldownProgress();
+                if (heatImage != null)
+                {
+                    heatImage.gameObject.SetActive(heatSphereActive);
+                    
+                    if (heatSphereActive)
+                    {
+                        // Actualizar el fillAmount basado en el cooldown
+                        // GetCooldownProgress retorna 1 cuando recién inicia y 0 cuando termina
+                        heatImage.fillAmount = cooldownProgress;
+                    }
+                }
             }
         }
     }
