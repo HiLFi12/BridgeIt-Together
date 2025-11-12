@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,13 @@ using UnityEngine;
 public class Box : MonoBehaviour, IInteractable
 {
     public InteractPriority InteractPriority => InteractPriority.High;
+    
+    [SerializeField] private GameObject shadow;
+
+    private void Start()
+    {
+        shadow.SetActive(false);
+    }
 
     public void Interact(GameObject interactor)
     {
