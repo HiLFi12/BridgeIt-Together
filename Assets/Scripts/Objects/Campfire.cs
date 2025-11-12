@@ -1,12 +1,20 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using BridgeItTogether.Gameplay.Abstractions;
 
 public class Campfire : MonoBehaviour, IInteractable
 {
     public InteractPriority InteractPriority => InteractPriority.Medium;
-
+    
+    [SerializeField] private GameObject shadow;
+    
     [Header("Audio")]
     [SerializeField] private int igniteSfxIndex = -1;
+
+    private void Start()
+    {
+        shadow.SetActive(false);
+    }
 
     public void Interact(GameObject interactor)
     {

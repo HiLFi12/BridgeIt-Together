@@ -9,7 +9,7 @@ public class GenericObject1 : MonoBehaviour, IInteractable
     [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private float tiempoRecarga = 1.0f;
-
+    [SerializeField] private GameObject shadow;
     [SerializeField] private GameObject modeloVisual;
     
     private bool enRecarga = false;
@@ -19,7 +19,8 @@ public class GenericObject1 : MonoBehaviour, IInteractable
     
     private void Start()
     {
-
+        shadow.SetActive(false);
+        
         if (materialPrefabsSO == null)
         {
             Debug.LogError("No se ha asignado el MaterialPrefabSO en " + gameObject.name);

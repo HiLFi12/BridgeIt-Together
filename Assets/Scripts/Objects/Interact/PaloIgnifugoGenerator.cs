@@ -12,11 +12,17 @@ public class PaloIgnifugoGenerator : MonoBehaviour, IInteractable
     [SerializeField] private GameObject paloIgnifugoPrefab; // Prefab del palo ignífugo
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private float tiempoRecarga = 0.5f; // Tiempo antes de poder generar otro palo
+    [SerializeField] private GameObject shadow;
     
     private bool enRecarga = false;
     
     // Propiedad requerida por la interfaz IInteractable
     public InteractPriority InteractPriority => interactPriority;
+
+    private void Start()
+    {
+        shadow.SetActive(false);
+    }
     
     // Método llamado cuando un jugador interactúa con este objeto
     public void Interact(GameObject interactor)

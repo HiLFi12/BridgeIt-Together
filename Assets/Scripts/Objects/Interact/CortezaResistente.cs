@@ -14,6 +14,7 @@ public class CortezaResistente : MonoBehaviour, IInteractable
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private float tiempoRecarga = 3.0f; // Tiempo antes de poder generar otra resina
     [SerializeField] private Transform puntoSpawn; // Punto donde aparecerá la resina
+    [SerializeField] private GameObject shadow;
     
     [Header("Audio - Resina (AudioManager)")]
     [Tooltip("Índice en AudioManager.soundEffects para reproducir al spawnear la resina. -1 desactiva.")]
@@ -29,6 +30,8 @@ public class CortezaResistente : MonoBehaviour, IInteractable
     
     private void Start()
     {
+        shadow.SetActive(false);
+        
         // Verificar que tengamos las referencias necesarias
         if (materialPrefabsSO == null)
         {
