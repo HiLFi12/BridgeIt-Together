@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class PlayerObjectHolder : MonoBehaviour
 {
+    // Eventos para notificar cambios del objeto en mano (útiles para UI y previews)
+    public event System.Action<GameObject> OnPickedUp;
+    public event System.Action<GameObject> OnDropped;
+    public event System.Action<GameObject> OnUsed;
     [Header("Ancla para sostener (opcional)")]
     [SerializeField] private Transform holdAnchor;
 
@@ -80,6 +84,9 @@ public class PlayerObjectHolder : MonoBehaviour
 
         // Reproducir SFX de pick-up (vía AudioManager, como Campfire)
         PlayPickUpSfx();
+
+        // Notificar
+        try { OnPickedUp?.Invoke(heldObject); } catch { }
     }
 
     public void PickUpExistingInstance(GameObject objectInstance) => PickUp(objectInstance);
@@ -92,6 +99,7 @@ public class PlayerObjectHolder : MonoBehaviour
         
         DeactivateUIForObject(heldObject);
         lastUIIndex = -1;
+        var dropped = heldObject;
         heldObject.transform.SetParent(null, true);
         if (heldRigidbody != null)
         {
@@ -102,6 +110,8 @@ public class PlayerObjectHolder : MonoBehaviour
         // Reproducir SFX de drop (vía AudioManager)
         PlayDropSfx();
         heldObject = null;
+        // Notificar
+        try { OnDropped?.Invoke(dropped); } catch { }
     }
     
     public void UseHeldObject()
@@ -109,6 +119,7 @@ public class PlayerObjectHolder : MonoBehaviour
         if (heldObject == null) return;
         
         DeactivateUIForObject(heldObject);
+        var used = heldObject;
         
         if (heldRigidbody != null)
         {
@@ -118,6 +129,8 @@ public class PlayerObjectHolder : MonoBehaviour
         }
         Destroy(heldObject);
         heldObject = null;
+        // Notificar
+        try { OnUsed?.Invoke(used); } catch { }
     }
     
     private void ActivateUIForObject(GameObject obj)

@@ -43,6 +43,18 @@ public class PlayerBridgeInteraction : MonoBehaviour
     // Event fired when a repair attempt finishes: bool indicates success
     public event Action<bool> OnRepairResult;
 
+    [Header("Ghost Preview")]
+    [Tooltip("Material para la silueta fantasma; si no se asigna, se creará uno transparente en runtime.")]
+    [SerializeField] private Material previewMaterial;
+    [SerializeField, Range(0f,1f)] private float previewAlpha = 0.45f;
+    [SerializeField] private Color previewTint = new Color(0.1f, 0.8f, 1f, 0.45f);
+    [SerializeField] private bool showPreview = true;
+
+    // Estado del ghost
+    private GameObject ghostInstance;
+    private BridgeConstructionGrid ghostGrid;
+    private int ghostX = -1, ghostZ = -1, ghostLayer = -1;
+
     private void Start()
     {
         objectHolder = GetComponent<PlayerObjectHolder>();
@@ -65,6 +77,35 @@ public class PlayerBridgeInteraction : MonoBehaviour
         {
             Debug.LogError($"¡El punto de construcción (buildPoint) no está asignado en {gameObject.name}! Crea un Transform vacío como hijo del jugador y asígnalo.");
         }
+
+        // Suscribirse a eventos del holder para gestionar el ghost
+        if (objectHolder != null)
+        {
+            objectHolder.OnPickedUp += HandlePickedUp;
+            objectHolder.OnDropped += HandleDropped;
+            objectHolder.OnUsed += HandleUsed;
+        }
+
+        // Suscribirse al resultado de construcción para ocultar ghost al construir
+        OnBuildResult += HandleBuildResult;
+    }
+
+    private void OnDestroy()
+    {
+        if (objectHolder != null)
+        {
+            objectHolder.OnPickedUp -= HandlePickedUp;
+            objectHolder.OnDropped -= HandleDropped;
+            objectHolder.OnUsed -= HandleUsed;
+        }
+        OnBuildResult -= HandleBuildResult;
+        DestroyGhost();
+    }
+
+    private void Update()
+    {
+        // Actualizar la vista previa cada frame para seguir la posición/selección
+        UpdateGhostPreview();
     }
     
     // Esta función debe ser llamada desde el sistema de interacción del jugador
@@ -230,6 +271,8 @@ public class PlayerBridgeInteraction : MonoBehaviour
         {
             Debug.LogWarning($"OnBuildResult listener threw an exception: {ex}");
         }
+
+        // Si construyó, el UseHeldObject ocultará el ghost; si falló, lo mantenemos/actualizamos
     }
     
     /// <summary>
@@ -261,6 +304,180 @@ public class PlayerBridgeInteraction : MonoBehaviour
         if (!isValidRepairMaterial) return false;
 
         return quadrant.TryAddLayer(BridgeQuadrantSO.MaterialType.Adoquin, 1);
+    }
+
+    // ===== Ghost Preview =====
+    private void HandlePickedUp(GameObject obj)
+    {
+        // Forzar actualización inmediata al recoger
+        UpdateGhostPreview(true);
+    }
+
+    private void HandleDropped(GameObject obj)
+    {
+        DestroyGhost();
+    }
+
+    private void HandleUsed(GameObject obj)
+    {
+        DestroyGhost();
+    }
+
+    private void HandleBuildResult(bool success)
+    {
+        if (success) DestroyGhost();
+    }
+
+    private void EnsurePreviewMaterial()
+    {
+        if (previewMaterial != null) return;
+
+        // Crear un material transparente simple si no hay uno asignado
+        Shader sh = Shader.Find("Universal Render Pipeline/Lit");
+        if (sh == null) sh = Shader.Find("Standard");
+        if (sh == null)
+        {
+            // Como último recurso, usar el primer shader disponible
+            sh = Shader.Find("Diffuse");
+        }
+        var mat = new Material(sh);
+        // Intentar configurar transparencia básica
+        mat.color = new Color(previewTint.r, previewTint.g, previewTint.b, previewAlpha);
+        previewMaterial = mat;
+    }
+
+    private void UpdateGhostPreview(bool force = false)
+    {
+        if (!showPreview) { DestroyGhost(); return; }
+        if (objectHolder == null || !objectHolder.HasObjectInHand()) { DestroyGhost(); return; }
+        if (bridgeGrids == null || bridgeGrids.Length == 0 || buildPoint == null) { DestroyGhost(); return; }
+
+        // Encontrar cuadrante objetivo
+        BridgeConstructionGrid g;
+        int x, z;
+        if (!FindTargetQuadrantAllGrids(buildPoint.position, out g, out x, out z))
+        {
+            DestroyGhost();
+            return;
+        }
+
+        // Determinar el índice de la siguiente capa correcta o reparación válida
+        var so = GetQuadrantSO(g, x, z);
+        if (so == null || so.requiredLayers == null || so.requiredLayers.Length == 0)
+        {
+            DestroyGhost();
+            return;
+        }
+
+        // Material en mano
+        GameObject inHand = objectHolder.GetHeldObject();
+        int matLayerIndex = 0;
+        BridgeMaterialInfo matInfo = inHand != null ? inHand.GetComponent<BridgeMaterialInfo>() : null;
+        if (matInfo != null) matLayerIndex = matInfo.layerIndex;
+        else if (inHand != null && inHand.tag.StartsWith("BridgeLayer"))
+        {
+            var s = inHand.tag.Substring(11);
+            if (int.TryParse(s, out int li)) matLayerIndex = li;
+        }
+
+        int nextLayer = GetNextCorrectLayerIndex(g, x, z);
+        bool isRepair = false;
+        if (nextLayer == -1 && so.IsDamaged())
+        {
+            // Superficie ya completa pero dañada: permitir reparación con adoquín o capa superior
+            int lastIdx = Mathf.Max(0, so.requiredLayers.Length - 1);
+            if (matInfo != null)
+            {
+                isRepair = matInfo.materialType == BridgeQuadrantSO.MaterialType.Adoquin || matInfo.layerIndex == lastIdx;
+            }
+            else if (inHand != null && inHand.tag == $"BridgeLayer{lastIdx}")
+            {
+                isRepair = true;
+            }
+            nextLayer = isRepair ? Mathf.Max(0, so.requiredLayers.Length - 1) : -1;
+        }
+
+        // Validación del material vs capa requerida
+        if (nextLayer < 0)
+        {
+            DestroyGhost();
+            return;
+        }
+        if (!isRepair && matLayerIndex != nextLayer)
+        {
+            // Material no coincide con la siguiente capa: no mostrar para evitar confusión
+            DestroyGhost();
+            return;
+        }
+
+        // Obtener prefab visual de la capa requerida
+        var layer = so.requiredLayers[nextLayer];
+        GameObject prefab = layer != null ? layer.visualPrefab : null;
+        if (prefab == null)
+        {
+            // Si no hay prefab, no hay nada que previsualizar
+            DestroyGhost();
+            return;
+        }
+
+        // Calcular posición/escala final como en el grid
+        float layerHeight = (nextLayer < g.layerHeights.Length) ? g.layerHeights[nextLayer] : (0.5f * nextLayer);
+        float cx = g.QuadrantStepX;
+        float cz = g.QuadrantStepZ;
+        Vector3 pos = g.transform.position + new Vector3(x * cx + cx * 0.5f, layerHeight, z * cz + cz * 0.5f);
+
+        Vector3 layerScaleCfg = (nextLayer < g.layerScales.Length) ? g.layerScales[nextLayer] : Vector3.one;
+        Vector3 baseScaleCfg = g.usarTamañoPorEje ? new Vector3(g.quadrantSizeX, g.quadrantSizeY, g.quadrantSizeZ)
+                                                  : new Vector3(g.quadrantSize, 1f, g.quadrantSize);
+        Vector3 finalScale = g.layerScaleMode == BridgeConstructionGrid.LayerScaleMode.RelativeToQuadrantSize
+            ? Vector3.Scale(baseScaleCfg, layerScaleCfg)
+            : layerScaleCfg;
+
+        // Si ya tenemos un ghost compatible y no se forzó recreación, solo actualizar transform
+        if (!force && ghostInstance != null && ghostGrid == g && ghostX == x && ghostZ == z && ghostLayer == nextLayer)
+        {
+            ghostInstance.transform.position = pos;
+            ghostInstance.transform.localScale = finalScale;
+            return;
+        }
+
+        // Recrear ghost si cambió objetivo/capa/prefab
+        DestroyGhost();
+        EnsurePreviewMaterial();
+
+        ghostInstance = Instantiate(prefab);
+        ghostInstance.name = $"GhostPreview_{x}_{z}_L{nextLayer}";
+        ghostInstance.transform.position = pos;
+        ghostInstance.transform.rotation = prefab.transform.localRotation;
+        ghostInstance.transform.localScale = finalScale;
+        ghostGrid = g; ghostX = x; ghostZ = z; ghostLayer = nextLayer;
+
+        // Colorear/deshabilitar colisiones
+        var rends = ghostInstance.GetComponentsInChildren<Renderer>(true);
+        foreach (var r in rends)
+        {
+            try
+            {
+                // Usar sharedMaterial para evitar copias innecesarias
+                r.sharedMaterial = previewMaterial;
+                var c = previewTint; c.a = previewAlpha;
+                if (r.sharedMaterial.HasProperty("_BaseColor")) r.sharedMaterial.SetColor("_BaseColor", c);
+                else if (r.sharedMaterial.HasProperty("_Color")) r.sharedMaterial.color = c;
+            }
+            catch { }
+        }
+        var cols = ghostInstance.GetComponentsInChildren<Collider>(true);
+        foreach (var c in cols) { c.enabled = false; }
+    }
+
+    private void DestroyGhost()
+    {
+        if (ghostInstance != null)
+        {
+            try { Destroy(ghostInstance); } catch { }
+            ghostInstance = null;
+        }
+        ghostGrid = null; ghostX = ghostZ = ghostLayer = -1;
     }
 
     // Obtiene el siguiente índice de capa correcto usando el grid seleccionado
