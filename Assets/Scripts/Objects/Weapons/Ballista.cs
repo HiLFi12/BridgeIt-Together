@@ -10,6 +10,7 @@ public class Ballista : MonoBehaviour, IInteractable
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private GameObject arrowPrefab;
     [SerializeField] private GameObject smokeEffectPrefab;
+    [SerializeField] private GameObject shadow;
     
     [Header("Launch Settings")]
     [SerializeField, Min(0.1f)] private float launchForce = 15f;
@@ -53,6 +54,7 @@ public class Ballista : MonoBehaviour, IInteractable
 
     private void Start()
     {
+        shadow.SetActive(false);
         StartReload();
     }
     

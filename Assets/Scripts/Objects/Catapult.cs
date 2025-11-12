@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using BridgeItTogether.Gameplay.Abstractions;
+using UnityEngine.Experimental.Rendering;
 
 public class Catapult : MonoBehaviour, IInteractable
 {
@@ -17,6 +18,7 @@ public class Catapult : MonoBehaviour, IInteractable
     [SerializeField, Min(0.1f)] private float launchGravity = 9.81f;
     [SerializeField] private bool kinematicDuringLaunch = true;
     [SerializeField] private float minLaunchDistance = 0.05f;
+    [SerializeField] private GameObject shadow;
 
     [Header("Catapult Rotation")]
     [SerializeField] private Transform rotatingArm;
@@ -167,6 +169,8 @@ public class Catapult : MonoBehaviour, IInteractable
 
     private void Start()
     {
+        shadow.SetActive(false);
+        
         if (rotatingArm)
         {
             rotatingArm.localRotation = Quaternion.Euler(0f, 0f, lowAngle);

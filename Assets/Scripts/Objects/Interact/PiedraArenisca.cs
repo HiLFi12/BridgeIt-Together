@@ -14,6 +14,7 @@ public class PiedraArenisca : MonoBehaviour, IInteractable
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private float tiempoRecarga = 2.0f; // Tiempo de cooldown entre entregas
     [SerializeField] private Transform puntoSpawn; // Dónde aparece el material (fallback)
+    [SerializeField] private GameObject shadow;
 
     private bool enRecarga = false;
 
@@ -21,6 +22,8 @@ public class PiedraArenisca : MonoBehaviour, IInteractable
 
     private void Start()
     {
+        shadow.SetActive(false);
+        
         if (materialPrefabsSO == null)
         {
             Debug.LogError("No se ha asignado MaterialPrefabSO en " + gameObject.name);
