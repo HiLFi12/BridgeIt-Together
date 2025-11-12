@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 using System.Collections;
 
 public class Furnace : MonoBehaviour, IInteractable
@@ -15,6 +17,11 @@ public class Furnace : MonoBehaviour, IInteractable
     [Header("Carbón")]
     [SerializeField] private int maxCoal = 1;
     private int currentCoal = 0;
+
+    [Header("UI")]
+    [SerializeField] private GameObject coalImage;
+    [SerializeField] private TextMeshProUGUI coalText;
+    [SerializeField] private Image heatImage;
 
     [Header("Heat")]
     [SerializeField] private HeatSphere heatSphere;
@@ -44,6 +51,7 @@ public class Furnace : MonoBehaviour, IInteractable
     private void Start()
     {
         shadow.SetActive(false);
+        UpdateUI();
     }
 
     public void Interact(GameObject interactor)
@@ -137,6 +145,7 @@ public class Furnace : MonoBehaviour, IInteractable
                 OnFurnaceTurnedOn?.Invoke(this, interactor);
             }
             
+            UpdateUI();
             return true;
         }
         // If furnace is full and heat is active, allow reload and reset cooldown
@@ -184,10 +193,20 @@ public class Furnace : MonoBehaviour, IInteractable
         if (heatSphere != null)
         {
             bool active = heatSphere.gameObject.activeSelf;
-            if (lastHeatActive && !active)
+            if (lastHeatActive != active)
             {
-                // flanco de apagado
-                HandleHeatSphereJustTurnedOff();
+                // Cambio de estado de la HeatSphere
+                if (lastHeatActive && !active)
+                {
+                    // flanco de apagado
+                    HandleHeatSphereJustTurnedOff();
+                }
+                UpdateUI();
+            }
+            // Actualizar UI cada frame si la HeatSphere está activa (para el fillAmount)
+            else if (active)
+            {
+                UpdateUI();
             }
             lastHeatActive = active;
         }
@@ -199,6 +218,39 @@ public class Furnace : MonoBehaviour, IInteractable
         {
             currentCoal = 0;
             if (reloadDelay > 0f) reloadTimer = reloadDelay;
+            UpdateUI();
+        }
+    }
+
+    private void UpdateUI()
+    {
+        // Actualizar texto del carbón
+        if (coalText != null)
+        {
+            coalText.text = $"{currentCoal}/{maxCoal}";
+        }
+
+        bool heatSphereActive = heatSphere != null && heatSphere.gameObject.activeSelf;
+
+        // Actualizar visibilidad de la imagen del carbón
+        // La imagen se muestra solo cuando la HeatSphere está desactivada
+        if (coalImage != null)
+        {
+            coalImage.gameObject.SetActive(!heatSphereActive);
+        }
+
+        // Actualizar visibilidad y fillAmount de la imagen de calor
+        // La imagen se muestra solo cuando la HeatSphere está activada
+        if (heatImage != null)
+        {
+            heatImage.gameObject.SetActive(heatSphereActive);
+            
+            if (heatSphereActive)
+            {
+                // Actualizar el fillAmount basado en el cooldown
+                // GetCooldownProgress retorna 1 cuando recién inicia y 0 cuando termina
+                heatImage.fillAmount = heatSphere.GetCooldownProgress();
+            }
         }
     }
 }
