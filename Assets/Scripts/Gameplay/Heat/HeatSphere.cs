@@ -127,6 +127,23 @@ public class HeatSphere : MonoBehaviour
         return currentCooldown > 0f;
     }
 
+    /// <summary>
+    /// Retorna el progreso del cooldown normalizado (0 = terminado, 1 = recién iniciado)
+    /// </summary>
+    public float GetCooldownProgress()
+    {
+        if (cooldown <= 0f) return 0f;
+        return Mathf.Clamp01(currentCooldown / cooldown);
+    }
+
+    /// <summary>
+    /// Retorna el cooldown actual restante en segundos
+    /// </summary>
+    public float GetCurrentCooldown()
+    {
+        return currentCooldown;
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = IsOnCooldown() ? Color.red : Color.yellow;
