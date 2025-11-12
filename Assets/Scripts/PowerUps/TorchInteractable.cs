@@ -11,6 +11,7 @@ public class TorchInteractable : MonoBehaviour, IInteractable
     
     [SerializeField] private TorchSide torchSide;
     [SerializeField] private PowerUpRitualGranFuego ritualPowerUp;
+    [SerializeField] private GameObject shadow;
     
     public InteractPriority InteractPriority => InteractPriority.High;
 
@@ -23,6 +24,11 @@ public class TorchInteractable : MonoBehaviour, IInteractable
     {
         torchSide = side;
         ritualPowerUp = powerUp;
+    }
+
+    private void Start()
+    {
+        shadow.SetActive(false);
     }
 
 
