@@ -13,6 +13,10 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
     [Header("UI Configuration")]
     [SerializeField] private int notReadyUIIndex = -1;
     [SerializeField] private int readyUIIndex = 1;
+
+    [Header("Audio - Activación (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir cuando pasa a estado 'ready'. -1 desactiva.")]
+    [SerializeField] private int readyActivateSfxIndex = -1;
     
     // Override UIIndex para devolver el índice correcto según el estado de isReady
     public override int UIIndex => isReady ? readyUIIndex : notReadyUIIndex;
@@ -78,6 +82,7 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
         if (isReady) return;
         isReady = true; // heredado
         AplicarEstadoVisual();
+        PlayReadySfx();
         
         // Notificar al PlayerUIManager sobre el cambio de estado
         if (playerUIManager != null)
@@ -100,12 +105,23 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
         {
             SetReady(true);
             AplicarEstadoVisual();
+            PlayReadySfx();
             
             // Notificar al PlayerUIManager sobre el cambio de estado
             if (playerUIManager != null)
             {
                 playerUIManager.RefreshHeldObjectUI(UIIndex);
             }
+        }
+    }
+
+    private void PlayReadySfx()
+    {
+        if (readyActivateSfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(readyActivateSfxIndex);
         }
     }
 }

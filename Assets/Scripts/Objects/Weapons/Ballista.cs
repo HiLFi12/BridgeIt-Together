@@ -26,6 +26,10 @@ public class Ballista : MonoBehaviour, IInteractable
     
     [Header("Interaction")]
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
+
+    [Header("Audio - Disparo (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir al disparar la flecha. -1 desactiva.")]
+    [SerializeField] private int shootSfxIndex = -1;
     
     private bool isReady;
     private GameObject currentArrow;
@@ -94,6 +98,9 @@ public class Ballista : MonoBehaviour, IInteractable
         Vector3 forceDirection = shootPoint.TransformDirection(launchDirection.normalized);
         arrowRb.AddForce(forceDirection * launchForce, ForceMode.Impulse);
 
+    // SFX de disparo
+    PlayShootSfx();
+
         // Limpiar referencia
         currentArrow = null;
 
@@ -115,6 +122,16 @@ public class Ballista : MonoBehaviour, IInteractable
         if (reloadCoroutine != null)
             StopCoroutine(reloadCoroutine);
         reloadCoroutine = StartCoroutine(DelayedReload());
+    }
+
+    private void PlayShootSfx()
+    {
+        if (shootSfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(shootSfxIndex);
+        }
     }
 
     private IEnumerator DelayedReload()

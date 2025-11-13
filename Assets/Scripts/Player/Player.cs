@@ -27,6 +27,10 @@ public class Player : MonoBehaviour, IHitable
     [SerializeField] private GameObject dashEffectPrefab;
     [SerializeField] private Transform dashSpawn;
     
+    [Header("Audio - Dash (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir al iniciar el dash. -1 desactiva.")]
+    [SerializeField] private int dashSfxIndex = -1;
+    
     [Header("Interaction UI")]
     [SerializeField] private Image interactionKeyUI;
     [SerializeField] private Image interactionPadUI;
@@ -240,6 +244,9 @@ public class Player : MonoBehaviour, IHitable
         {
             Instantiate(dashEffectPrefab, dashSpawn.transform.position, Quaternion.identity);
         }
+        
+        // SFX de dash
+        PlayDashSfx();
         
         Debug.Log($"[Player] Dash iniciado en dirección: {direction}");
     }
@@ -618,5 +625,15 @@ public class Player : MonoBehaviour, IHitable
         // Dash UI
         if (dashKeyUI != null) dashKeyUI.gameObject.SetActive(!usePad);
         if (dashPadUI != null) dashPadUI.gameObject.SetActive(usePad);
+    }
+
+    private void PlayDashSfx()
+    {
+        if (dashSfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(dashSfxIndex);
+        }
     }
 }

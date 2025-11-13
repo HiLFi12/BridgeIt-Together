@@ -895,8 +895,6 @@ MonoBehaviour:
   jumpHeight: 1
   gravityValue: -9.81
   rotationSpeed: 10
-  repositionDuration: 0.2
-  useDirectTeleport: 1
 --- !u!136 &7995096227938079687
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1053,8 +1051,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   interactKey: 101
-  dropKey: 113
-  buildKey: 102
   dashKey: 304
   dashDistance: 5
   dashDuration: 0.2
@@ -1087,6 +1083,7 @@ MonoBehaviour:
   dashOnlyWhenGrounded: 1
   dashEffectPrefab: {fileID: 6813416509558619124, guid: 2f22f3b25344a8643834d3b0dee65aaa, type: 3}
   dashSpawn: {fileID: 3014450075215335105}
+  dashSfxIndex: 14
   interactionKeyUI: {fileID: 9120726787656957187}
   interactionPadUI: {fileID: 3716351525016710185}
   buildKeyUI: {fileID: 7756339494565014635}
@@ -1134,6 +1131,13 @@ MonoBehaviour:
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 64
+  spherecastRadius: 0.22
+  spherecastUpOffset: 0.3
+  spherecastExtraDistance: 1
+  previewMaterial: {fileID: 0}
+  previewAlpha: 0.45
+  previewTint: {r: 0.1, g: 0.8, b: 1, a: 0.45}
+  showPreview: 1
 --- !u!114 &124070237574347097
 MonoBehaviour:
   m_ObjectHideFlags: 0

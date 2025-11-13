@@ -34,6 +34,10 @@ public class Catapult : MonoBehaviour, IInteractable
     [Header("UI")]
     [SerializeField] private Image reloadImage;
 
+    [Header("Audio - Lanzamiento (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir al lanzar el objeto. -1 desactiva.")]
+    [SerializeField] private int launchSfxIndex = -1;
+
     private readonly Dictionary<Transform, Coroutine> activeLaunches = new();
 
     [SerializeField] private bool isReady = true;
@@ -97,6 +101,9 @@ public class Catapult : MonoBehaviour, IInteractable
 
             targetT.SetParent(null, true);
             hitable?.OnLaunched(destino);
+
+            // SFX de lanzamiento
+            PlayLaunchSfx();
 
             var routine = StartCoroutine(LaunchRoutine(targetT, destino));
             activeLaunches[targetT] = routine;
@@ -377,6 +384,16 @@ public class Catapult : MonoBehaviour, IInteractable
         // La barra permanece visible y llena
 
         reloadUIUpdateCoroutine = null;
+    }
+
+    private void PlayLaunchSfx()
+    {
+        if (launchSfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(launchSfxIndex);
+        }
     }
 
     private void StopAndHideReloadUI()
