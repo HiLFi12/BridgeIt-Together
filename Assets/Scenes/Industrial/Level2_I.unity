@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 8863999}
   m_Layer: 12
   m_Name: SafeWalls1 (6)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1061,7 +1061,7 @@ GameObject:
   - component: {fileID: 130428406}
   m_Layer: 12
   m_Name: SafeWalls1 (9)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2035,7 +2035,7 @@ GameObject:
   - component: {fileID: 242935501}
   m_Layer: 12
   m_Name: SafeWalls1 (2)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2468,7 +2468,7 @@ GameObject:
   - component: {fileID: 297039467}
   m_Layer: 12
   m_Name: SafeWalls (3)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4769,7 +4769,7 @@ GameObject:
   - component: {fileID: 698790365}
   m_Layer: 12
   m_Name: SafeWalls1 (3)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5980,7 +5980,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  additionalProtectedTags:
+  - InvisibleWall
 --- !u!114 &798834836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7923,7 +7924,7 @@ GameObject:
   - component: {fileID: 1030963471}
   m_Layer: 12
   m_Name: SafeWalls1 (1)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9029,7 +9030,7 @@ GameObject:
   - component: {fileID: 1153648224}
   m_Layer: 12
   m_Name: SafeWalls (3)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11714,7 +11715,7 @@ GameObject:
   - component: {fileID: 1499812692}
   m_Layer: 12
   m_Name: SafeWalls1 (8)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11850,7 +11851,7 @@ GameObject:
   - component: {fileID: 1508117684}
   m_Layer: 12
   m_Name: SafeWalls1 (10)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12336,7 +12337,7 @@ GameObject:
   - component: {fileID: 1563866780}
   m_Layer: 12
   m_Name: SafeWalls (2)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12489,9 +12490,17 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 1589006826248433058, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_TagString
+      value: InvisibleWall
+      objectReference: {fileID: 0}
     - target: {fileID: 2174769494411797431, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_Layer
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2174769494411797431, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_TagString
+      value: InvisibleWall
       objectReference: {fileID: 0}
     - target: {fileID: 4504146982958957589, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_LocalPosition.x
@@ -12540,6 +12549,10 @@ PrefabInstance:
     - target: {fileID: 6248043942882160696, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_Layer
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 6248043942882160696, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_TagString
+      value: InvisibleWall
       objectReference: {fileID: 0}
     - target: {fileID: 7511072028943821834, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_LocalScale.z
@@ -13149,7 +13162,7 @@ GameObject:
   - component: {fileID: 1645447955}
   m_Layer: 12
   m_Name: SafeWalls (2)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14939,7 +14952,7 @@ GameObject:
   - component: {fileID: 1875821658}
   m_Layer: 12
   m_Name: SafeWalls1 (5)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15075,7 +15088,7 @@ GameObject:
   - component: {fileID: 1885372577}
   m_Layer: 12
   m_Name: SafeWalls1 (4)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16697,7 +16710,7 @@ GameObject:
   - component: {fileID: 2038383358}
   m_Layer: 12
   m_Name: SafeWalls1 (7)
-  m_TagString: Untagged
+  m_TagString: InvisibleWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
