@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
 {
@@ -21,6 +23,10 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
     [Tooltip("Opcional: si no se encuentra componente Player se puede usar un tag para validar el HeatSphere.")]
     [SerializeField] private string playerRootTag = "Player";
     [SerializeField] private GameObject shadow;
+
+    [Header("UI")]
+    [SerializeField] private Image[] coalImages;
+    [SerializeField] private TextMeshProUGUI[] coalTexts;
 
     [Header("Debug")]
     public bool debugLogs = false;
@@ -73,6 +79,8 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
         holder.UseHeldObject(); // consumir
         if (debugLogs) Debug.Log($"[CalorHumano] Carbón aceptado ({before} -> {carbonesActuales})", this);
 
+        UpdateUI();
+
         if (carbonesActuales >= carbonesNecesarios)
         {
             if (debugLogs) Debug.Log("[CalorHumano] Requisitos completos. (TurnOn interno)", this);
@@ -89,6 +97,9 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
         if (carbonesActuales >= carbonesNecesarios || isActive) return;
         carbonesActuales++;
         if (debugLogs) Debug.Log($"[CalorHumano] (Legacy) Carbón insertado {carbonesActuales}/{carbonesNecesarios}", this);
+        
+        UpdateUI();
+        
         if (carbonesActuales >= carbonesNecesarios)
         {
             internalTurnOnRequest = true;
@@ -96,9 +107,10 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
         }
     }
     
-    private void Start()
+    private new void Start()
     {
         shadow.SetActive(false);
+        UpdateUI();
     }
 
     private void Update() { /* activación ahora sucede en TryAddCoal / InsertarCarbon */ }
@@ -130,6 +142,8 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
         
         // Notificar que el PowerUp fue activado (para tutoriales)
         OnCalorHumanoActivated?.Invoke(this);
+        
+        UpdateUI(); // Ocultar UI de carbón cuando se activa
         
         StartCoroutine(RunHeatEffect());
     }
@@ -223,5 +237,20 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
     public void TurnOnShadow()
     {
         // TODO: Implementar visualización de sombra/highlight
+    }
+
+    private void UpdateUI()
+    {
+        // Actualizar textos del carbón
+        if (coalTexts != null)
+        {
+            foreach (var coalText in coalTexts)
+            {
+                if (coalText != null)
+                {
+                    coalText.text = $"{carbonesActuales}/{carbonesNecesarios}";
+                }
+            }
+        }
     }
 }
