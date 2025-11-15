@@ -15,6 +15,12 @@ public class HeatSphere : MonoBehaviour
     [SerializeField] private float cooldown = 10f;
     private float currentCooldown = 0f;
 
+    [Header("Audio - Calor Activo (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir en loop mientras la HeatSphere esté activa. -1 desactiva.")]
+    [SerializeField] private int loopSfxIndex = -1;
+
+    private AudioSource loopAudioSource;
+
     // Aumentado para abarcar más colliders en escenas densas (rocas, decoraciones, capas visuales)
     private Collider[] detectedColliders = new Collider[128];
     private HashSet<ITurnable> activeTurnables = new HashSet<ITurnable>();
@@ -24,6 +30,7 @@ public class HeatSphere : MonoBehaviour
     {
         CreateVisualSphere();
         currentCooldown = cooldown;
+        SetupLoopAudio();
     }
 
     private void CreateVisualSphere()
@@ -115,6 +122,12 @@ public class HeatSphere : MonoBehaviour
             }
         }
         activeTurnables.Clear();
+
+        // Detener audio en loop al desactivarse el prefab
+        if (loopAudioSource != null)
+        {
+            loopAudioSource.Stop();
+        }
     }
 
     public void ResetCooldown()
@@ -154,5 +167,22 @@ public class HeatSphere : MonoBehaviour
     {
         // Solo ponemos el cooldown a 0; el Update se encargará de desactivar en el siguiente frame.
         currentCooldown = 0f;
+    }
+
+    private void SetupLoopAudio()
+    {
+        if (loopSfxIndex < 0) return;
+
+        var audioManager = FindFirstObjectByType<AudioManager>();
+        if (audioManager == null || audioManager.soundEffects == null) return;
+        if (loopSfxIndex < 0 || loopSfxIndex >= audioManager.soundEffects.Count) return;
+
+        // Crear un AudioSource local que haga loop del clip elegido
+        loopAudioSource = gameObject.AddComponent<AudioSource>();
+        loopAudioSource.clip = audioManager.soundEffects[loopSfxIndex];
+        loopAudioSource.loop = true;
+        loopAudioSource.playOnAwake = false;
+        loopAudioSource.spatialBlend = 1f; // 3D
+        loopAudioSource.Play();
     }
 }

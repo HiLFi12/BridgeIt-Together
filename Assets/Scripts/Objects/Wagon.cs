@@ -29,6 +29,10 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
     [Header("Estado / Debug")] 
     [SerializeField] private bool debugGizmos = true;
 
+    [Header("Audio - Movimiento (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir en loop mientras el vagón se mueve. -1 desactiva.")]
+    [SerializeField] private int moveLoopSfxIndex = -1;
+
     // ITurnable
     public bool isTurned { get; private set; } = false;
 
@@ -44,6 +48,9 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
     private Rigidbody heldRigidbody;
 
     private Coroutine travelRoutine;
+
+    // Audio
+    private AudioSource moveLoopSource;
 
     private void Awake()
     {
@@ -120,6 +127,7 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
         }
         if (travelRoutine != null) StopCoroutine(travelRoutine);
         heatLostDuringTrip = false; // se limpia al comenzar
+        StartMoveLoopSfx();
         travelRoutine = StartCoroutine(Viajar());
     }
 
@@ -203,6 +211,8 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
         {
             isTurned = false; // forzamos estado off hasta nuevo TurnOn real por HeatSphere
         }
+
+        StopMoveLoopSfx();
     }
 
     // --- Holder Lógica ---
@@ -268,6 +278,38 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
         else
         {
             isTurned = false;
+        }
+    }
+
+    private void StartMoveLoopSfx()
+    {
+        if (moveLoopSfxIndex < 0) return;
+        if (moveLoopSource != null && moveLoopSource.isPlaying) return;
+
+        var audioManager = FindFirstObjectByType<AudioManager>();
+        if (audioManager == null || audioManager.soundEffects == null) return;
+        if (moveLoopSfxIndex < 0 || moveLoopSfxIndex >= audioManager.soundEffects.Count) return;
+
+        if (moveLoopSource == null)
+        {
+            moveLoopSource = gameObject.AddComponent<AudioSource>();
+            moveLoopSource.loop = true;
+            moveLoopSource.playOnAwake = false;
+            moveLoopSource.spatialBlend = 1f; // 3D
+        }
+
+        moveLoopSource.clip = audioManager.soundEffects[moveLoopSfxIndex];
+        if (moveLoopSource.clip != null)
+        {
+            moveLoopSource.Play();
+        }
+    }
+
+    private void StopMoveLoopSfx()
+    {
+        if (moveLoopSource != null && moveLoopSource.isPlaying)
+        {
+            moveLoopSource.Stop();
         }
     }
 

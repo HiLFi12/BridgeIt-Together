@@ -11,6 +11,10 @@ public class Marble : MaterialTipo2Ready, ITurnable
     [SerializeField, Tooltip("Si está activo, al salir del área de calor vuelve al estado 'no listo'.")]
     private bool revertWhenOutOfHeat = true;
 
+    [Header("Audio - Cambio de Estado (AudioManager)")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir cuando Marble cambia de 'no listo' a 'ready'. -1 desactiva.")]
+    [SerializeField] private int readySfxIndex = -1;
+
     public bool isTurned => isReady;
 
     protected override void Awake()
@@ -32,6 +36,7 @@ public class Marble : MaterialTipo2Ready, ITurnable
         if (isReady) return;
         isReady = true;
         AplicarEstadoVisual();
+        PlayReadySfx();
     }
 
     // ITurnable: llamado por HeatSphere cuando sale del radio de calor
@@ -41,5 +46,15 @@ public class Marble : MaterialTipo2Ready, ITurnable
         if (!isReady) return;
         isReady = false;
         AplicarEstadoVisual();
+    }
+
+    private void PlayReadySfx()
+    {
+        if (readySfxIndex < 0) return;
+        var audio = FindFirstObjectByType<AudioManager>();
+        if (audio != null)
+        {
+            audio.PlaySFX(readySfxIndex);
+        }
     }
 }
