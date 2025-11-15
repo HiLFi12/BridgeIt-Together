@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
@@ -20,6 +21,8 @@ public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
     
     [Header("UI Configuration")]
     [SerializeField] private int uiIndex = 3;
+    [SerializeField] private GameObject canvas;
+    [SerializeField] private GameObject shadow;
     
     public int UIIndex => uiIndex;
 
@@ -31,6 +34,11 @@ public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
 
     public InteractPriority InteractPriority => InteractPriority.High;
 
+    private void Start()
+    {
+        shadow.SetActive(false);
+    }
+
     public void Interact(GameObject interactor)
     {
         if (isCarried) return;
@@ -39,7 +47,27 @@ public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
         {
             holder.PickUpExistingInstance(gameObject);
             isCarried = true;
+            
+            // Suscribirse al evento OnDropped para detectar cuando se suelta
+            holder.OnDropped += OnStatueDropped;
+            
             // Feedback visual/sonoro opcional aquí
+        }
+    }
+    
+    private void OnStatueDropped(GameObject droppedObject)
+    {
+        // Verificar que el objeto soltado sea esta estatua
+        if (droppedObject == gameObject)
+        {
+            isCarried = false;
+            
+            // Desuscribirse del evento para evitar memory leaks
+            PlayerObjectHolder[] holders = FindObjectsByType<PlayerObjectHolder>(FindObjectsSortMode.None);
+            foreach (var holder in holders)
+            {
+                holder.OnDropped -= OnStatueDropped;
+            }
         }
     }
     
@@ -64,6 +92,15 @@ public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
         {
             powerUp.OnStatueArrived();
             // Feedback visual/sonoro de llegada
+        }
+
+        if (isCarried)
+        {
+            canvas.SetActive(false);
+        }
+        else
+        {
+            canvas.SetActive(true);
         }
     }
 
