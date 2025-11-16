@@ -355,22 +355,22 @@ public class PlayerBridgeInteraction : MonoBehaviour
         if (tag == "Heater" || tag == "Battery" || tag == "Coal" || tag == "Torch")
             return false;
 
-        // Necesita BridgeMaterialInfo o tag BridgeLayerX
+        // 1) Si es un MaterialBaseInteractable, respetar su gating (ready) mediante PuedeConstruirse
+        var interactable = obj.GetComponent<MaterialBaseInteractable>();
+        if (interactable != null)
+            return interactable.PuedeConstruirse;
+
+        // 2) Compatibilidad: si solo tiene BridgeMaterialInfo, permitir
         var info = obj.GetComponent<BridgeMaterialInfo>();
         if (info != null) return true;
 
-        if (tag != null && tag.StartsWith("BridgeLayer"))
+        // 3) Compatibilidad: tags BridgeLayerX válidos
+        if (!string.IsNullOrEmpty(tag) && tag.StartsWith("BridgeLayer"))
         {
-            // Validar que realmente tenga un número detrás
             int parsed;
             if (int.TryParse(tag.Substring("BridgeLayer".Length), out parsed))
                 return true;
         }
-
-        // Opcional: si exiges MaterialBaseInteractable
-        var interactable = obj.GetComponent<MaterialBaseInteractable>();
-        if (interactable != null && interactable.PuedeConstruirse)
-            return true;
 
         return false;
     }
