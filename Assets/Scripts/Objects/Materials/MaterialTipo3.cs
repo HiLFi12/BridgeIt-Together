@@ -1,37 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using BridgeItTogether.Gameplay.Abstractions;
 
-public class MaterialTipo3 : MonoBehaviour, IHitable, IUIActivatable
+public class MaterialTipo3 : MaterialBaseInteractable, IUIActivatable
 {
-    [Header("Configuración del material")]
-    [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;
-    
     [Header("UI Configuration")]
     [SerializeField] private int uiIndex = 0;
     
     public int UIIndex => uiIndex;
-    
-    private void Start()
-    {
-        EnsureBridgeMaterialInfo();
 
-    }
-    
-    private void EnsureBridgeMaterialInfo()
+    // Índice de capa para este material (capa superior, índice 2)
+    protected override int LayerIndex => 2;
+
+    protected override void PostEnsure()
     {
-        BridgeMaterialInfo materialInfo = GetComponent<BridgeMaterialInfo>();
-        if (materialInfo == null)
+        // MaterialBaseInteractable ya creó/actualizó BridgeMaterialInfo con era y layerIndex
+        var materialInfo = GetComponent<BridgeMaterialInfo>();
+        if (materialInfo != null)
         {
-            materialInfo = gameObject.AddComponent<BridgeMaterialInfo>();
+            materialInfo.materialType = BridgeQuadrantSO.MaterialType.Metal; // MaterialTipo3 es metal
         }
-        
-        materialInfo.layerIndex = 2;
-        materialInfo.era = era;
-        materialInfo.materialType = BridgeQuadrantSO.MaterialType.Metal; // MaterialTipo3 es metal
-        
-        gameObject.tag = "BridgeLayer2";
     }
 
     public void SetUIIndex(int index)
@@ -42,4 +29,4 @@ public class MaterialTipo3 : MonoBehaviour, IHitable, IUIActivatable
     public void OnLaunched(Vector3 targetPosition)
     {
     }
-} 
+}

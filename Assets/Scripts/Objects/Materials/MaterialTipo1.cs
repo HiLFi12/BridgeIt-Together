@@ -1,36 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using BridgeItTogether.Gameplay.Abstractions;
 
-public class MaterialTipo1 : MonoBehaviour, IHitable, IUIActivatable
+public class MaterialTipo1 : MaterialBaseInteractable, IUIActivatable
 {
-    [Header("Configuración del material")]
-    [SerializeField] private BridgeQuadrantSO.EraType era = BridgeQuadrantSO.EraType.Prehistoric;
-    
     [Header("UI Configuration")]
     [SerializeField] private int uiIndex = 0;
     
     public int UIIndex => uiIndex;
     
-    private void Start()
+    protected override int LayerIndex => 0; // capa base
+
+    protected override void PostEnsure()
     {
-        EnsureBridgeMaterialInfo();
-    }
-    
-    private void EnsureBridgeMaterialInfo()
-    {
-        BridgeMaterialInfo materialInfo = GetComponent<BridgeMaterialInfo>();
-        if (materialInfo == null)
+        // Aseguramos el tipo de material en el BridgeMaterialInfo creado por la base
+        var info = GetComponent<BridgeMaterialInfo>();
+        if (info != null)
         {
-            materialInfo = gameObject.AddComponent<BridgeMaterialInfo>();
+            info.materialType = BridgeQuadrantSO.MaterialType.Wood; // MaterialTipo1 es madera
         }
-
-        materialInfo.layerIndex = 0;
-        materialInfo.era = era;
-        materialInfo.materialType = BridgeQuadrantSO.MaterialType.Wood; // MaterialTipo1 es madera
-
-        gameObject.tag = "BridgeLayer0";
     }
     
     public void SetUIIndex(int index)

@@ -346,11 +346,48 @@ public class PlayerBridgeInteraction : MonoBehaviour
         previewMaterial = mat;
     }
 
+    private bool EsMaterialDeConstruccionValido(GameObject obj)
+    {
+        if (obj == null) return false;
+
+        // Excluir explícitos (herramientas / consumibles / interactuables especiales)
+        string tag = obj.tag;
+        if (tag == "Heater" || tag == "Battery" || tag == "Coal" || tag == "Torch")
+            return false;
+
+        // 1) Si es un MaterialBaseInteractable, respetar su gating (ready) mediante PuedeConstruirse
+        var interactable = obj.GetComponent<MaterialBaseInteractable>();
+        if (interactable != null)
+            return interactable.PuedeConstruirse;
+
+        // 2) Compatibilidad: si solo tiene BridgeMaterialInfo, permitir
+        var info = obj.GetComponent<BridgeMaterialInfo>();
+        if (info != null) return true;
+
+        // 3) Compatibilidad: tags BridgeLayerX válidos
+        if (!string.IsNullOrEmpty(tag) && tag.StartsWith("BridgeLayer"))
+        {
+            int parsed;
+            if (int.TryParse(tag.Substring("BridgeLayer".Length), out parsed))
+                return true;
+        }
+
+        return false;
+    }
+
     private void UpdateGhostPreview(bool force = false)
     {
         if (!showPreview) { DestroyGhost(); return; }
         if (objectHolder == null || !objectHolder.HasObjectInHand()) { DestroyGhost(); return; }
         if (bridgeGrids == null || bridgeGrids.Length == 0 || buildPoint == null) { DestroyGhost(); return; }
+
+        GameObject inHand = objectHolder.GetHeldObject();
+        // NUEVO: si no es un material válido, ocultar preview y salir
+        if (!EsMaterialDeConstruccionValido(inHand))
+        {
+            DestroyGhost();
+            return;
+        }
 
         // Encontrar cuadrante objetivo
         BridgeConstructionGrid g;
@@ -361,7 +398,6 @@ public class PlayerBridgeInteraction : MonoBehaviour
             return;
         }
 
-        // Determinar el índice de la siguiente capa correcta o reparación válida
         var so = GetQuadrantSO(g, x, z);
         if (so == null || so.requiredLayers == null || so.requiredLayers.Length == 0)
         {
@@ -370,57 +406,55 @@ public class PlayerBridgeInteraction : MonoBehaviour
         }
 
         // Material en mano
-        GameObject inHand = objectHolder.GetHeldObject();
         int matLayerIndex = 0;
-        BridgeMaterialInfo matInfo = inHand != null ? inHand.GetComponent<BridgeMaterialInfo>() : null;
+        BridgeMaterialInfo matInfo = inHand.GetComponent<BridgeMaterialInfo>();
         if (matInfo != null) matLayerIndex = matInfo.layerIndex;
-        else if (inHand != null && inHand.tag.StartsWith("BridgeLayer"))
+        else if (inHand.tag.StartsWith("BridgeLayer"))
         {
             var s = inHand.tag.Substring(11);
-            if (int.TryParse(s, out int li)) matLayerIndex = li;
+            int li;
+            if (int.TryParse(s, out li)) matLayerIndex = li;
         }
 
         int nextLayer = GetNextCorrectLayerIndex(g, x, z);
         bool isRepair = false;
         if (nextLayer == -1 && so.IsDamaged())
         {
-            // Superficie ya completa pero dañada: permitir reparación con adoquín o capa superior
             int lastIdx = Mathf.Max(0, so.requiredLayers.Length - 1);
             if (matInfo != null)
             {
                 isRepair = matInfo.materialType == BridgeQuadrantSO.MaterialType.Adoquin || matInfo.layerIndex == lastIdx;
             }
-            else if (inHand != null && inHand.tag == $"BridgeLayer{lastIdx}")
+            else if (inHand.tag == $"BridgeLayer{lastIdx}")
             {
                 isRepair = true;
             }
-            nextLayer = isRepair ? Mathf.Max(0, so.requiredLayers.Length - 1) : -1;
+            nextLayer = isRepair ? lastIdx : -1;
         }
 
-        // Validación del material vs capa requerida
         if (nextLayer < 0)
         {
             DestroyGhost();
             return;
         }
+
+        // Validar coincidencia capa vs material (si no es reparación)
         if (!isRepair && matLayerIndex != nextLayer)
         {
-            // Material no coincide con la siguiente capa: no mostrar para evitar confusión
             DestroyGhost();
             return;
         }
 
-        // Obtener prefab visual de la capa requerida
+        // Obtener prefab visual
         var layer = so.requiredLayers[nextLayer];
-        GameObject prefab = layer != null ? layer.visualPrefab : null;
+        GameObject prefab = (layer != null) ? layer.visualPrefab : null;
         if (prefab == null)
         {
-            // Si no hay prefab, no hay nada que previsualizar
             DestroyGhost();
             return;
         }
 
-        // Calcular posición/escala final como en el grid
+        // Posición / escala
         float layerHeight = (nextLayer < g.layerHeights.Length) ? g.layerHeights[nextLayer] : (0.5f * nextLayer);
         float cx = g.QuadrantStepX;
         float cz = g.QuadrantStepZ;
@@ -433,7 +467,6 @@ public class PlayerBridgeInteraction : MonoBehaviour
             ? Vector3.Scale(baseScaleCfg, layerScaleCfg)
             : layerScaleCfg;
 
-        // Si ya tenemos un ghost compatible y no se forzó recreación, solo actualizar transform
         if (!force && ghostInstance != null && ghostGrid == g && ghostX == x && ghostZ == z && ghostLayer == nextLayer)
         {
             ghostInstance.transform.position = pos;
@@ -441,7 +474,6 @@ public class PlayerBridgeInteraction : MonoBehaviour
             return;
         }
 
-        // Recrear ghost si cambió objetivo/capa/prefab
         DestroyGhost();
         EnsurePreviewMaterial();
 
@@ -452,13 +484,11 @@ public class PlayerBridgeInteraction : MonoBehaviour
         ghostInstance.transform.localScale = finalScale;
         ghostGrid = g; ghostX = x; ghostZ = z; ghostLayer = nextLayer;
 
-        // Colorear/deshabilitar colisiones
         var rends = ghostInstance.GetComponentsInChildren<Renderer>(true);
         foreach (var r in rends)
         {
             try
             {
-                // Usar sharedMaterial para evitar copias innecesarias
                 r.sharedMaterial = previewMaterial;
                 var c = previewTint; c.a = previewAlpha;
                 if (r.sharedMaterial.HasProperty("_BaseColor")) r.sharedMaterial.SetColor("_BaseColor", c);

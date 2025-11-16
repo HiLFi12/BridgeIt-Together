@@ -211,20 +211,17 @@ public class PowerUpRitualGranFuego : PowerUpBase
 
         if (bridgeGrid != null)
         {
-            // Construir automáticamente todos los cuadrantes hasta la capa 3
-            // (según el spec: capas 0, 1 y 2, no la capa 3 que sería la 4ta capa)
+            // Construir automáticamente todos los cuadrantes hasta la capa indicada
             ConstructBridgeAutomatically();
-            
-            // Esperar la duración del efecto
-            yield return new WaitForSeconds(duration);
         }
         else
         {
             Debug.LogError("PowerUpRitualGranFuego: BridgeConstructionGrid no está asignado.");
-            yield return new WaitForSeconds(1f);
         }
 
+        // Ritual: efecto instantáneo, no necesitamos mantenerlo activo por duration
         Despawn();
+        yield break;
     }
 
     /// <summary>

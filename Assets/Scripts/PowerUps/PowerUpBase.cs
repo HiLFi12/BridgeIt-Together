@@ -39,10 +39,8 @@ public abstract class PowerUpBase : MonoBehaviour
 
     public virtual void TryActivate(GameObject activator)
     {
-        Debug.Log("Intentando activar PowerUp...");
         if (!isAvailable)
         {
-            Debug.Log("PowerUp no disponible para activación.");
             return;
         }
         isActive = true;
@@ -61,7 +59,6 @@ public abstract class PowerUpBase : MonoBehaviour
     protected virtual void Despawn()
     {
         // Feedback visual/sonoro de desaparición
-        // Removido Destroy(gameObject) para evitar destrucción automática
         gameObject.SetActive(false);
     }
 
