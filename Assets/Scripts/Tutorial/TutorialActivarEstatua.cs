@@ -9,7 +9,7 @@ public class TutorialActivarEstatua : TutorialSO
         
         // Suscribirse al evento estático de la estatua
         PowerUpMotivacionEstatua.OnEstatuaActivated += OnEstatuaActivated;
-        
+
         Debug.Log("[TutorialActivarEstatua] Inicializado. Esperando que se active una estatua con flecha.");
     }
 
