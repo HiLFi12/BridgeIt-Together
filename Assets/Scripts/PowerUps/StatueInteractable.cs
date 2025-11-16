@@ -1,23 +1,24 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
-public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
+public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
 {
-    public PowerUpMotivacionEstatua powerUp;
-    public Transform destinationPoint;
     private bool isCarried = false;
 
     [Header("Lifetime / Despawn")]
-    [Tooltip("Tiempo en segundos que la estatua permanece en el mapa antes de desaparecer.")]
+    [Tooltip("Tiempo en segundos que la estatua permanece en el mapa antes de desaparecer si no se activó.")]
     public float lifeDuration = 60f;
     [Tooltip("Prefab de efecto que se instancia al morir (opcional).")]
     public GameObject dieEffectPrefab;
     [Tooltip("Si true el efecto se parenta a la estatua antes de destruirla.")]
     public bool attachDieEffect = false;
 
-    [Header("Motivación")]
-    [Tooltip("Duración en segundos del efecto de motivación cuando la estatua es impactada por una flecha.")]
-    public float motivationDuration = 20f;
+    [Header("Construcción Automática")]
+    [Tooltip("Grid de puente sobre el que aplicar construcción automática cuando la estatua se activa y muere.")]
+    [SerializeField] private BridgeConstructionGrid bridgeGrid;
+    [Tooltip("Índice de capa máximo a construir (0=Base, 1=Soporte, 2=Superficie). Igual que RitualGranFuego.")]
+    [SerializeField, Range(0, 2)] private int buildUpToLayer = 2;
     
     [Header("UI Configuration")]
     [SerializeField] private int uiIndex = 3;
@@ -27,15 +28,12 @@ public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
     public int UIIndex => uiIndex;
 
     private float lifeTimer;
-    private bool isDead = false;
-
-    // Evento opcional para suscriptores externos
-    public System.Action OnDie; 
 
     public InteractPriority InteractPriority => InteractPriority.High;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         shadow.SetActive(false);
     }
 
@@ -78,20 +76,16 @@ public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
 
     private void Update()
     {
+        // Contador de vida específico de la estatua (independiente del TTL de PowerUpBase)
         // Countdown de vida
-        if (!isDead && lifeDuration > 0f)
+        if (!isActive && lifeDuration > 0f)
         {
             lifeTimer += Time.deltaTime;
             if (lifeTimer >= lifeDuration)
             {
-                Die();
+                // Si expira por tiempo sin ser activada, solo se destruye sin efecto
+                Despawn();
             }
-        }
-
-        if (isCarried && Vector3.Distance(transform.position, destinationPoint.position) < 1f)
-        {
-            powerUp.OnStatueArrived();
-            // Feedback visual/sonoro de llegada
         }
 
         if (isCarried)
@@ -104,65 +98,73 @@ public class StatueInteractable : MonoBehaviour, IInteractable, IUIActivatable
         }
     }
 
-    /// <summary>
-    /// Despawning controlado de la estatua. Instancia efecto y destruye el GameObject.
-    /// </summary>
-    public void Die()
-    {
-        if (isDead) return;
-        isDead = true;
-
-        if (dieEffectPrefab != null)
-        {
-            GameObject fx = Instantiate(dieEffectPrefab, transform.position, transform.rotation);
-            if (attachDieEffect && fx != null)
-            {
-                fx.transform.SetParent(transform, true);
-            }
-            // Autodestruir efecto si tiene ParticleSystem principal
-            var ps = fx.GetComponent<ParticleSystem>();
-            if (ps != null)
-            {
-                float ttl = ps.main.duration + ps.main.startLifetime.constantMax;
-                Destroy(fx, ttl);
-            }
-        }
-
-        OnDie?.Invoke();
-        Destroy(gameObject);
-    }
-
-    // Detección de Arrow para activar motivación y luego morir
+    // Detección de Arrow para activar la construcción y luego morir
     private void OnCollisionEnter(Collision collision)
     {
-        if (isDead) return;
+        if (isActive) return;
         if (collision.collider && collision.collider.GetComponent<Arrow>() != null)
         {
-            TriggerMotivationAndDie();
+            TryActivate(collision.gameObject);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (isDead) return;
+        if (isActive) return;
         if (other.GetComponent<Arrow>() != null)
         {
-            TriggerMotivationAndDie();
+            TryActivate(other.gameObject);
         }
-    }
-
-    private void TriggerMotivationAndDie()
-    {
-        // Activar motivación usando la duración configurable desde el inspector.
-        if (motivationDuration > 0f)
-        {
-            MotivationBuffManager.Activate(motivationDuration);
-        }
-        Die();
     }
 
     public void TurnOnShadow()
     {
         // TODO: Implementar visualización de sombra/highlight
     }
-} 
+
+    /// <summary>
+    /// Construye automáticamente los cuadrantes del puente hasta la capa indicada en buildUpToLayer,
+    /// reutilizando la misma lógica que PowerUpRitualGranFuego.
+    /// </summary>
+    private void ConstructBridgeAutomatically()
+    {
+        if (bridgeGrid == null) return;
+
+        int maxGridLayer = (bridgeGrid.layerHeights != null)
+            ? Mathf.Max(0, bridgeGrid.layerHeights.Length - 1)
+            : 2;
+
+        int targetMax = Mathf.Clamp(buildUpToLayer, 0, maxGridLayer);
+
+        for (int x = 0; x < bridgeGrid.gridWidth; x++)
+        {
+            for (int z = 0; z < bridgeGrid.gridLength; z++)
+            {
+                var so = bridgeGrid.GetQuadrantSO(x, z);
+                if (so == null || so.requiredLayers == null) continue;
+
+                for (int layerIndex = 0; layerIndex <= targetMax && layerIndex < so.requiredLayers.Length; layerIndex++)
+                {
+                    if (!so.requiredLayers[layerIndex].isCompleted)
+                    {
+                        // marcar la capa como completada directamente
+                        so.requiredLayers[layerIndex].isCompleted = true;
+                    }
+                }
+
+                // actualizar visuales/colisionadores del cuadrante después de modificar el SO
+                bridgeGrid.RefreshQuadrantVisuals(x, z);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Efecto del power-up: construir el puente y luego destruir la estatua.
+    /// </summary>
+    protected override IEnumerator EffectCoroutine(GameObject activator)
+    {
+        ConstructBridgeAutomatically();
+        Despawn();
+        yield break;
+    }
+}

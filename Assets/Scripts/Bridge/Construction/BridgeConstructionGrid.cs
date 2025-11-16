@@ -443,12 +443,20 @@ public class BridgeConstructionGrid : MonoBehaviour
             return false;
         }
 
-        // 5. Verificar estado de construcción del material si trae componente MaterialBaseInteractable
-        //    Esto permite que materiales como MaterialTipo2Ready bloqueen la construcción hasta estar listos (isReady=true)
+        // 5. Verificar que el objeto en mano sea un material de construcción válido
+        //    Exigimos que implemente MaterialBaseInteractable; si no, NO se puede usar para construir.
+        //    Esto evita que objetos como CoalItem, estatuas, etc. se cuelen como materiales del puente.
         if (layerObject != null)
         {
             var materialInteractable = layerObject.GetComponent<MaterialBaseInteractable>();
-            if (materialInteractable != null && !materialInteractable.PuedeConstruirse)
+            if (materialInteractable == null)
+            {
+                Debug.Log($"[GRID] {layerObject.name} no es un MaterialBaseInteractable, ignorando como material de construcción.");
+                return false;
+            }
+
+            // Permitir que materiales especiales bloqueen la construcción hasta estar listos (isReady=true)
+            if (!materialInteractable.PuedeConstruirse)
             {
                 return false;
             }

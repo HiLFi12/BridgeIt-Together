@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
+public class PowerUpCalorHumano : PowerUpBase, IInteractable
 {
     // Evento estático para notificar cuando el PowerUp es activado (TurnOn llamado)
     public static event System.Action<PowerUpCalorHumano> OnCalorHumanoActivated;
@@ -13,15 +13,7 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
     [Tooltip("Cantidad de carbones necesarios para activar el power up.")]
     public int carbonesNecesarios = 3;
 
-    [Header("Efecto de Calor a Jugadores")]
-    [Tooltip("Duración total del efecto manteniendo vivos los HeatSphere de los jugadores.")]
-    public float effectDuration = 20f;
-    [Tooltip("Intervalo con el que se refresca el cooldown de cada HeatSphere mientras dura el efecto.")]
-    public float heatRefreshInterval = 0.75f;
-    [Tooltip("Si está activo, solo se encenderán HeatSphere que estén bajo un Player. (Recomendado ON)")]
-    [SerializeField] private bool soloHeatDeJugadores = true;
-    [Tooltip("Opcional: si no se encuentra componente Player se puede usar un tag para validar el HeatSphere.")]
-    [SerializeField] private string playerRootTag = "Player";
+    [Header("Visual")]
     [SerializeField] private GameObject shadow;
 
     [Header("UI")]
@@ -31,25 +23,18 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
     [Header("Debug")]
     public bool debugLogs = false;
 
-    [Header("Protección ITurnable")]
-    [Tooltip("Ignora TurnOff externos (llamados por otros sistemas) hasta que termine la duración interna.")]
-    [SerializeField] private bool protectFromExternalTurnOff = true;
-
-    // Indicador de que el apagado fue iniciado por la propia rutina interna
-    private bool internalTurnOffRequest = false;
-    // Indicador de que el encendido fue solicitado internamente (al cumplir carbones)
-    private bool internalTurnOnRequest = false;
-
     // Estado interno
     private int carbonesActuales = 0;
-    private readonly List<HeatSphere> _playerHeatSpheres = new List<HeatSphere>();
+
+    [Header("Construcción Automática")]
+    [Tooltip("Grid de puente sobre el que aplicar construcción automática al finalizar Calor Humano.")]
+    [SerializeField] private BridgeConstructionGrid bridgeGrid;
+    [Tooltip("Índice de capa máximo a construir (0=Base, 1=Soporte, 2=Superficie). Igual que RitualGranFuego.")]
+    [SerializeField, Range(0, 2)] private int buildUpToLayer = 2;
 
     [Header("Interacción (Carbón)")]
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     public InteractPriority InteractPriority => interactPriority;
-
-    // ITurnable
-    public bool isTurned => isActive; // Reutilizamos isActive de PowerUpBase como estado encendido
 
     #region Interacción estilo Furnace
     public void Interact(GameObject interactor)
@@ -83,9 +68,9 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
 
         if (carbonesActuales >= carbonesNecesarios)
         {
-            if (debugLogs) Debug.Log("[CalorHumano] Requisitos completos. (TurnOn interno)", this);
-            internalTurnOnRequest = true;
-            TurnOn();
+            if (debugLogs) Debug.Log("[CalorHumano] Requisitos completos. (TryActivate)", this);
+            // Activamos el PowerUp usando el flujo estándar de PowerUpBase
+            TryActivate(interactor);
         }
         return true;
     }
@@ -102,8 +87,8 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
         
         if (carbonesActuales >= carbonesNecesarios)
         {
-            internalTurnOnRequest = true;
-            TurnOn();
+            if (debugLogs) Debug.Log("[CalorHumano] (Legacy) Requisitos completos. (TryActivate)", this);
+            TryActivate(null);
         }
     }
     
@@ -117,120 +102,50 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable, ITurnable
 
     protected override IEnumerator EffectCoroutine(GameObject activator)
     {
-        // No usado directamente; la lógica se ejecuta desde TurnOn/TurnOff ahora.
-        yield break;
-    }
-
-    public void TurnOn()
-    {
-        if (isActive) return;
-        // Si NO es un encendido interno (carbones completos) y aún no se cumple requisito, ignorar
-        if (!internalTurnOnRequest && carbonesActuales < carbonesNecesarios)
+        // Solo permitimos el efecto si se cumplió el requisito de carbones
+        if (carbonesActuales < carbonesNecesarios)
         {
-            if (debugLogs) Debug.Log("[CalorHumano] TurnOn externo ignorado (no cumple requisitos).", this);
-            return;
+            if (debugLogs) Debug.Log("[CalorHumano] EffectCoroutine cancelado: no se cumplen carbones.", this);
+            yield break;
         }
-
-        // Consumir la bandera de encendido interno
-        internalTurnOnRequest = false;
-
-        isActive = true;
-        isAvailable = false;
-        internalTurnOffRequest = false;
-        if (lifeCoroutine != null) StopCoroutine(lifeCoroutine);
-        if (debugLogs) Debug.Log("[CalorHumano] TurnOn() -> iniciando efecto válido.", this);
         
         // Notificar que el PowerUp fue activado (para tutoriales)
         OnCalorHumanoActivated?.Invoke(this);
-        
-        UpdateUI(); // Ocultar UI de carbón cuando se activa
-        
-        StartCoroutine(RunHeatEffect());
-    }
 
-    public void TurnOff()
-    {
-        if (protectFromExternalTurnOff && !internalTurnOffRequest)
-        {
-            if (debugLogs) Debug.Log("[CalorHumano] TurnOff externo ignorado (protegido).", this);
-            return; // Se ignora apagado de sistemas externos
-        }
-        if (!isActive) return;
-        if (debugLogs) Debug.Log("[CalorHumano] TurnOff() -> finalizando efecto.", this);
-        isActive = false;
-        // No destruimos de inmediato: dejamos que los HeatSphere expiren solos
+        // Ocultar / actualizar UI al activarse
+        UpdateUI();
+
+        // Construir automáticamente, igual que RitualGranFuego
+        ConstructBridgeAutomatically();
+
+        // Calor Humano: efecto instantáneo, no hace falta esperar duration
         Despawn();
+        yield break;
     }
 
-    private IEnumerator RunHeatEffect()
+    /// <summary>
+    /// Construye automáticamente los cuadrantes del puente hasta la capa indicada en buildUpToLayer,
+    /// reutilizando la misma lógica que PowerUpRitualGranFuego.
+    /// </summary>
+    private void ConstructBridgeAutomatically()
     {
-        GatherPlayerHeatSpheres();
-        float elapsed = 0f;
-        while (elapsed < effectDuration && isActive)
-        {
-            RefreshHeatSpheres();
-            yield return new WaitForSeconds(heatRefreshInterval);
-            elapsed += heatRefreshInterval;
-        }
-        if (debugLogs) Debug.Log("[CalorHumano] Duración completada o desactivado. TurnOff interno.", this);
-        internalTurnOffRequest = true;
-        TurnOff();
-    }
+        if (bridgeGrid == null) return;
 
-    private void GatherPlayerHeatSpheres()
-    {
-        _playerHeatSpheres.Clear();
+        int maxGridLayer = (bridgeGrid.layerHeights != null)
+            ? Mathf.Max(0, bridgeGrid.layerHeights.Length - 1)
+            : 2;
 
-        var allHeat = FindObjectsOfType<HeatSphere>(true);
-        foreach (var hs in allHeat)
+        int targetMax = Mathf.Clamp(buildUpToLayer, 0, maxGridLayer);
+
+        for (int x = 0; x < bridgeGrid.gridWidth; x++)
         {
-            if (hs == null) continue;
-            if (soloHeatDeJugadores)
+            for (int z = 0; z < bridgeGrid.gridLength; z++)
             {
-                // Criterio 1: Tiene un componente Player en su jerarquía padre
-                bool esDeJugador = hs.GetComponentInParent<Player>() != null;
-
-                // Criterio 2 (fallback opcional): El root (o algún padre) tiene un tag específico
-                if (!esDeJugador && !string.IsNullOrEmpty(playerRootTag))
+                for (int layerIndex = 0; layerIndex <= targetMax; layerIndex++)
                 {
-                    Transform t = hs.transform;
-                    while (t != null && !esDeJugador)
-                    {
-                        if (t.CompareTag(playerRootTag))
-                        {
-                            esDeJugador = true;
-                            break;
-                        }
-                        t = t.parent;
-                    }
-                }
-
-                if (!esDeJugador)
-                {
-                    // Saltar HeatSphere que no son de jugador (e.g., hornos u otros power-ups)
-                    continue;
+                    bridgeGrid.TryBuildLayer(x, z, layerIndex, null);
                 }
             }
-
-            _playerHeatSpheres.Add(hs);
-        }
-
-        if (debugLogs) Debug.Log($"[CalorHumano] HeatSphere jugadores detectados: {_playerHeatSpheres.Count}", this);
-    }
-
-    private void RefreshHeatSpheres()
-    {
-        for (int i = _playerHeatSpheres.Count - 1; i >= 0; i--)
-        {
-            var hs = _playerHeatSpheres[i];
-            if (hs == null)
-            {
-                _playerHeatSpheres.RemoveAt(i);
-                continue;
-            }
-            if (!hs.gameObject.activeSelf)
-                hs.gameObject.SetActive(true);
-            hs.ResetCooldown(); // renueva el tiempo interno
         }
     }
 

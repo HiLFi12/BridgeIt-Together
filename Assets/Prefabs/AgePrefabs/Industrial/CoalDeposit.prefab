@@ -373,10 +373,6 @@ MonoBehaviour:
   spawnSfxIndex: -1
   activateSfxIndex: -1
   carbonesNecesarios: 5
-  effectDuration: 40
-  heatRefreshInterval: 0.75
-  soloHeatDeJugadores: 1
-  playerRootTag: Player
   shadow: {fileID: 8972571325463338380}
   coalImages:
   - {fileID: 875512010860800048}
@@ -385,7 +381,8 @@ MonoBehaviour:
   - {fileID: 7969897578810982988}
   - {fileID: 6421700315098328316}
   debugLogs: 0
-  protectFromExternalTurnOff: 1
+  bridgeGrid: {fileID: 0}
+  buildUpToLayer: 1
   interactPriority: 4
 --- !u!65 &6275343561759922391
 BoxCollider:

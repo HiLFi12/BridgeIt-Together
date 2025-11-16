@@ -308,12 +308,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22616d3b2171aa845b61a7ae3eeb8e88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  powerUp: {fileID: 5282034991169345031, guid: 552e228fc8966d74db452c8f8d86e547, type: 3}
-  destinationPoint: {fileID: 4531737962384553690, guid: c15e7c9a5fbebe342bc412e1a6a1cc15, type: 3}
+  duration: 10
+  timeToLive: 15
+  spawnSfxIndex: -1
+  activateSfxIndex: -1
   lifeDuration: 99999
   dieEffectPrefab: {fileID: 104829970813648393, guid: d3015b7eea383f64d8b81f965cc466e7, type: 3}
   attachDieEffect: 0
-  motivationDuration: 20
+  bridgeGrid: {fileID: 0}
+  buildUpToLayer: 1
   uiIndex: 3
   canvas: {fileID: 5377388071790593900}
   shadow: {fileID: 1914067230137824277}

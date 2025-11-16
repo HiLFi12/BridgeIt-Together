@@ -1742,6 +1742,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2580870037752099030, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
     - target: {fileID: 5252760316567976276, guid: 177ed5cace6d65943aff654400948698, type: 3}
+      propertyPath: autoSpawn
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252760316567976276, guid: 177ed5cace6d65943aff654400948698, type: 3}
       propertyPath: bridgeGrid
       value: 
       objectReference: {fileID: 985317586}
@@ -1751,11 +1755,11 @@ PrefabInstance:
       objectReference: {fileID: 752726193}
     - target: {fileID: 5252760316567976276, guid: 177ed5cace6d65943aff654400948698, type: 3}
       propertyPath: maxSpawnDelay
-      value: 1
+      value: 160
       objectReference: {fileID: 0}
     - target: {fileID: 5252760316567976276, guid: 177ed5cace6d65943aff654400948698, type: 3}
       propertyPath: minSpawnDelay
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5252760316567976276, guid: 177ed5cace6d65943aff654400948698, type: 3}
       propertyPath: maxSpawnInterval
@@ -2299,7 +2303,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7608672962820044972, guid: 9539d968481bd904eb7955a7e9f15f00, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -297.35
+      value: -284.69
       objectReference: {fileID: 0}
     - target: {fileID: 7608672962820044972, guid: 9539d968481bd904eb7955a7e9f15f00, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2307,7 +2311,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7608672962820044972, guid: 9539d968481bd904eb7955a7e9f15f00, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 397.88
+      value: 418.45
       objectReference: {fileID: 0}
     - target: {fileID: 7608672962820044972, guid: 9539d968481bd904eb7955a7e9f15f00, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3961,6 +3965,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CoalDeposit
       objectReference: {fileID: 0}
+    - target: {fileID: 2580870037752099030, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4897698460427902470, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
       propertyPath: m_LocalPosition.x
       value: -284.78
@@ -4000,6 +4008,18 @@ PrefabInstance:
     - target: {fileID: 4897698460427902470, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6794124959495141859, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9131316214125464037, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
+      propertyPath: bridgeGrid
+      value: 
+      objectReference: {fileID: 985317586}
+    - target: {fileID: 9131316214125464037, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
+      propertyPath: buildUpToLayer
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
