@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// Patrón similar a CortezaResistente (IInteractable) pero dirigido a Furnace.
 /// </summary>
 [DisallowMultipleComponent]
-public class CoalItem : MonoBehaviour, IInteractable, IHitable
+public class CoalItem : MonoBehaviour, IInteractable, IHitable, IUIActivatable
 {
 	[Header("Interacción")]
 	[SerializeField] private InteractPriority interactPriority = InteractPriority.Low;
@@ -17,6 +17,11 @@ public class CoalItem : MonoBehaviour, IInteractable, IHitable
 	[Tooltip("Capas a considerar para buscar el Furnace.")]
 	[SerializeField] private LayerMask searchLayers = ~0;
 	[SerializeField] private bool debugLogs = false;
+	
+	[Header("UI Configuration")]
+	[SerializeField] private int uiIndex = 0;
+    
+	public int UIIndex => uiIndex;
 
 	public InteractPriority InteractPriority => interactPriority;
 
@@ -52,6 +57,11 @@ public class CoalItem : MonoBehaviour, IInteractable, IHitable
 			if (debugLogs) Debug.Log("[CoalItem] No se pudo agregar carbón al Furnace (quizá está lleno o el objeto no era válido).", this);
 		}
 	}
+	
+	public void SetUIIndex(int index)
+    {
+        uiIndex = index;
+    }
 	
 	public void TurnOnShadow()
 	{
