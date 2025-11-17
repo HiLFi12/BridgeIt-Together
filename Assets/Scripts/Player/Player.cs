@@ -398,7 +398,12 @@ public class Player : MonoBehaviour, IHitable
                 {
                     seleccionado.Interact(this.gameObject);
 
-                    ignoredInteractables.Add(seleccionado);
+                    // No ignorar objetos que deben ser siempre interactuables
+                    if (!IsAlwaysInteractable(seleccionado))
+                    {
+                        ignoredInteractables.Add(seleccionado);
+                    }
+                    
                     OnPlayerInteracted?.Invoke();
                 }
             }
@@ -514,6 +519,24 @@ public class Player : MonoBehaviour, IHitable
         return false;
     }
 
+    /// <summary>
+    /// Determina si un interactable debe ser siempre detectable (no ignorarse después de interactuar).
+    /// Catapult, Ballista y WagonLeverInteractable son excepciones que siempre deben estar disponibles.
+    /// </summary>
+    private bool IsAlwaysInteractable(IInteractable interactable)
+    {
+        if (interactable == null) return false;
+        var comp = interactable as Component;
+        if (comp == null) return false;
+        
+        // Verificar si es uno de los tipos que debe ser siempre interactuable
+        if (comp.GetComponentInParent<Catapult>() != null) return true;
+        if (comp.GetComponentInParent<Ballista>() != null) return true;
+        if (comp.GetComponentInParent<WagonLeverInteractable>() != null) return true;
+        if (comp.GetComponentInParent<Wagon>() != null) return true;
+        
+        return false;
+    }
     private void ShowInteractionUI()
     {
         if (CurrentInteractionUI != null && !CurrentInteractionUI.gameObject.activeInHierarchy)
