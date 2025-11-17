@@ -70,6 +70,12 @@ public class Player : MonoBehaviour, IHitable
     
     public PlayerInput PlayerInput => playerInput;
     public PlayerController PlayerController => playerController;
+    
+    // Propiedades para acceder a las UIs desde PlayerUIManager
+    public Image InteractionKeyUI => interactionKeyUI;
+    public Image InteractionPadUI => interactionPadUI;
+    public Image BuildKeyUI => buildKeyUI;
+    public Image BuildPadUI => buildPadUI;
 
     public delegate void PlayerInteractedHandler();
     public event PlayerInteractedHandler OnPlayerInteracted;

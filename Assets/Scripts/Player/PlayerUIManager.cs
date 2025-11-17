@@ -35,6 +35,9 @@ public class PlayerUIManager : MonoBehaviour
     
     // Diccionario para rastrear qué cuadrantes activó este jugador específico
     private Dictionary<int, HashSet<BridgeQuadrant>> _myActivatedQuadrants = new Dictionary<int, HashSet<BridgeQuadrant>>();
+    
+    // Referencia al componente Player
+    private Player _player;
 
     private void Awake()
     {
@@ -43,6 +46,9 @@ public class PlayerUIManager : MonoBehaviour
             _allManagers.Add(this);
             Debug.Log($"PlayerUIManager registrado: {gameObject.name}. Total managers: {_allManagers.Count}");
         }
+        
+        // Obtener referencia al componente Player
+        _player = GetComponent<Player>();
     }
 
     private void OnDestroy()
@@ -61,6 +67,31 @@ public class PlayerUIManager : MonoBehaviour
                 _sharedActiveCount[i] = 0;
             }
             TurnOffUIInternal(i);
+        }
+    }
+
+    private void Update()
+    {
+        if (_player == null) return;
+        
+        // Verificar si interactionUI o BuildUI están activos
+        bool interactionUIActive = (_player.InteractionKeyUI != null && _player.InteractionKeyUI.gameObject.activeInHierarchy) ||
+                                    (_player.InteractionPadUI != null && _player.InteractionPadUI.gameObject.activeInHierarchy);
+        
+        bool buildUIActive = (_player.BuildKeyUI != null && _player.BuildKeyUI.gameObject.activeInHierarchy) ||
+                            (_player.BuildPadUI != null && _player.BuildPadUI.gameObject.activeInHierarchy);
+        
+        // Si interactionUI o BuildUI están activos, desactivar todas las playerUI
+        if (interactionUIActive || buildUIActive)
+        {
+            for (int i = 0; i < uiGroups.Count; i++)
+            {
+                UIGroup group = uiGroups[i];
+                if (group.playerUI != null && group.playerUI.gameObject.activeInHierarchy)
+                {
+                    group.playerUI.gameObject.SetActive(false);
+                }
+            }
         }
     }
 
@@ -175,7 +206,26 @@ public class PlayerUIManager : MonoBehaviour
 
         if (group.playerUI != null)
         {
-            group.playerUI.gameObject.SetActive(true);
+            // Solo activar playerUI si las UIs de interacción y construcción NO están activas
+            if (_player != null)
+            {
+                bool interactionUIActive = (_player.InteractionKeyUI != null && _player.InteractionKeyUI.gameObject.activeInHierarchy) ||
+                                            (_player.InteractionPadUI != null && _player.InteractionPadUI.gameObject.activeInHierarchy);
+                
+                bool buildUIActive = (_player.BuildKeyUI != null && _player.BuildKeyUI.gameObject.activeInHierarchy) ||
+                                    (_player.BuildPadUI != null && _player.BuildPadUI.gameObject.activeInHierarchy);
+                
+                // Solo activar si ninguna de las UIs está activa
+                if (!interactionUIActive && !buildUIActive)
+                {
+                    group.playerUI.gameObject.SetActive(true);
+                }
+            }
+            else
+            {
+                // Si no hay referencia al player, activar normalmente
+                group.playerUI.gameObject.SetActive(true);
+            }
         }
     }
 
@@ -505,3 +555,6 @@ public class PlayerUIManager : MonoBehaviour
         TurnOnPlayerUIOnly(index);
     }
 }
+
+
+
