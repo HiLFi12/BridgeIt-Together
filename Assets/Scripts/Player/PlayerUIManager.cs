@@ -33,8 +33,15 @@ public class PlayerUIManager : MonoBehaviour
     [Header("Grupos de UI")]
     [SerializeField] private List<UIGroup> uiGroups = new List<UIGroup>();
     
+    [Header("Referencias")]
+    [Tooltip("Referencia al componente Player para verificar UIs de interacción/construcción")]
+    [SerializeField] private Player player;
+    
     // Diccionario para rastrear qué cuadrantes activó este jugador específico
     private Dictionary<int, HashSet<BridgeQuadrant>> _myActivatedQuadrants = new Dictionary<int, HashSet<BridgeQuadrant>>();
+    
+    // Índice de UI que debería estar activo (pero puede estar oculto por interacción/construcción)
+    private int _pendingPlayerUIIndex = -1;
 
     private void Awake()
     {
@@ -42,6 +49,12 @@ public class PlayerUIManager : MonoBehaviour
         {
             _allManagers.Add(this);
             Debug.Log($"PlayerUIManager registrado: {gameObject.name}. Total managers: {_allManagers.Count}");
+        }
+        
+        // Auto-asignar Player si no está asignado
+        if (player == null)
+        {
+            player = GetComponent<Player>();
         }
     }
 
@@ -175,7 +188,18 @@ public class PlayerUIManager : MonoBehaviour
 
         if (group.playerUI != null)
         {
-            group.playerUI.gameObject.SetActive(true);
+            // Guardar el índice pendiente
+            _pendingPlayerUIIndex = index;
+            
+            // Solo activar si no hay UIs de interacción/construcción activas
+            if (!IsInteractionOrBuildUIActive())
+            {
+                group.playerUI.gameObject.SetActive(true);
+            }
+            else
+            {
+                Debug.Log($"PlayerUIManager ({gameObject.name}): playerUI[{index}] no se activa porque hay UI de interacción/construcción activa");
+            }
         }
     }
 
@@ -188,6 +212,12 @@ public class PlayerUIManager : MonoBehaviour
         if (group.playerUI != null)
         {
             group.playerUI.gameObject.SetActive(false);
+            
+            // Limpiar el índice pendiente si coincide
+            if (_pendingPlayerUIIndex == index)
+            {
+                _pendingPlayerUIIndex = -1;
+            }
         }
     }
 
@@ -503,5 +533,49 @@ public class PlayerUIManager : MonoBehaviour
         }
         // Activar la UI del índice deseado
         TurnOnPlayerUIOnly(index);
+    }
+    
+    /// <summary>
+    /// Verifica si alguna UI de interacción o construcción está activa.
+    /// </summary>
+    private bool IsInteractionOrBuildUIActive()
+    {
+        if (player == null)
+            return false;
+        
+        return player.IsInteractionUIActive || player.IsBuildUIActive;
+    }
+    
+    /// <summary>
+    /// Método llamado por Player cuando cambia el estado de las UIs de interacción/construcción.
+    /// Refresca la playerUI pendiente según corresponda.
+    /// </summary>
+    public void OnInteractionOrBuildUIChanged()
+    {
+        if (_pendingPlayerUIIndex < 0 || !IsValidIndex(_pendingPlayerUIIndex))
+            return;
+        
+        UIGroup group = uiGroups[_pendingPlayerUIIndex];
+        if (group.playerUI == null)
+            return;
+        
+        // Si hay UI de interacción/construcción activa, ocultar playerUI
+        if (IsInteractionOrBuildUIActive())
+        {
+            if (group.playerUI.gameObject.activeInHierarchy)
+            {
+                group.playerUI.gameObject.SetActive(false);
+                Debug.Log($"PlayerUIManager ({gameObject.name}): Ocultando playerUI[{_pendingPlayerUIIndex}] por UI de interacción/construcción");
+            }
+        }
+        // Si no hay UI de interacción/construcción, mostrar playerUI pendiente
+        else
+        {
+            if (!group.playerUI.gameObject.activeInHierarchy)
+            {
+                group.playerUI.gameObject.SetActive(true);
+                Debug.Log($"PlayerUIManager ({gameObject.name}): Mostrando playerUI[{_pendingPlayerUIIndex}] porque ya no hay UI de interacción/construcción");
+            }
+        }
     }
 }

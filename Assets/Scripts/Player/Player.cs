@@ -55,6 +55,7 @@ public class Player : MonoBehaviour, IHitable
     private CharacterController characterController;
     private PlayerController playerController;
     private PlayerInput playerInput;
+    private PlayerUIManager uiManager;
     private InputAction interactAction;
     
     private InputAction dashAction;
@@ -70,6 +71,10 @@ public class Player : MonoBehaviour, IHitable
     
     public PlayerInput PlayerInput => playerInput;
     public PlayerController PlayerController => playerController;
+    
+    // Propiedades para verificar el estado de las UIs
+    public bool IsInteractionUIActive => CurrentInteractionUI != null && CurrentInteractionUI.gameObject.activeInHierarchy;
+    public bool IsBuildUIActive => CurrentBuildUI != null && CurrentBuildUI.gameObject.activeInHierarchy;
 
     public delegate void PlayerInteractedHandler();
     public event PlayerInteractedHandler OnPlayerInteracted;
@@ -90,6 +95,7 @@ public class Player : MonoBehaviour, IHitable
         characterController = GetComponent<CharacterController>();
         playerController = GetComponent<PlayerController>();
         playerInput = GetComponent<PlayerInput>();
+        uiManager = GetComponent<PlayerUIManager>();
         gameConditionManager = FindObjectOfType<GameConditionManager>();
         
         if (playerInput != null)
@@ -542,6 +548,9 @@ public class Player : MonoBehaviour, IHitable
         if (CurrentInteractionUI != null && !CurrentInteractionUI.gameObject.activeInHierarchy)
         {
             CurrentInteractionUI.gameObject.SetActive(true);
+            // Notificar al UIManager que la UI de interacción cambió
+            if (uiManager != null)
+                uiManager.OnInteractionOrBuildUIChanged();
         }
     }
 
@@ -550,6 +559,9 @@ public class Player : MonoBehaviour, IHitable
         if (CurrentInteractionUI != null && CurrentInteractionUI.gameObject.activeInHierarchy)
         {
             CurrentInteractionUI.gameObject.SetActive(false);
+            // Notificar al UIManager que la UI de interacción cambió
+            if (uiManager != null)
+                uiManager.OnInteractionOrBuildUIChanged();
         }
     }
 
@@ -575,13 +587,23 @@ public class Player : MonoBehaviour, IHitable
     private void ShowBuildUI()
     {
         if (CurrentBuildUI != null && !CurrentBuildUI.gameObject.activeInHierarchy)
+        {
             CurrentBuildUI.gameObject.SetActive(true);
+            // Notificar al UIManager que la UI de construcción cambió
+            if (uiManager != null)
+                uiManager.OnInteractionOrBuildUIChanged();
+        }
     }
 
     private void HideBuildUI()
     {
         if (CurrentBuildUI != null && CurrentBuildUI.gameObject.activeInHierarchy)
+        {
             CurrentBuildUI.gameObject.SetActive(false);
+            // Notificar al UIManager que la UI de construcción cambió
+            if (uiManager != null)
+                uiManager.OnInteractionOrBuildUIChanged();
+        }
     }
 
     private void TryDropObject()
