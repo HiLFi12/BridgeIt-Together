@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
 {
+    // Evento para notificar cuando un player agarra la estatua
+    public static event System.Action<StatueInteractable, GameObject> OnStatuePickedUp;
+    
     private bool isCarried = false;
 
     [Header("Lifetime / Despawn")]
@@ -45,6 +48,9 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
         {
             holder.PickUpExistingInstance(gameObject);
             isCarried = true;
+            
+            // Notificar que la estatua fue agarrada
+            OnStatuePickedUp?.Invoke(this, interactor);
             
             // Suscribirse al evento OnDropped para detectar cuando se suelta
             holder.OnDropped += OnStatueDropped;

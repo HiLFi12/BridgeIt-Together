@@ -1,47 +1,48 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "TutorialActivarMaterialTipo2", menuName = "Tutorial/TutorialActivarMaterialTipo2", order = 10)]
 public class TutorialActivarMaterialTipo2 : TutorialSO
 {
-    private MaterialTipo2Ready[] allMaterials;
+    private HashSet<MaterialTipo2Ready> _initialReadyMaterials;
+    private bool _hasInitialized;
 
     public override void Initialize()
     {
         base.Initialize();
         
-        // Encontrar todos los MaterialTipo2Ready en la escena
-        allMaterials = Object.FindObjectsByType<MaterialTipo2Ready>(FindObjectsSortMode.None);
+        // Guardar referencias a los materiales que YA están ready al inicio
+        _initialReadyMaterials = new HashSet<MaterialTipo2Ready>();
         
-        if (allMaterials == null || allMaterials.Length == 0)
+        MaterialTipo2Ready[] allMaterials = Object.FindObjectsByType<MaterialTipo2Ready>(FindObjectsSortMode.None);
+        foreach (var material in allMaterials)
         {
-            Debug.LogWarning("[TutorialActivarMaterialTipo2] No se encontraron MaterialTipo2Ready en la escena.");
+            if (material != null && material.IsReady)
+            {
+                _initialReadyMaterials.Add(material);
+            }
         }
-        else
-        {
-            Debug.Log($"[TutorialActivarMaterialTipo2] Inicializado con {allMaterials.Length} material(es).");
-            // Chequear al inicializar por si ya hay alguno activado
-            CheckAndComplete();
-        }
+        
+        _hasInitialized = true;
+        
+        Debug.Log($"[TutorialActivarMaterialTipo2] Inicializado. {_initialReadyMaterials.Count} materiales ya estaban ready. Esperando activación de un material nuevo.");
     }
 
     public override void UpdateTutorial()
     {
-        if (TutorialFinished || allMaterials == null || allMaterials.Length == 0) return;
+        if (TutorialFinished || !_hasInitialized) return;
 
-        CheckAndComplete();
-    }
-
-    private void CheckAndComplete()
-    {
-        // Revisar todos los materiales en la escena
+        // Buscar materiales que estén ready AHORA
+        MaterialTipo2Ready[] allMaterials = Object.FindObjectsByType<MaterialTipo2Ready>(FindObjectsSortMode.None);
+        
         foreach (var material in allMaterials)
         {
             if (material == null) continue;
-
-            // Verificar si isReady es true (usando la propiedad IsReady de la clase base)
-            if (material.IsReady)
+            
+            // Si este material está ready Y NO estaba en el set inicial → es nuevo!
+            if (material.IsReady && !_initialReadyMaterials.Contains(material))
             {
-                Debug.Log($"[TutorialActivarMaterialTipo2] Material '{material.name}' encontrado con isReady=true.");
+                Debug.Log($"[TutorialActivarMaterialTipo2] Material '{material.name}' activado (no estaba ready al inicio). Completando tutorial.");
                 CompleteTutorial();
                 return;
             }
@@ -51,7 +52,11 @@ public class TutorialActivarMaterialTipo2 : TutorialSO
     public override void ResetTutorial()
     {
         base.ResetTutorial();
-        allMaterials = null;
+        _hasInitialized = false;
+        if (_initialReadyMaterials != null)
+        {
+            _initialReadyMaterials.Clear();
+        }
     }
 }
 
