@@ -32,6 +32,9 @@ public class PlayerUIManager : MonoBehaviour
 
     [Header("Grupos de UI")]
     [SerializeField] private List<UIGroup> uiGroups = new List<UIGroup>();
+    
+    // Diccionario para rastrear qué cuadrantes activó este jugador específico
+    private Dictionary<int, HashSet<BridgeQuadrant>> _myActivatedQuadrants = new Dictionary<int, HashSet<BridgeQuadrant>>();
 
     private void Awake()
     {
@@ -108,17 +111,22 @@ public class PlayerUIManager : MonoBehaviour
         // Activar la playerUI SOLO de este manager
         TurnOnPlayerUIOnly(index);
         
-        // Activar las UI compartidas (othersUI y bridgeQuadrants) solo la primera vez
+        // Los cuadrantes del puente se activan SOLO para este manager (basado en su posición)
+        // Los othersUI se activan para todos solo la primera vez
         if (_sharedActiveCount[index] == 1)
         {
+            // Activar othersUI compartidos en todos los managers
             foreach (PlayerUIManager manager in _allManagers)
             {
                 if (manager != null)
                 {
-                    manager.TurnOnSharedUIOnly(index);
+                    manager.TurnOnSharedUIOthersOnly(index);
                 }
             }
         }
+        
+        // Activar cuadrantes del puente solo para ESTE manager
+        TurnOnBridgeQuadrantsOnly(index);
     }
 
     public void TurnOffUI(int index)
@@ -143,14 +151,17 @@ public class PlayerUIManager : MonoBehaviour
         // Desactivar la playerUI SOLO de este manager
         TurnOffPlayerUIOnly(index);
         
-        // Desactivar las UI compartidas solo cuando nadie las use
+        // Desactivar cuadrantes del puente solo para ESTE manager
+        TurnOffBridgeQuadrantsOnly(index);
+        
+        // Desactivar las UI compartidas (othersUI) solo cuando nadie las use
         if (_sharedActiveCount[index] == 0)
         {
             foreach (PlayerUIManager manager in _allManagers)
             {
                 if (manager != null)
                 {
-                    manager.TurnOffSharedUIOnly(index);
+                    manager.TurnOffSharedUIOthersOnly(index);
                 }
             }
         }
@@ -180,6 +191,107 @@ public class PlayerUIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Activa solo los cuadrantes del puente para ESTE jugador específico.
+    /// </summary>
+    private void TurnOnBridgeQuadrantsOnly(int index)
+    {
+        if (!IsValidIndex(index)) return;
+
+        UIGroup group = uiGroups[index];
+
+        if (group.useBridgeQuadrants)
+        {
+            // Inicializar el HashSet para este índice si no existe
+            if (!_myActivatedQuadrants.ContainsKey(index))
+            {
+                _myActivatedQuadrants[index] = new HashSet<BridgeQuadrant>();
+            }
+            
+            Debug.Log($"PlayerUIManager ({gameObject.name}): Activando BridgeQuadrants para grupo[{index}] '{group.name}' capa {group.bridgeLayer}, registrados: {group.registeredQuadrants.Count}");
+            Vector3 playerPos = transform.position;
+            
+            // Activar solo los cuadrantes accesibles desde el lado del jugador
+            // y registrarlos en _myActivatedQuadrants
+            ActivateAccessibleQuadrantsFromPlayerSide(group, playerPos, index);
+        }
+    }
+    
+    /// <summary>
+    /// Desactiva solo los cuadrantes del puente que ESTE jugador activó.
+    /// </summary>
+    private void TurnOffBridgeQuadrantsOnly(int index)
+    {
+        if (!IsValidIndex(index)) return;
+
+        UIGroup group = uiGroups[index];
+
+        if (group.useBridgeQuadrants && _myActivatedQuadrants.ContainsKey(index))
+        {
+            // Solo apagar los cuadrantes que ESTE jugador activó
+            HashSet<BridgeQuadrant> myQuadrants = _myActivatedQuadrants[index];
+            
+            foreach (BridgeQuadrant quadrant in myQuadrants)
+            {
+                if (quadrant != null)
+                {
+                    Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
+                    if (layerUI != null)
+                    {
+                        layerUI.gameObject.SetActive(false);
+                    }
+                }
+            }
+            
+            // Limpiar el registro de cuadrantes activados por este jugador
+            myQuadrants.Clear();
+            
+            Debug.Log($"PlayerUIManager ({gameObject.name}): Desactivados cuadrantes del puente para índice {index}");
+        }
+    }
+
+    /// <summary>
+    /// Activa solo los othersUI compartidos (no los cuadrantes del puente).
+    /// </summary>
+    private void TurnOnSharedUIOthersOnly(int index)
+    {
+        if (!IsValidIndex(index)) return;
+
+        UIGroup group = uiGroups[index];
+        
+        if (group.othersUI != null && group.othersUI.Length > 0)
+        {
+            foreach (Image otherUI in group.othersUI)
+            {
+                if (otherUI != null)
+                {
+                    otherUI.gameObject.SetActive(true);
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Desactiva solo los othersUI compartidos (no los cuadrantes del puente).
+    /// </summary>
+    private void TurnOffSharedUIOthersOnly(int index)
+    {
+        if (!IsValidIndex(index)) return;
+
+        UIGroup group = uiGroups[index];
+        
+        if (group.othersUI != null && group.othersUI.Length > 0)
+        {
+            foreach (Image otherUI in group.othersUI)
+            {
+                if (otherUI != null)
+                {
+                    otherUI.gameObject.SetActive(false);
+                }
+            }
+        }
+    }
+
     private void TurnOnSharedUIOnly(int index)
     {
         if (!IsValidIndex(index)) return;
@@ -188,19 +300,17 @@ public class PlayerUIManager : MonoBehaviour
 
         if (group.useBridgeQuadrants)
         {
-            Debug.Log($"PlayerUIManager ({gameObject.name}): Activando BridgeQuadrants para grupo[{index}] '{group.name}' capa {group.bridgeLayer}, registrados: {group.registeredQuadrants.Count}");
-            foreach (BridgeQuadrant quadrant in group.registeredQuadrants)
+            // Inicializar el HashSet para este índice si no existe
+            if (!_myActivatedQuadrants.ContainsKey(index))
             {
-                if (quadrant != null && quadrant.CanBuildLayer(group.bridgeLayer))
-                {
-                    Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
-                    if (layerUI != null)
-                    {
-                        Debug.Log($"Activando UI de BridgeQuadrant '{quadrant.gameObject.name}' para capa {group.bridgeLayer} en grupo[{index}] '{group.name}'");
-                        layerUI.gameObject.SetActive(true);
-                    }
-                }
+                _myActivatedQuadrants[index] = new HashSet<BridgeQuadrant>();
             }
+            
+            Debug.Log($"PlayerUIManager ({gameObject.name}): Activando BridgeQuadrants para grupo[{index}] '{group.name}' capa {group.bridgeLayer}, registrados: {group.registeredQuadrants.Count}");
+            Vector3 playerPos = transform.position;
+            
+            // Activar solo los cuadrantes accesibles desde el lado del jugador
+            ActivateAccessibleQuadrantsFromPlayerSide(group, playerPos, index);
         }
         
         if (group.othersUI != null && group.othersUI.Length > 0)
@@ -213,6 +323,119 @@ public class PlayerUIManager : MonoBehaviour
                 }
             }
         }
+    }
+    
+    /// <summary>
+    /// Activa solo los cuadrantes accesibles desde el lado del jugador.
+    /// Recorre el puente desde el borde más cercano hacia el centro, columna por columna,
+    /// y se detiene cuando encuentra cuadrantes no construibles.
+    /// </summary>
+    private void ActivateAccessibleQuadrantsFromPlayerSide(UIGroup group, Vector3 playerPos, int index)
+    {
+        if (group.registeredQuadrants.Count == 0) return;
+        
+        // Obtener el HashSet de cuadrantes activados por este jugador
+        HashSet<BridgeQuadrant> myQuadrants = _myActivatedQuadrants[index];
+        
+        // Agrupar cuadrantes por grid
+        Dictionary<BridgeConstructionGrid, List<BridgeQuadrant>> quadrantsByGrid = new Dictionary<BridgeConstructionGrid, List<BridgeQuadrant>>();
+        
+        foreach (BridgeQuadrant quadrant in group.registeredQuadrants)
+        {
+            if (quadrant != null && quadrant.grid != null)
+            {
+                if (!quadrantsByGrid.ContainsKey(quadrant.grid))
+                {
+                    quadrantsByGrid[quadrant.grid] = new List<BridgeQuadrant>();
+                }
+                quadrantsByGrid[quadrant.grid].Add(quadrant);
+            }
+        }
+        
+        // Procesar cada grid
+        foreach (var kvp in quadrantsByGrid)
+        {
+            BridgeConstructionGrid grid = kvp.Key;
+            List<BridgeQuadrant> quadrants = kvp.Value;
+            
+            // Determinar de qué lado está el jugador
+            int leftEdgeX = 0;
+            int rightEdgeX = grid.gridWidth - 1;
+            
+            float leftEdgePosX = grid.transform.position.x + (leftEdgeX + 0.5f) * grid.QuadrantStepX;
+            float rightEdgePosX = grid.transform.position.x + (rightEdgeX + 0.5f) * grid.QuadrantStepX;
+            
+            float distToLeftEdge = Mathf.Abs(playerPos.x - leftEdgePosX);
+            float distToRightEdge = Mathf.Abs(playerPos.x - rightEdgePosX);
+            
+            bool playerNearLeftEdge = distToLeftEdge < distToRightEdge;
+            
+            Debug.Log($"Jugador en X={playerPos.x:F1}, Borde izq X={leftEdgePosX:F1}, Borde der X={rightEdgePosX:F1}, Player cerca del borde: {(playerNearLeftEdge ? "IZQUIERDO" : "DERECHO")}");
+            
+            // Recorrer desde el borde del jugador hacia el centro, columna por columna
+            int startX = playerNearLeftEdge ? leftEdgeX : rightEdgeX;
+            int direction = playerNearLeftEdge ? 1 : -1; // 1 = hacia derecha, -1 = hacia izquierda
+            int activatedCount = 0;
+            
+            // Para cada columna desde el borde del jugador
+            for (int x = startX; x >= 0 && x < grid.gridWidth; x += direction)
+            {
+                bool columnHasAccessible = false;
+                
+                // Para cada fila en esta columna
+                for (int z = 0; z < grid.gridLength; z++)
+                {
+                    BridgeQuadrant quadrant = FindQuadrantAt(quadrants, x, z);
+                    
+                    if (quadrant != null && quadrant.CanBuildLayer(group.bridgeLayer))
+                    {
+                        Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
+                        if (layerUI != null)
+                        {
+                            layerUI.gameObject.SetActive(true);
+                            columnHasAccessible = true;
+                            activatedCount++;
+                            
+                            // Registrar este cuadrante como activado por ESTE jugador
+                            myQuadrants.Add(quadrant);
+                            
+                            Debug.Log($"  ✓ Activado cuadrante [{x},{z}]");
+                        }
+                    }
+                }
+                
+                // Si esta columna no tiene ningún cuadrante accesible, detener la búsqueda
+                // (el puente no ha progresado hasta aquí todavía)
+                if (!columnHasAccessible && x != startX)
+                {
+                    Debug.Log($"  ✗ Columna {x} no tiene cuadrantes accesibles, deteniendo búsqueda");
+                    break;
+                }
+            }
+            
+            Debug.Log($"Total activados: {activatedCount} cuadrantes desde borde X={startX}");
+        }
+    }
+    
+    /// <summary>
+    /// Encuentra un cuadrante en la lista por sus coordenadas X,Z.
+    /// </summary>
+    private BridgeQuadrant FindQuadrantAt(List<BridgeQuadrant> quadrants, int x, int z)
+    {
+        foreach (BridgeQuadrant quadrant in quadrants)
+        {
+            if (quadrant == null) continue;
+            
+            string[] parts = quadrant.gameObject.name.Split('_');
+            if (parts.Length < 3) continue;
+            
+            if (int.TryParse(parts[1], out int quadX) && int.TryParse(parts[2], out int quadZ))
+            {
+                if (quadX == x && quadZ == z)
+                    return quadrant;
+            }
+        }
+        return null;
     }
 
     private void TurnOffSharedUIOnly(int index)
