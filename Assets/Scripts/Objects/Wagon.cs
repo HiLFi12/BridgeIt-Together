@@ -26,6 +26,10 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
     [Header("Holder del Vagón")]
     [SerializeField] private Transform holderAnchor;
 
+    [Header("Objetos Estáticos")]
+    [SerializeField, Tooltip("GameObjects que no se moverán con el wagon (como canvas UI)")]
+    private GameObject[] staticObjects;
+
     [Header("Estado / Debug")] 
     [SerializeField] private bool debugGizmos = true;
 
@@ -41,7 +45,6 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
 
     private bool traveling = false;
     private bool atPointA = true; // indica si está estacionado exactamente en A (si es false asumimos está en B)
-    private bool heatLostDuringTrip = false;
 
     // Holder
     private GameObject heldObject; // único objeto
@@ -126,7 +129,6 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
             return;
         }
         if (travelRoutine != null) StopCoroutine(travelRoutine);
-        heatLostDuringTrip = false; // se limpia al comenzar
         StartMoveLoopSfx();
         travelRoutine = StartCoroutine(Viajar());
     }
@@ -161,6 +163,23 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
             target = atPointA ? pointB.position : pointA.position;
         }
 
+        // Guardar posiciones world de objetos estáticos
+        Vector3[] staticPositions = null;
+        Quaternion[] staticRotations = null;
+        if (staticObjects != null && staticObjects.Length > 0)
+        {
+            staticPositions = new Vector3[staticObjects.Length];
+            staticRotations = new Quaternion[staticObjects.Length];
+            for (int i = 0; i < staticObjects.Length; i++)
+            {
+                if (staticObjects[i] != null)
+                {
+                    staticPositions[i] = staticObjects[i].transform.position;
+                    staticRotations[i] = staticObjects[i].transform.rotation;
+                }
+            }
+        }
+
         while (true)
         {
             Vector3 dir = (target - transform.position);
@@ -177,7 +196,34 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
                 break;
             }
             transform.Translate(step, Space.World); // movement
+            
+            // Restaurar posiciones de objetos estáticos
+            if (staticPositions != null)
+            {
+                for (int i = 0; i < staticObjects.Length; i++)
+                {
+                    if (staticObjects[i] != null)
+                    {
+                        staticObjects[i].transform.position = staticPositions[i];
+                        staticObjects[i].transform.rotation = staticRotations[i];
+                    }
+                }
+            }
+            
             yield return null;
+        }
+
+        // Restaurar posiciones al finalizar
+        if (staticPositions != null)
+        {
+            for (int i = 0; i < staticObjects.Length; i++)
+            {
+                if (staticObjects[i] != null)
+                {
+                    staticObjects[i].transform.position = staticPositions[i];
+                    staticObjects[i].transform.rotation = staticRotations[i];
+                }
+            }
         }
 
         // Llegó al destino
@@ -204,12 +250,6 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
         {
             transform.position = (freezePointPositions && worldPointsInitialized) ? worldPointB : pointB.position;
             atPointA = false;
-        }
-
-        // Si se perdió el calor durante el viaje, no vuelve a poder iniciar hasta nuevo TurnOn
-        if (heatLostDuringTrip)
-        {
-            isTurned = false; // forzamos estado off hasta nuevo TurnOn real por HeatSphere
         }
 
         StopMoveLoopSfx();
@@ -257,28 +297,17 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
     // --- ITurnable ---
     public void TurnOn()
     {
-        // Puede llamarse múltiples veces mientras está dentro de HeatSphere.
-        // Si el calor regresa antes de finalizar el viaje, queremos que NO se invalide al llegar.
+        // Llamado por HeatSphere cuando el wagon entra en su radio de detección.
+        // El wagon inmediatamente obtiene capacidad de moverse.
         isTurned = true;
-        if (traveling && heatLostDuringTrip)
-        {
-            // Se recuperó el calor antes de terminar: limpiar la marca para que no se apague al llegar.
-            heatLostDuringTrip = false;
-        }
     }
 
     public void TurnOff()
     {
-        if (!isTurned) return;
-        if (traveling)
-        {
-            // Marcar que se perdió calor en medio del viaje; se evaluará al llegar.
-            heatLostDuringTrip = true;
-        }
-        else
-        {
-            isTurned = false;
-        }
+        // Llamado por HeatSphere cuando el wagon sale de su radio de detección.
+        // El wagon inmediatamente pierde capacidad de iniciar nuevos viajes.
+        // Si está viajando, continúa hasta llegar al destino.
+        isTurned = false;
     }
 
     private void StartMoveLoopSfx()
