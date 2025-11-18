@@ -1460,10 +1460,10 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1879942476390926983, guid: 8679cf095520648408f96059b46151ac, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8053599}
+      addedObject: {fileID: 1073291921}
     - targetCorrespondingSourceObject: {fileID: 1879942476390926983, guid: 8679cf095520648408f96059b46151ac, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1073291921}
+      addedObject: {fileID: 8053599}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8679cf095520648408f96059b46151ac, type: 3}
 --- !u!1001 &151860808
@@ -2931,37 +2931,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 285019179}
   m_CullTransparentMesh: 1
---- !u!1 &286669503
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 286669504}
-  m_Layer: 0
-  m_Name: QuadrantContainer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &286669504
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 286669503}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1410363239}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &316538336
 GameObject:
   m_ObjectHideFlags: 0
@@ -14090,47 +14059,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
-      propertyPath: gridWidth
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
-      propertyPath: gridLength
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
-      propertyPath: quadrantSize
-      value: 2.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
-      propertyPath: quadrantSizeX
-      value: 3.39
-      objectReference: {fileID: 0}
-    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
-      propertyPath: quadrantSizeZ
-      value: 3.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
-      propertyPath: quadrantParent
-      value: 
-      objectReference: {fileID: 286669504}
-    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       propertyPath: quadrantPrefab
       value: 
       objectReference: {fileID: 1666559791}
-    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
-      propertyPath: "usarTama\xF1oPorEje"
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7962460780614538347, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       propertyPath: m_Name
       value: BridgeGrid
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 201285140784237310, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 286669504}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
 --- !u!114 &1410363238 stripped

@@ -77,6 +77,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   era: 0
+  puedeConstruirse: 1
+  prioridad: 2
+  useReadyState: 0
+  isReady: 1
   uiIndex: 0
 --- !u!114 &-831426862461257270
 MonoBehaviour:
@@ -241,6 +245,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2335d81f5c85ecb4bbe34ab23cb47b4a, type: 3}
       propertyPath: m_Name
       value: Shadow
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2335d81f5c85ecb4bbe34ab23cb47b4a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -56,12 +56,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7962460780614538347}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 7.6535645, y: -4.6013794, z: 0.5395508}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3436574218697569631}
+  - {fileID: 8876311938451952858}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1103696424932745856
@@ -76,18 +77,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1fd4ef5223b7b1479cbcbd141b043b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridWidth: 6
-  gridLength: 4
-  quadrantSize: 1.8
+  gridWidth: 3
+  gridLength: 2
+  quadrantSize: 2.5
+  "usarTama\xF1oPorEje": 1
+  quadrantSizeX: 3.39
+  quadrantSizeY: 1
+  quadrantSizeZ: 3.5
   defaultQuadrantSO: {fileID: 11400000, guid: 77890f5d67c601246b7fb7adfcc8ff49, type: 2}
   quadrantPrefab: {fileID: 0}
-  quadrantParent: {fileID: 3436574218697569631}
+  quadrantParent: {fileID: 8876311938451952858}
   layerHeights:
   - -2.15
   - 0
   - 0.6
   layerScales:
-  - {x: 0.5, y: 0.4, z: 0.5}
+  - {x: 0.5, y: 1.03, z: 0.5}
   - {x: 25, y: 50, z: 25}
   - {x: 3, y: 1, z: 2}
   layerScaleMode: 0
@@ -99,4 +104,34 @@ MonoBehaviour:
   lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
-  showDebugTools: 1
+--- !u!1 &9165215412740061059
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8876311938451952858}
+  m_Layer: 0
+  m_Name: QuadrantContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8876311938451952858
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9165215412740061059}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 201285140784237310}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
