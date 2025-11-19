@@ -3228,8 +3228,12 @@ MonoBehaviour:
   damagedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   showLifeInScene: 1
   lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
+  shakerLifeThreshold: 1
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
+  usarUmbralesAbsolutosGrietas: 1
+  valorGrieta1: 43
+  valorGrieta2: 3
 --- !u!4 &985317587
 Transform:
   m_ObjectHideFlags: 0
@@ -5536,7 +5540,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0996ad12c66ee4448a95b26eaedccb85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: {x: 28, y: 5.14}
+  size: {x: 16, y: 5.14}
   drawGizmos: 1
   fillColor: {r: 0, g: 1, b: 0, a: 0.08}
   wireColor: {r: 0, g: 1, b: 0, a: 0.6}
@@ -6951,7 +6955,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4007369094713557878, guid: 69c32670a0be98349aa1084ac027ab78, type: 3}
       propertyPath: size.x
-      value: 28
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 4007369094713557878, guid: 69c32670a0be98349aa1084ac027ab78, type: 3}
       propertyPath: size.y

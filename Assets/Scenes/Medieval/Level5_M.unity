@@ -2924,6 +2924,32 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9539d968481bd904eb7955a7e9f15f00, type: 3}
+--- !u!1 &379491010 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1463823449301472405, guid: 7efd5cc8cccfbf64ca203202ac6d89ce, type: 3}
+  m_PrefabInstance: {fileID: 1408934519}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &379491012
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379491010}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 30.867802, y: 34.711834, z: 30.15033}
+  m_Center: {x: 110.20905, y: -21.27483, z: -276.8895}
 --- !u!1001 &385066154
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6160,8 +6186,12 @@ MonoBehaviour:
   damagedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   showLifeInScene: 1
   lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
+  shakerLifeThreshold: 1
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
+  usarUmbralesAbsolutosGrietas: 1
+  valorGrieta1: 43
+  valorGrieta2: 3
 --- !u!4 &985317587
 Transform:
   m_ObjectHideFlags: 0
@@ -9847,7 +9877,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2754609703830145950, guid: 7efd5cc8cccfbf64ca203202ac6d89ce, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1675942511}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1463823449301472405, guid: 7efd5cc8cccfbf64ca203202ac6d89ce, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 379491012}
   m_SourcePrefab: {fileID: 100100000, guid: 7efd5cc8cccfbf64ca203202ac6d89ce, type: 3}
 --- !u!4 &1408934520 stripped
 Transform:
@@ -11034,6 +11067,7 @@ GameObject:
   - component: {fileID: 1558567047}
   - component: {fileID: 1558567049}
   - component: {fileID: 1558567048}
+  - component: {fileID: 1558567050}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
@@ -11113,6 +11147,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1558567046}
   m_Mesh: {fileID: -3196507049654337341, guid: 8fde4b3ad8c449740811f7988bb5baa3, type: 3}
+--- !u!65 &1558567050
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1558567046}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 30.86779, y: 34.711823, z: 30.15033}
+  m_Center: {x: 110.209015, y: -21.274609, z: -276.88925}
 --- !u!1 &1565446240
 GameObject:
   m_ObjectHideFlags: 0
@@ -13613,8 +13668,12 @@ MonoBehaviour:
   damagedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   showLifeInScene: 1
   lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
+  shakerLifeThreshold: 1
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
+  usarUmbralesAbsolutosGrietas: 1
+  valorGrieta1: 43
+  valorGrieta2: 3
 --- !u!4 &1968330783
 Transform:
   m_ObjectHideFlags: 0
@@ -15602,6 +15661,14 @@ PrefabInstance:
     - target: {fileID: 2174769494411797431, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_TagString
       value: InvisibleWall
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198179508157654912, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 40.136967
+      objectReference: {fileID: 0}
+    - target: {fileID: 2198179508157654912, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -36.2068
       objectReference: {fileID: 0}
     - target: {fileID: 4504146982958957589, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_LocalPosition.x
