@@ -18,6 +18,10 @@ public class QuadrantLastLayerShaker : MonoBehaviour
     [Tooltip("Frecuencia base (Hz)")]
     [SerializeField] private float frequency = 4f;
 
+    [Header("Umbral de Vida para Temblor")]
+    [Tooltip("El temblor inicia cuando la vida absoluta restante es menor o igual a este valor.")]
+    public float shakeThresholdLifePoints = 1f;
+
     [Header("Debug")]
     [SerializeField] private bool autoFromRenderers = true;
     [SerializeField] private bool drawGizmos = false;
@@ -63,7 +67,7 @@ public class QuadrantLastLayerShaker : MonoBehaviour
         bool lastBuilt = lastIdx >= 0 && lastIdx < quadrantSO.requiredLayers.Length && quadrantSO.requiredLayers[lastIdx].isCompleted;
 
         float lifePoints = GetLifePoints(quadrantSO);
-        bool shouldShake = lastBuilt && quadrantSO.lastLayerState != BridgeQuadrantSO.LastLayerState.Destroyed && lifePoints <= 1f;
+    bool shouldShake = lastBuilt && quadrantSO.lastLayerState != BridgeQuadrantSO.LastLayerState.Destroyed && lifePoints <= shakeThresholdLifePoints;
 
         if (!shouldShake)
         {
@@ -172,6 +176,11 @@ public class QuadrantLastLayerShaker : MonoBehaviour
             targetTransforms = targets;
         _initialized = false;
         CaptureBases();
+    }
+
+    public void ConfigureShakeThreshold(float value)
+    {
+        shakeThresholdLifePoints = Mathf.Max(0f, value);
     }
 
 #if UNITY_EDITOR

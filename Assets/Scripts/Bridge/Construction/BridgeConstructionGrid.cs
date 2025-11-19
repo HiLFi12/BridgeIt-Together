@@ -45,6 +45,10 @@ public class BridgeConstructionGrid : MonoBehaviour
     public bool showLifeInScene = true;
     public Color lifeTextColor = new Color(1f, 0.95f, 0.6f);
 
+    [Header("Shaker Última Capa")]
+    [Tooltip("Vida (puntos absolutos) a partir de la cual la última capa comienza a temblar. Ej: 1 = cuando queda <=1 de vida.")]
+    [SerializeField] private float shakerLifeThreshold = 1f;
+
     [Header("Sistema de Power Ups")]
     public float powerUpEffectMultiplier = 1.5f;
     public bool isPowerUpActive = false;
@@ -204,6 +208,14 @@ public class BridgeConstructionGrid : MonoBehaviour
         yield return null;
     }
 
+    [Header("Grietas (Daño Última Capa)")]
+    [Tooltip("Usar valores absolutos de vida para mostrar grietas (en vez de ratio 0..1).")]
+    [SerializeField] private bool usarUmbralesAbsolutosGrietas = true;
+    [Tooltip("Vida >= valorGrieta1 => sin grietas. Ej: 43")]
+    [SerializeField] private float valorGrieta1 = 43f;
+    [Tooltip("valorGrieta1 > Vida >= valorGrieta2 => grieta1 encendida. Vida < valorGrieta2 => grieta2 encendida.")]
+    [SerializeField] private float valorGrieta2 = 3f;
+
     // Validación de propiedades en el editor
     private void OnValidate()
     {
@@ -250,6 +262,11 @@ public class BridgeConstructionGrid : MonoBehaviour
         else if (Application.isPlaying && constructionGrid != null)
         {
             ApplyConfiguredScalesAfterInit();
+        }
+
+        if (usarUmbralesAbsolutosGrietas && valorGrieta1 < valorGrieta2)
+        {
+            valorGrieta1 = valorGrieta2;
         }
     }
 
@@ -952,7 +969,7 @@ public class BridgeConstructionGrid : MonoBehaviour
                             if (lastLayerRoot != null)
                             {
                                 BindLastLayerShaker(lastLayerRoot, info.quadrantSO);
-                                int crackLevel = DetermineCrackLevel(info.quadrantSO);
+                                int crackLevel = DetermineCrackLevel(info.quadrantSO); // ahora soporta absoluto
                                 ToggleCracks(lastLayerRoot, crackLevel);
                             }
                         }
@@ -1572,6 +1589,12 @@ public class BridgeConstructionGrid : MonoBehaviour
         if (bind != null)
         {
             bind.Invoke(comp, new object[] { so, targets });
+            // Configurar umbral de vida para temblor si existe método público
+            var config = type.GetMethod("ConfigureShakeThreshold", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            if (config != null)
+            {
+                config.Invoke(comp, new object[] { shakerLifeThreshold });
+            }
         }
     }
 
@@ -1625,50 +1648,82 @@ public class BridgeConstructionGrid : MonoBehaviour
         box.enabled = true;
     }
 
-    // === NUEVO: Utilidades para alternar grietas según "vida" ===
-    // crackLevel: 0 = todas OFF, 1 = grieta3 ON, 2 = grieta2 ON, 3 = grieta1 ON
+    // === NUEVO: Utilidades para alternar grietas según vida ===
+    // Para modo absoluto:
+    // Vida >= valorGrieta1 -> crackLevel = 0 (ninguna)
+    // valorGrieta1 > Vida >= valorGrieta2 -> crackLevel = 1 (grieta1)
+    // Vida < valorGrieta2 -> crackLevel = 2 (grieta2)
+    // Modo ratio legacy (mantenido para compatibilidad): devuelve 3,2,1 (grieta1,grieta2,grieta3)
     private void ToggleCracks(GameObject lastLayerRoot, int crackLevel)
     {
         if (lastLayerRoot == null) return;
 
         Transform c1 = FindDirectChildIgnoreCase(lastLayerRoot.transform, "grieta1");
         Transform c2 = FindDirectChildIgnoreCase(lastLayerRoot.transform, "grieta2");
-        Transform c3 = FindDirectChildIgnoreCase(lastLayerRoot.transform, "grieta3");
+        Transform c3 = FindDirectChildIgnoreCase(lastLayerRoot.transform, "grieta3"); // seguirá apagada en modo absoluto
 
+        if (usarUmbralesAbsolutosGrietas)
+        {
+            if (c1 != null) c1.gameObject.SetActive(crackLevel == 1);
+            if (c2 != null) c2.gameObject.SetActive(crackLevel == 2);
+            if (c3 != null) c3.gameObject.SetActive(false);
+            return;
+        }
+
+        // Legacy (ratio) mantiene las tres
         if (c1 != null) c1.gameObject.SetActive(crackLevel == 3);
         if (c2 != null) c2.gameObject.SetActive(crackLevel == 2);
         if (c3 != null) c3.gameObject.SetActive(crackLevel == 1);
     }
 
-    private Transform FindDirectChildIgnoreCase(Transform parent, string childNameLower)
-    {
-        if (parent == null) return null;
-        string target = childNameLower.ToLowerInvariant();
-        for (int i = 0; i < parent.childCount; i++)
-        {
-            var ch = parent.GetChild(i);
-            if (ch != null && ch.name != null && ch.name.ToLowerInvariant() == target)
-                return ch;
-        }
-        return null;
-    }
-
-    // Determina 3, 2 o 1 según bandas de vida relativas al umbral de daño
     private int DetermineCrackLevel(BridgeQuadrantSO so)
     {
         if (so == null) return 0;
-        float life = Mathf.Clamp01(so.GetLifeRatio());
+        if (usarUmbralesAbsolutosGrietas) return DetermineCrackLevelAbsolute(so);
+
+        float lifeRatio = Mathf.Clamp01(so.GetLifeRatio());
         float thr = so.damagedThreshold01; // ~0.40
         float a = Mathf.Max(0f, thr - 0.10f); // ~0.30 → nivel 3
         float c = Mathf.Max(0f, thr - 0.30f); // ~0.10 → nivel 1
 
-        if (life >= a) return 3;
-        if (life > c) return 2;
+        if (lifeRatio >= a) return 3;
+        if (lifeRatio > c) return 2;
         return 1;
     }
 
-    // Helpers de paso por eje
+    private int DetermineCrackLevelAbsolute(BridgeQuadrantSO so)
+    {
+        float vida = GetAbsoluteLifePoints(so);
+        if (vida >= valorGrieta1) return 0;
+        if (vida >= valorGrieta2) return 1;
+        return 2;
+    }
+
+    private float GetAbsoluteLifePoints(BridgeQuadrantSO so)
+    {
+        if (so == null) return 0f;
+        switch (so.era)
+        {
+            case BridgeQuadrantSO.EraType.Futuristic: return so.batteryLife;     // 0..100
+            default: return so.currentLife;                                      // 0..maxLife
+        }
+    }
+
+    // === Helper para búsqueda de hijos directos por nombre (case-insensitive) ===
+    private Transform FindDirectChildIgnoreCase(Transform parent, string childName)
+    {
+        if (parent == null || string.IsNullOrEmpty(childName)) return null;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            var c = parent.GetChild(i);
+            if (string.Equals(c.name, childName, System.StringComparison.OrdinalIgnoreCase))
+                return c;
+        }
+        return null;
+    }
+
+    // === Propiedades públicas para otros scripts (tamaño de paso de cuadrante) ===
     public float QuadrantStepX => usarTamañoPorEje ? quadrantSizeX : quadrantSize;
-    public float QuadrantStepY => usarTamañoPorEje ? quadrantSizeY : 1f;
+    public float QuadrantStepY => usarTamañoPorEje ? quadrantSizeY : 1f; // Y se usa como escala vertical base
     public float QuadrantStepZ => usarTamañoPorEje ? quadrantSizeZ : quadrantSize;
 }
