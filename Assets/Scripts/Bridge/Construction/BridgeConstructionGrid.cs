@@ -543,6 +543,104 @@ public class BridgeConstructionGrid : MonoBehaviour
     }
 
     /// <summary>
+    /// Construye una capa omitiendo la validación de material en mano.
+    /// Útil para construcción inicial del puente, herramientas de editor y sistemas automáticos.
+    /// Respeta las mismas reglas de secuencia y actualiza visuales/sonidos.
+    /// </summary>
+    public bool TryBuildLayerBySystem(int x, int z, int layerIndex)
+    {
+        // 1) Coordenadas válidas
+        if (!IsValidQuadrant(x, z))
+        {
+            Debug.LogError($"COORDENADAS INVÁLIDAS: Cuadrante [{x},{z}] no es válido. Límites: [0-{gridWidth - 1}, 0-{gridLength - 1}]");
+            return false;
+        }
+
+        // 2) SO existente
+        if (constructionGrid[x, z].quadrantSO == null)
+        {
+            Debug.LogError($"ERROR: El ScriptableObject para el cuadrante [{x},{z}] es nulo.");
+            return false;
+        }
+
+        // 3) Índice de capa válido
+        var so = constructionGrid[x, z].quadrantSO;
+        if (layerIndex < 0 || layerIndex >= so.requiredLayers.Length)
+        {
+            Debug.LogError($"ERROR: Índice de capa {layerIndex} fuera de rango [0-{so.requiredLayers.Length - 1}]");
+            return false;
+        }
+
+        // Estado previo (debug)
+        string estadoCapas = "";
+        for (int i = 0; i < so.requiredLayers.Length; i++)
+        {
+            bool completada = so.requiredLayers[i].isCompleted;
+            estadoCapas += $"Capa {i}: {(completada ? "Completada" : "Incompleta")}, ";
+        }
+        Debug.Log($"[GRID/SYS] Estado del cuadrante [{x},{z}] ANTES: {estadoCapas}");
+
+        // 4) Respetar secuencia de construcción
+        int primerCapaIncompleta = -1;
+        for (int i = 0; i < so.requiredLayers.Length; i++)
+        {
+            if (!so.requiredLayers[i].isCompleted)
+            {
+                primerCapaIncompleta = i;
+                break;
+            }
+        }
+        if (primerCapaIncompleta == -1)
+        {
+            Debug.LogError($"ERROR: El cuadrante [{x},{z}] ya tiene todas sus capas completas. No se puede construir más.");
+            return false;
+        }
+        if (layerIndex != primerCapaIncompleta)
+        {
+            Debug.LogError($"ERROR DE SECUENCIA (SYS): Debes construir primero la capa {primerCapaIncompleta}, no la capa {layerIndex}");
+            return false;
+        }
+
+        // 5) Construir llamando al SO; permitimos objeto nulo en este caso
+        bool success = so.TryAddLayer(layerIndex, null);
+        if (success)
+        {
+            // Actualizar BridgeQuadrant
+            GameObject quadrantObj = constructionGrid[x, z].quadrantObject;
+            if (quadrantObj != null)
+            {
+                BridgeQuadrant bridgeQuadrant = quadrantObj.GetComponent<BridgeQuadrant>();
+                if (bridgeQuadrant != null)
+                {
+                    bridgeQuadrant.SetCurrentLayer(layerIndex);
+                }
+            }
+
+            UpdateQuadrantVisuals(x, z);
+            // Opcional: reproducir sonido de construcción también en sistema
+            PlayConstructionSound(x, z);
+
+            string estadoCapasDespues = "";
+            for (int i = 0; i < so.requiredLayers.Length; i++)
+            {
+                bool completada = so.requiredLayers[i].isCompleted;
+                estadoCapasDespues += $"Capa {i}: {(completada ? "Completada" : "Incompleta")}, ";
+            }
+            Debug.Log($"[GRID/SYS] Estado del cuadrante [{x},{z}] DESPUÉS: {estadoCapasDespues}");
+            Debug.Log($"ÉXITO (SYS): Capa {layerIndex} construida en cuadrante [{x},{z}]");
+        }
+        else
+        {
+            bool layerCompleted = so.requiredLayers[layerIndex].isCompleted;
+            Debug.LogError($"FALLO (SYS): No se pudo construir la capa {layerIndex} en cuadrante [{x},{z}]. " +
+                           $"Estado de esta capa: {(layerCompleted ? "Ya estaba completada" : "Incompleta")}, " +
+                           $"LastLayerState: {so.lastLayerState}");
+        }
+
+        return success;
+    }
+
+    /// <summary>
     /// Fuerza la finalización de todas las capas restantes de un cuadrante, sin requerir materiales.
     /// No construye capas ya completas. Devuelve true si al menos una capa cambió a completada.
     /// </summary>

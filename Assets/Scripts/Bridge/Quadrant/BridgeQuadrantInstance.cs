@@ -65,20 +65,25 @@ public class BridgeQuadrantInstance : MonoBehaviour, ITurnable
         if (!Application.isPlaying || !validateHeatByProbing) return;
         if (quadrantSO == null) return;
 
-        // Solo validar si creemos que hay calor aplicado
-        if (!quadrantSO.heatActive) return;
-
         if (Time.time < _nextProbeTime) return;
         _nextProbeTime = Time.time + probeInterval;
 
         bool anyHeat = ProbeAnyHeat();
         if (anyHeat)
         {
+            // Si detectamos calor y aún no está activo en el SO, encenderlo proactivamente
+            if (!quadrantSO.heatActive)
+            {
+                if (debugHeatProbe)
+                    Debug.Log($"[BridgeQuadrantInstance] Detected HeatSphere cerca. Activando calor en '{name}'.");
+                quadrantSO.ApplyHeat();
+            }
             _lastHeatSeenTime = Time.time;
         }
         else
         {
-            if (Time.time - _lastHeatSeenTime > heatLoseGraceSeconds)
+            // Si no vemos calor por un tiempo de gracia, apagar
+            if (quadrantSO.heatActive && Time.time - _lastHeatSeenTime > heatLoseGraceSeconds)
             {
                 if (debugHeatProbe)
                     Debug.Log($"[BridgeQuadrantInstance] Apagando calor por ausencia de HeatSphere en '{name}'.");

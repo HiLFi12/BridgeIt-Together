@@ -28,8 +28,35 @@ public class BridgeInitialConstructor : MonoBehaviour
     {
         if (applyOnStart)
         {
-            ConstructInitialBridge();
+            // Asegurar que el BridgeConstructionGrid esté inicializado antes de construir.
+            // Usamos una corrutina para esperar al menos un frame y permitir que Awake/Start del Grid corran.
+            StartCoroutine(DeferredConstruct());
         }
+    }
+
+    private System.Collections.IEnumerator DeferredConstruct()
+    {
+        // Esperar a que exista bridgeGrid
+        if (bridgeGrid == null)
+        {
+            bridgeGrid = FindObjectOfType<BridgeConstructionGrid>();
+        }
+
+        // Esperar 1 frame para garantizar ejecución de Start en el Grid
+        yield return null;
+
+        // Intentar asegurar inicialización del grid (en caso de que Start aún no haya creado la grilla)
+        EnsureGridInitialized();
+
+        // Si aún no está, esperar algunos frames como fallback
+        int safetyFrames = 5;
+        while (!IsGridBackerAllocated() && safetyFrames-- > 0)
+        {
+            yield return null;
+            EnsureGridInitialized();
+        }
+
+        ConstructInitialBridge();
     }
     
     /// <summary>
@@ -47,6 +74,14 @@ public class BridgeInitialConstructor : MonoBehaviour
                 return;
             }
         }
+
+        // Asegurar que el grid interno esté construido antes de intentar construir capas
+        EnsureGridInitialized();
+        if (!IsGridBackerAllocated())
+        {
+            Debug.LogError("BridgeInitialConstructor: El BridgeConstructionGrid no está inicializado aún (constructionGrid es null).");
+            return;
+        }
         
         if (initialConstructedLayers <= 0)
         {
@@ -58,8 +93,6 @@ public class BridgeInitialConstructor : MonoBehaviour
         if (showDebugMessages)
             Debug.Log($"BridgeInitialConstructor: Iniciando construcción hasta la capa {initialConstructedLayers}");
         
-        // Crear objeto temporal para la construcción
-        GameObject tempObject = new GameObject("TempConstructionObject");
         
         int quadrantsConstructed = 0;
         int layersConstructed = 0;
@@ -81,11 +114,34 @@ public class BridgeInitialConstructor : MonoBehaviour
                     Debug.Log($"Construyendo cuadrante [{x},{z}] hasta la capa {initialConstructedLayers}");
                 
                 bool quadrantSuccess = true;
+
+                // Obtener SO para validar cuántas capas soporta este cuadrante (evita out-of-range en presets raros)
+                var so = bridgeGrid.GetQuadrantSO(x, z);
+                if (so == null)
+                {
+                    if (showDebugMessages)
+                        Debug.LogWarning($"  ✗ QuadrantSO nulo en [{x},{z}]. Saltando.");
+                    continue;
+                }
+                int capasDisponibles = (so.requiredLayers != null) ? so.requiredLayers.Length : 0;
+                if (capasDisponibles <= 0)
+                {
+                    if (showDebugMessages)
+                        Debug.LogWarning($"  ✗ QuadrantSO en [{x},{z}] no tiene capas definidas (requiredLayers.Length=0). Saltando.");
+                    continue;
+                }
+                int layersToBuild = Mathf.Clamp(initialConstructedLayers, 0, capasDisponibles);
+                if (layersToBuild <= 0)
+                {
+                    if (showDebugMessages)
+                        Debug.LogWarning($"  ✗ layersToBuild calculado en 0 para [{x},{z}] (initial={initialConstructedLayers}, disponibles={capasDisponibles}).");
+                    continue;
+                }
                 
                 // Construir las capas una por una hasta el límite especificado
-                for (int layer = 0; layer < initialConstructedLayers; layer++)
+                for (int layer = 0; layer < layersToBuild; layer++)
                 {
-                    bool layerSuccess = bridgeGrid.TryBuildLayer(x, z, layer, tempObject);
+                    bool layerSuccess = bridgeGrid.TryBuildLayerBySystem(x, z, layer);
                     
                     if (layerSuccess)
                     {
@@ -103,7 +159,7 @@ public class BridgeInitialConstructor : MonoBehaviour
                 }
                 
                 // Si es la última capa y se especificó un estado particular, aplicarlo
-                if (quadrantSuccess && initialConstructedLayers == 3 && lastLayerState != BridgeQuadrantSO.LastLayerState.Complete)
+                if (quadrantSuccess && layersToBuild == 3 && lastLayerState != BridgeQuadrantSO.LastLayerState.Complete)
                 {
                     SetLastLayerState(x, z, lastLayerState);
                 }
@@ -115,17 +171,38 @@ public class BridgeInitialConstructor : MonoBehaviour
             }
         }
         
-        // Limpiar objeto temporal
-        if (tempObject != null)
-        {
-            DestroyImmediate(tempObject);
-        }
+        // No se crea ni necesita objeto temporal para construcción por sistema
         
         if (showDebugMessages)
         {
             Debug.Log($"BridgeInitialConstructor: Construcción completada. " +
                      $"Cuadrantes construidos: {quadrantsConstructed}, " +
                      $"Capas totales construidas: {layersConstructed}");
+        }
+    }
+
+    // Usa reflexión para comprobar si el campo privado 'constructionGrid' del BridgeConstructionGrid está asignado
+    private bool IsGridBackerAllocated()
+    {
+        if (bridgeGrid == null) return false;
+        var gridType = bridgeGrid.GetType();
+        var field = gridType.GetField("constructionGrid", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (field == null) return false;
+        var value = field.GetValue(bridgeGrid);
+        return value != null;
+    }
+
+    // Intenta invocar el método privado InitializeGrid() del BridgeConstructionGrid si aún no está inicializado
+    private void EnsureGridInitialized()
+    {
+        if (bridgeGrid == null) return;
+        if (IsGridBackerAllocated()) return; // ya está
+
+        var gridType = bridgeGrid.GetType();
+        var init = gridType.GetMethod("InitializeGrid", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (init != null)
+        {
+            init.Invoke(bridgeGrid, null);
         }
     }
     

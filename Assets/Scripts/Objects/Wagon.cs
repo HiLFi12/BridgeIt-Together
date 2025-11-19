@@ -37,6 +37,10 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
     [Tooltip("Índice en AudioManager.soundEffects para reproducir en loop mientras el vagón se mueve. -1 desactiva.")]
     [SerializeField] private int moveLoopSfxIndex = -1;
 
+    [Header("Requisitos para iniciar")]
+    [Tooltip("Si está activo, se requiere calor (isTurned) para iniciar el viaje. Por defecto desactivado para eliminar dependencia del HeatSphere.")]
+    [SerializeField] private bool requireHeatToStart = false;
+
     // ITurnable
     public bool isTurned { get; private set; } = false;
 
@@ -141,9 +145,10 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
             Debug.Log("Wagon: ya está viajando.");
             return false;
         }
-        if (!isTurned)
+        // Dependencia de calor eliminada por defecto. Si se desea, se puede reactivar con 'requireHeatToStart'.
+        if (requireHeatToStart && !isTurned)
         {
-            Debug.Log("Wagon: no hay calor activo, no se puede iniciar el viaje.");
+            Debug.Log("Wagon: se requiere calor para iniciar y no hay calor activo.");
             return false;
         }
         IniciarViaje();
