@@ -3896,6 +3896,14 @@ PrefabInstance:
       propertyPath: buildUpToLayer
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9131316214125464037, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
+      propertyPath: activationVfxSpawnPoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9131316214125464037, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
+      propertyPath: 'activationVfxSpawnPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 886020784}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4716,6 +4724,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 54f0834dad40a0a4ea062fa44f930908, type: 3}
+--- !u!1 &886020783
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 886020784}
+  m_Layer: 0
+  m_Name: SpawnPointVFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &886020784
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 886020783}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -260.21, y: 229.64, z: 237.71}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &916067355 stripped
 BoxCollider:
   m_CorrespondingSourceObject: {fileID: 6644201429299394500, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
@@ -17223,3 +17262,4 @@ SceneRoots:
   - {fileID: 1725372956}
   - {fileID: 1011703474}
   - {fileID: 211519467}
+  - {fileID: 886020784}

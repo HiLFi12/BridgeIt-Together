@@ -18,10 +18,22 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
     public bool attachDieEffect = false;
 
     [Header("Construcción Automática")]
-    [Tooltip("Grid de puente sobre el que aplicar construcción automática cuando la estatua se activa y muere.")]
-    [SerializeField] private BridgeConstructionGrid bridgeGrid;
-    [Tooltip("Índice de capa máximo a construir (0=Base, 1=Soporte, 2=Superficie). Igual que RitualGranFuego.")]
+    [Tooltip("Lista de grids sobre los que aplicar construcción automática al activar la estatua.")]
+    [SerializeField] private BridgeConstructionGrid[] bridgeGrids;
+    [Tooltip("Si está activo y la lista está vacía, autodescubre todos los BridgeConstructionGrid en la escena al iniciar.")]
+    [SerializeField] private bool autoFindBridgeGrids = true;
+    [Tooltip("Índice de capa máximo a construir (0=Base, 1=Soporte, 2=Superficie) aplicado a cada grid. Igual que RitualGranFuego.")]
     [SerializeField, Range(0, 2)] private int buildUpToLayer = 2;
+
+    [Header("VFX de Activación")]
+    [Tooltip("Lista de efectos VFX a instanciar al activarse la estatua.")]
+    [SerializeField] private GameObject[] activationVfxPrefabs;
+    [Tooltip("Puntos de spawn para cada VFX; índice i corresponde a activationVfxPrefabs[i]. Si falta, usa la posición de la estatua.")]
+    [SerializeField] private Transform[] activationVfxSpawnPoints;
+    [Tooltip("Si está activo, el VFX se parenta al spawnpoint (o a la estatua si no hay spawnpoint).")]
+    [SerializeField] private bool parentVfxToSpawn = false;
+    [Tooltip("Si > 0, destruye automáticamente cada VFX tras estos segundos.")]
+    [SerializeField] private float vfxAutoDestroyAfter = -1f;
     
     [Header("UI Configuration")]
     [SerializeField] private int uiIndex = 3;
@@ -38,6 +50,15 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
     {
         base.Start();
         shadow.SetActive(false);
+
+        if ((bridgeGrids == null || bridgeGrids.Length == 0) && autoFindBridgeGrids)
+        {
+#if UNITY_2023_1_OR_NEWER
+            bridgeGrids = FindObjectsByType<BridgeConstructionGrid>(FindObjectsSortMode.None);
+#else
+            bridgeGrids = FindObjectsOfType<BridgeConstructionGrid>();
+#endif
+        }
     }
 
     public void Interact(GameObject interactor)
@@ -134,32 +155,33 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
     /// </summary>
     private void ConstructBridgeAutomatically()
     {
-        if (bridgeGrid == null) return;
+        if (bridgeGrids == null || bridgeGrids.Length == 0) return;
 
-        int maxGridLayer = (bridgeGrid.layerHeights != null)
-            ? Mathf.Max(0, bridgeGrid.layerHeights.Length - 1)
-            : 2;
-
-        int targetMax = Mathf.Clamp(buildUpToLayer, 0, maxGridLayer);
-
-        for (int x = 0; x < bridgeGrid.gridWidth; x++)
+        foreach (var grid in bridgeGrids)
         {
-            for (int z = 0; z < bridgeGrid.gridLength; z++)
+            if (grid == null) continue;
+
+            int maxGridLayer = (grid.layerHeights != null)
+                ? Mathf.Max(0, grid.layerHeights.Length - 1)
+                : 2;
+            int targetMax = Mathf.Clamp(buildUpToLayer, 0, maxGridLayer);
+
+            for (int x = 0; x < grid.gridWidth; x++)
             {
-                var so = bridgeGrid.GetQuadrantSO(x, z);
-                if (so == null || so.requiredLayers == null) continue;
-
-                for (int layerIndex = 0; layerIndex <= targetMax && layerIndex < so.requiredLayers.Length; layerIndex++)
+                for (int z = 0; z < grid.gridLength; z++)
                 {
-                    if (!so.requiredLayers[layerIndex].isCompleted)
-                    {
-                        // marcar la capa como completada directamente
-                        so.requiredLayers[layerIndex].isCompleted = true;
-                    }
-                }
+                    var so = grid.GetQuadrantSO(x, z);
+                    if (so == null || so.requiredLayers == null) continue;
 
-                // actualizar visuales/colisionadores del cuadrante después de modificar el SO
-                bridgeGrid.RefreshQuadrantVisuals(x, z);
+                    for (int layerIndex = 0; layerIndex <= targetMax && layerIndex < so.requiredLayers.Length; layerIndex++)
+                    {
+                        if (!so.requiredLayers[layerIndex].isCompleted)
+                        {
+                            so.requiredLayers[layerIndex].isCompleted = true;
+                        }
+                    }
+                    grid.RefreshQuadrantVisuals(x, z);
+                }
             }
         }
     }
@@ -169,8 +191,46 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
     /// </summary>
     protected override IEnumerator EffectCoroutine(GameObject activator)
     {
+        // Construcción automática
         ConstructBridgeAutomatically();
+
+        // Instanciar efectos de activación
+        SpawnActivationVfx();
+
+        // Despawn inmediato tras el efecto
         Despawn();
         yield break;
+    }
+
+    /// <summary>
+    /// Instancia los VFX de activación mapeando por índice a sus spawnpoints.
+    /// </summary>
+    private void SpawnActivationVfx()
+    {
+        if (activationVfxPrefabs == null || activationVfxPrefabs.Length == 0) return;
+
+        for (int i = 0; i < activationVfxPrefabs.Length; i++)
+        {
+            var prefab = activationVfxPrefabs[i];
+            if (prefab == null) continue;
+
+            Transform sp = (activationVfxSpawnPoints != null && i < activationVfxSpawnPoints.Length)
+                ? activationVfxSpawnPoints[i]
+                : null;
+
+            Vector3 pos = sp != null ? sp.position : transform.position;
+            Quaternion rot = sp != null ? sp.rotation : transform.rotation;
+
+            GameObject vfx = Instantiate(prefab, pos, rot);
+            if (parentVfxToSpawn)
+            {
+                vfx.transform.SetParent(sp != null ? sp : transform, true);
+            }
+
+            if (vfxAutoDestroyAfter > 0f)
+            {
+                Destroy(vfx, vfxAutoDestroyAfter);
+            }
+        }
     }
 }

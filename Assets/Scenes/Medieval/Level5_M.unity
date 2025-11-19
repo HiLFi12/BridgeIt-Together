@@ -1174,6 +1174,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &181194775
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 181194776}
+  m_Layer: 0
+  m_Name: SpawnPointVFX (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &181194776
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 181194775}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -257.8, y: 229.64, z: 231.97}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &196059981
 GameObject:
   m_ObjectHideFlags: 0
@@ -2832,7 +2863,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
       propertyPath: m_LocalScale.y
-      value: 37.989468
+      value: 53.17006
       objectReference: {fileID: 0}
     - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
       propertyPath: m_LocalScale.z
@@ -3984,6 +4015,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3061969297140542942, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
+      propertyPath: activationVfxPrefabs.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3061969297140542942, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
+      propertyPath: 'activationVfxPrefabs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 104829970813648393, guid: 70a697a1a5b23cd4d9bb3e173ffab2ea, type: 3}
+    - target: {fileID: 3061969297140542942, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
+      propertyPath: activationVfxSpawnPoints.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3061969297140542942, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
+      propertyPath: 'activationVfxSpawnPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1061413191}
+    - target: {fileID: 3061969297140542942, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
+      propertyPath: 'activationVfxSpawnPoints.Array.data[1]'
+      value: 
+      objectReference: {fileID: 181194776}
     - target: {fileID: 5060500621107348281, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
       propertyPath: m_Name
       value: StatueInteractable
@@ -6315,6 +6366,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2528647417704479156, guid: 402672b5a1221044ab299c15430e2f2b, type: 3}
   m_PrefabInstance: {fileID: 1049509974}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1061413190
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1061413191}
+  m_Layer: 0
+  m_Name: SpawnPointVFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1061413191
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1061413190}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -257.08, y: 229.64, z: 246.97}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1068714490
 GameObject:
   m_ObjectHideFlags: 0
@@ -15798,3 +15880,5 @@ SceneRoots:
   - {fileID: 774368270}
   - {fileID: 936924216}
   - {fileID: 162098789}
+  - {fileID: 1061413191}
+  - {fileID: 181194776}
