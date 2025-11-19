@@ -100,9 +100,9 @@ public class QuadrantLastLayerShaker : MonoBehaviour
     {
         switch (so.era)
         {
-            case BridgeQuadrantSO.EraType.Industrial: return so.currentTemperature; // 0..maxTemperature(100)
-            case BridgeQuadrantSO.EraType.Futuristic: return so.batteryLife;       // 0..100
-            default: return so.currentLife;                                        // 0..maxLife(100)
+            case BridgeQuadrantSO.EraType.Industrial: return so.currentLife;      // Industrial migrado a vida unificada
+            case BridgeQuadrantSO.EraType.Futuristic: return so.batteryLife;      // 0..100
+            default: return so.currentLife;                                       // 0..maxLife(100)
         }
     }
 

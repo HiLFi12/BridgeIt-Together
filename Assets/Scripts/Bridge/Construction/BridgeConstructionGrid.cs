@@ -1065,7 +1065,8 @@ public class BridgeConstructionGrid : MonoBehaviour
                         string vidaTxt = string.Empty;
                         if (so.era == BridgeQuadrantSO.EraType.Industrial)
                         {
-                            vidaTxt = $"{so.currentTemperature:F1}/{so.maxTemperature:F1}";
+                            // Industrial migrado a vida unificada
+                            vidaTxt = $"{so.currentLife:F1}/{so.maxLife:F1}";
                         }
                         else if (so.era == BridgeQuadrantSO.EraType.Futuristic)
                         {

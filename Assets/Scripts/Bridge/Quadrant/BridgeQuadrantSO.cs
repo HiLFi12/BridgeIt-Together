@@ -54,9 +54,11 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     public int maxUsesBeforeDamage = 10;
     public int currentUses = 0;
 
-    public float maxTemperature = 100f;
-    public float currentTemperature = 100f;
-    public float temperatureDecayRate = 5f;
+    // Deprecated (Industrial ahora usa vida unificada maxLife/currentLife)
+    [HideInInspector] public float maxTemperature = 100f; // mantenido para compatibilidad si otros scripts aún lo consultan
+    [HideInInspector] public float currentTemperature = 100f; // ya no se modifica en Industrial
+    [Tooltip("Tasa de decaimiento de vida para era Industrial (antes temperatureDecayRate).")]
+    public float temperatureDecayRate = 5f; // reutilizado como decay de currentLife en Industrial
 
     public float damageChance = 0.3f;
 
@@ -148,7 +150,8 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
                 currentLife = maxLife;
                 break;
             case EraType.Industrial:
-                currentTemperature = maxTemperature;
+                // Ahora Industrial usa vida unificada
+                currentLife = maxLife;
                 break;
             case EraType.Contemporary:
                 currentLife = maxLife;
@@ -167,7 +170,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         switch (era)
         {
             case EraType.Industrial:
-                return maxTemperature > 0f ? Mathf.Clamp01(currentTemperature / maxTemperature) : 0f;
+                return maxLife > 0f ? Mathf.Clamp01(currentLife / maxLife) : 0f;
             case EraType.Futuristic:
                 return Mathf.Clamp01(batteryLife / 100f);
             default:
@@ -181,7 +184,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         switch (era)
         {
             case EraType.Industrial:
-                currentTemperature = maxTemperature * ratio01;
+                currentLife = maxLife * ratio01;
                 break;
             case EraType.Futuristic:
                 batteryLife = 100f * ratio01;
@@ -200,7 +203,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         switch (era)
         {
             case EraType.Industrial:
-                currentTemperature = Mathf.Max(0f, currentTemperature - amount);
+                currentLife = Mathf.Max(0f, currentLife - amount);
                 break;
             case EraType.Futuristic:
                 batteryLife = Mathf.Max(0f, batteryLife - amount);
@@ -373,7 +376,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         {
             switch (era)
             {
-                case EraType.Industrial: currentTemperature = maxTemperature; break;
+                case EraType.Industrial: currentLife = maxLife; break;
                 case EraType.Futuristic: batteryLife = 100f; break;
                 default: currentLife = maxLife; break;
             }
@@ -402,37 +405,35 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
             case EraType.Industrial:
                 if (lastLayerState != LastLayerState.Destroyed)
                 {
-                    // El sistema de vida industrial (temperatura) solo aplica cuando TODAS las capas están construidas
+                    // Vida industrial sólo decae cuando TODAS las capas están construidas
                     if (!AllLayersBuilt())
                     {
-                        break; // no decaer ni evaluar estados hasta tener la capa 2 completa
+                        break;
                     }
 
                     if (!isTurned)
                     {
-                        currentTemperature -= temperatureDecayRate * deltaTime;
-                        if (currentTemperature < 0f) currentTemperature = 0f;
+                        currentLife -= temperatureDecayRate * deltaTime; // reutilizamos temperatureDecayRate como decay de vida
+                        if (currentLife < 0f) currentLife = 0f;
                     }
 
-                    // Umbral de dañado al 40%
                     if (lastLayerState == LastLayerState.Complete && GetLifeRatio() < damagedThreshold01)
                         lastLayerState = LastLayerState.Damaged;
 
-                    if (currentTemperature <= 0f)
+                    if (currentLife <= 0f)
                     {
                         lastLayerState = LastLayerState.Destroyed;
                         DestroyQuadrant();
                     }
                 }
 
-                // Mini debug de vida (Industrial): current/max
-                if (debugLife && maxTemperature > 0f)
+                if (debugLife && maxLife > 0f)
                 {
                     _debugLifeTimer -= deltaTime;
                     if (_debugLifeTimer <= 0f)
                     {
-                        float ratio = Mathf.Clamp01(currentTemperature / maxTemperature);
-                    //    Debug.Log($"[BridgeQuadrantSO] '{name}' Vida: {currentTemperature:F1}/{maxTemperature:F1} ({ratio:P0}) | isTurned={isTurned} | waterBlockers={waterBlockers} | heatActive={heatActive} | state={lastLayerState}");
+                        float ratio = Mathf.Clamp01(currentLife / maxLife);
+                        // Debug.Log($"[BridgeQuadrantSO] '{name}' Vida: {currentLife:F1}/{maxLife:F1} ({ratio:P0}) | isTurned={isTurned} | heatActive={heatActive} | state={lastLayerState}");
                         _debugLifeTimer = Mathf.Max(0.1f, debugLifeInterval);
                     }
                 }
@@ -483,11 +484,10 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         if (era == EraType.Industrial && lastLayerState != LastLayerState.Destroyed)
         {
             heatActive = true;
-            // Si la temperatura llegó a 0 previamente, al volver a aplicar calor
-            // restauramos a máximo para evitar destrucción inmediata al reconstruir
-            if (currentTemperature <= 0f)
+            // Si la vida llegó a 0 antes y estamos reconstruyendo, restaurar a máximo al aplicar calor (evita destrucción inmediata tras reconstrucción parcial)
+            if (currentLife <= 0f)
             {
-                currentTemperature = maxTemperature;
+                currentLife = maxLife;
             }
             RecalculateTurned();
         }
