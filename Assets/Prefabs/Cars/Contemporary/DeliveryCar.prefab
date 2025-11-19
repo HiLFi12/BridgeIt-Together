@@ -77,12 +77,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 4860716971041990202}
   detectionRadius: 1
+  bridgeQuadrantTag: BridgeQuadrant
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 320
-  bridgeQuadrantTag: BridgeQuadrant
   vehicleTag: Vehicle
-  debugMode: 1
+  damageAmount: 1
 --- !u!1 &7713937841132986579
 GameObject:
   m_ObjectHideFlags: 0
@@ -271,6 +271,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93c7a05591d21474bba01d6c10a750f5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3317871593161356581}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 93c7a05591d21474bba01d6c10a750f5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 233784164083886183}
   m_SourcePrefab: {fileID: 100100000, guid: 93c7a05591d21474bba01d6c10a750f5, type: 3}
 --- !u!1 &6239423281754971052 stripped
 GameObject:
@@ -374,8 +377,35 @@ MonoBehaviour:
   ammo: 3
   autoResetAmmoOnEnable: 1
   oneRollPerCollider: 1
+--- !u!114 &233784164083886183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6239423281754971052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1483412f114c4d8c519dc8c4745963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ruedas:
+  - {fileID: 9127927429199369197}
+  - {fileID: 8330113451638759911}
+  velocidadRotacion: 360
+  ejeRotacion: {x: 1, y: 0, z: 0}
 --- !u!4 &6763618041952387350 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 93c7a05591d21474bba01d6c10a750f5, type: 3}
+  m_PrefabInstance: {fileID: 6509825423210424061}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8330113451638759911 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -6211297625264486630, guid: 93c7a05591d21474bba01d6c10a750f5, type: 3}
+  m_PrefabInstance: {fileID: 6509825423210424061}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &9127927429199369197 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -6558540569386502896, guid: 93c7a05591d21474bba01d6c10a750f5, type: 3}
   m_PrefabInstance: {fileID: 6509825423210424061}
   m_PrefabAsset: {fileID: 0}

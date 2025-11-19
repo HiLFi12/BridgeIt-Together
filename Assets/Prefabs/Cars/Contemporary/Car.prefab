@@ -46,12 +46,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 1753837026011674722}
   detectionRadius: 1
+  bridgeQuadrantTag: BridgeQuadrant
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 320
-  bridgeQuadrantTag: BridgeQuadrant
   vehicleTag: Vehicle
-  debugMode: 1
+  damageAmount: 1
 --- !u!1001 &449061316789053579
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -200,10 +200,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7f9f4a4e9e9cce049acf290216472149, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7515525097015399648}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7f9f4a4e9e9cce049acf290216472149, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1844059435718144614}
   m_SourcePrefab: {fileID: 100100000, guid: 7f9f4a4e9e9cce049acf290216472149, type: 3}
 --- !u!4 &122120136888536928 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7f9f4a4e9e9cce049acf290216472149, type: 3}
+  m_PrefabInstance: {fileID: 449061316789053579}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &710038805887238492 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1144462323251046871, guid: 7f9f4a4e9e9cce049acf290216472149, type: 3}
   m_PrefabInstance: {fileID: 449061316789053579}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &790956996241757658 stripped
@@ -283,3 +291,25 @@ MonoBehaviour:
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
+--- !u!114 &1844059435718144614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 790956996241757658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1483412f114c4d8c519dc8c4745963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ruedas:
+  - {fileID: 710038805887238492}
+  - {fileID: 5448934567263922088}
+  velocidadRotacion: 360
+  ejeRotacion: {x: 1, y: 0, z: 0}
+--- !u!1 &5448934567263922088 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -3628243245059256541, guid: 7f9f4a4e9e9cce049acf290216472149, type: 3}
+  m_PrefabInstance: {fileID: 449061316789053579}
+  m_PrefabAsset: {fileID: 0}

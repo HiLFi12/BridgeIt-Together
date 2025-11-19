@@ -75,6 +75,7 @@ GameObject:
   - component: {fileID: 8551482216539278869}
   - component: {fileID: 5010841045342427424}
   - component: {fileID: 3186373480475479346}
+  - component: {fileID: 6027012440123806254}
   m_Layer: 13
   m_Name: IndustrialExplosiveWaterCar
   m_TagString: Vehicle
@@ -208,6 +209,25 @@ MonoBehaviour:
   debugLogs: 0
   gizmoColor: {r: 0.3, g: 0.8, b: 1, a: 0.5}
   gizmoSphereRadius: 0.2
+--- !u!114 &6027012440123806254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2948579226618137670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1483412f114c4d8c519dc8c4745963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ruedas:
+  - {fileID: 307971254470380154}
+  - {fileID: 445120994963547815}
+  - {fileID: 8681801973113325058}
+  - {fileID: 6534308925497584600}
+  velocidadRotacion: 360
+  ejeRotacion: {x: 1, y: 0, z: 0}
 --- !u!1 &4629991719522009331
 GameObject:
   m_ObjectHideFlags: 0
@@ -349,8 +369,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 71dcdb32a56f50446b726f1772826820, type: 3}
+--- !u!1 &307971254470380154 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 482960549026496863, guid: 71dcdb32a56f50446b726f1772826820, type: 3}
+  m_PrefabInstance: {fileID: 213340672541690661}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &445120994963547815 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 349190710330879362, guid: 71dcdb32a56f50446b726f1772826820, type: 3}
+  m_PrefabInstance: {fileID: 213340672541690661}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5962990308741533192 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5779591812274406701, guid: 71dcdb32a56f50446b726f1772826820, type: 3}
+  m_PrefabInstance: {fileID: 213340672541690661}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6534308925497584600 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6366813816542404861, guid: 71dcdb32a56f50446b726f1772826820, type: 3}
+  m_PrefabInstance: {fileID: 213340672541690661}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8681801973113325058 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8831001225270463783, guid: 71dcdb32a56f50446b726f1772826820, type: 3}
   m_PrefabInstance: {fileID: 213340672541690661}
   m_PrefabAsset: {fileID: 0}

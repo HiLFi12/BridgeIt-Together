@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7269658524915195505}
   - component: {fileID: 8551482216539278869}
   - component: {fileID: 5010841045342427424}
+  - component: {fileID: 3960193950240530961}
   m_Layer: 13
   m_Name: IndustrialBasicCar
   m_TagString: Vehicle
@@ -108,6 +109,25 @@ MonoBehaviour:
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
+--- !u!114 &3960193950240530961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2948579226618137670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1483412f114c4d8c519dc8c4745963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ruedas:
+  - {fileID: 1593542707275597085}
+  - {fileID: 7581990162697657153}
+  - {fileID: 8668263225033151382}
+  - {fileID: 5717873305370999932}
+  velocidadRotacion: 360
+  ejeRotacion: {x: 1, y: 0, z: 0}
 --- !u!1 &8444443851282445424
 GameObject:
   m_ObjectHideFlags: 0
@@ -220,5 +240,25 @@ PrefabInstance:
 --- !u!4 &1533741730664137861 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7828277028435728379, guid: 677f87da22d8e5f43b3094c1a8db5fb9, type: 3}
+  m_PrefabInstance: {fileID: 8785205114256151422}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1593542707275597085 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8067696424663209571, guid: 677f87da22d8e5f43b3094c1a8db5fb9, type: 3}
+  m_PrefabInstance: {fileID: 8785205114256151422}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5717873305370999932 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3941396222605881090, guid: 677f87da22d8e5f43b3094c1a8db5fb9, type: 3}
+  m_PrefabInstance: {fileID: 8785205114256151422}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7581990162697657153 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1212579221511555135, guid: 677f87da22d8e5f43b3094c1a8db5fb9, type: 3}
+  m_PrefabInstance: {fileID: 8785205114256151422}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8668263225033151382 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 117246402723053800, guid: 677f87da22d8e5f43b3094c1a8db5fb9, type: 3}
   m_PrefabInstance: {fileID: 8785205114256151422}
   m_PrefabAsset: {fileID: 0}

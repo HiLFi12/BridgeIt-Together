@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2253430218919571608}
   - component: {fileID: 4167049208454991291}
   - component: {fileID: 7885140514597380896}
+  - component: {fileID: 7419128976182039871}
   m_Layer: 13
   m_Name: Truck
   m_TagString: Vehicle
@@ -108,6 +109,25 @@ MonoBehaviour:
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
+--- !u!114 &7419128976182039871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8711410610183130581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1483412f114c4d8c519dc8c4745963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ruedas:
+  - {fileID: 8893166036706186138}
+  - {fileID: 3834958020710618763}
+  - {fileID: 186081969022239191}
+  - {fileID: 410547533191648864}
+  velocidadRotacion: 360
+  ejeRotacion: {x: 1, y: 0, z: 0}
 --- !u!1 &9069533344224689303
 GameObject:
   m_ObjectHideFlags: 0
@@ -154,13 +174,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 7261261749526087648}
   detectionRadius: 1
+  bridgeQuadrantTag: BridgeQuadrant
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 320
-  bridgeQuadrantTag: BridgeQuadrant
   vehicleTag: Vehicle
-  debugMode: 1
-  heavyDamageAmount: 15
+  damageAmount: 1
+  damageMultiplier: 20
 --- !u!1001 &8157545239976457517
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -250,8 +270,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 395e8c423c0fb154882e28acf7bed5ca, type: 3}
+--- !u!1 &186081969022239191 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8331787662601270522, guid: 395e8c423c0fb154882e28acf7bed5ca, type: 3}
+  m_PrefabInstance: {fileID: 8157545239976457517}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &410547533191648864 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8396929493712020301, guid: 395e8c423c0fb154882e28acf7bed5ca, type: 3}
+  m_PrefabInstance: {fileID: 8157545239976457517}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3834958020710618763 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -4319534592634362970, guid: 395e8c423c0fb154882e28acf7bed5ca, type: 3}
+  m_PrefabInstance: {fileID: 8157545239976457517}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8556792363669050054 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 395e8c423c0fb154882e28acf7bed5ca, type: 3}
+  m_PrefabInstance: {fileID: 8157545239976457517}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8893166036706186138 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8475858849024612681, guid: 395e8c423c0fb154882e28acf7bed5ca, type: 3}
   m_PrefabInstance: {fileID: 8157545239976457517}
   m_PrefabAsset: {fileID: 0}

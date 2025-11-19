@@ -239,10 +239,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 197ad879a7cbc6c46a014d1d11135ca6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8161864968844423669}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 197ad879a7cbc6c46a014d1d11135ca6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8159424950356145924}
   m_SourcePrefab: {fileID: 100100000, guid: 197ad879a7cbc6c46a014d1d11135ca6, type: 3}
 --- !u!4 &2572497944672128504 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 197ad879a7cbc6c46a014d1d11135ca6, type: 3}
+  m_PrefabInstance: {fileID: 2610364012695104019}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2769325040958950243 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 168742388730454384, guid: 197ad879a7cbc6c46a014d1d11135ca6, type: 3}
   m_PrefabInstance: {fileID: 2610364012695104019}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2952261206123648834 stripped
@@ -347,3 +355,25 @@ MonoBehaviour:
   ammo: 2
   autoResetAmmoOnEnable: 1
   oneRollPerCollider: 1
+--- !u!114 &8159424950356145924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2952261206123648834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1483412f114c4d8c519dc8c4745963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ruedas:
+  - {fileID: 6781184530645283397}
+  - {fileID: 2769325040958950243}
+  velocidadRotacion: 360
+  ejeRotacion: {x: 1, y: 0, z: 0}
+--- !u!1 &6781184530645283397 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8800732249358850134, guid: 197ad879a7cbc6c46a014d1d11135ca6, type: 3}
+  m_PrefabInstance: {fileID: 2610364012695104019}
+  m_PrefabAsset: {fileID: 0}

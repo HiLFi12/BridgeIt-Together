@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5786666951659194499}
   - component: {fileID: 7534566590204756760}
   - component: {fileID: 7236148492619856147}
+  - component: {fileID: 3882966056317788333}
   m_Layer: 13
   m_Name: MerchCar
   m_TagString: Vehicle
@@ -136,6 +137,27 @@ MonoBehaviour:
   ammo: 1
   autoResetAmmoOnEnable: 1
   oneRollPerCollider: 1
+--- !u!114 &3882966056317788333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248325544060308125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1483412f114c4d8c519dc8c4745963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ruedas:
+  - {fileID: 6568968708765721037}
+  - {fileID: 4650690026027835754}
+  - {fileID: 888603704112120241}
+  - {fileID: 6835420262616579822}
+  - {fileID: 7839431472634822889}
+  - {fileID: 822435259789576606}
+  velocidadRotacion: 360
+  ejeRotacion: {x: 1, y: 0, z: 0}
 --- !u!1 &3259004454268015159
 GameObject:
   m_ObjectHideFlags: 0
@@ -314,6 +336,16 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 6281617299461113839}
   m_SourcePrefab: {fileID: 100100000, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}
+--- !u!1 &822435259789576606 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1991513188407250279, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}
+  m_PrefabInstance: {fileID: 1209962189587645689}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &888603704112120241 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2062176316206449992, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}
+  m_PrefabInstance: {fileID: 1209962189587645689}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &4014438401658599194 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2845290109464130531, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}
@@ -337,7 +369,28 @@ MonoBehaviour:
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 0
+  damageAmount: 1
   medievalDamageAmount: 10
+--- !u!1 &4650690026027835754 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5782683233675240851, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}
+  m_PrefabInstance: {fileID: 1209962189587645689}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6568968708765721037 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5468227635360671028, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}
+  m_PrefabInstance: {fileID: 1209962189587645689}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6835420262616579822 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5626945025201027607, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}
+  m_PrefabInstance: {fileID: 1209962189587645689}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7839431472634822889 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8935677469708256272, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}
+  m_PrefabInstance: {fileID: 1209962189587645689}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8724069432829763031 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7627049233474902318, guid: e2f2a3d378db95e48bc190ccf2bd4b0a, type: 3}

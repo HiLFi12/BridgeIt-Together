@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8551482216539278869}
   - component: {fileID: 1763032722423227207}
   - component: {fileID: -9196359997409664779}
+  - component: {fileID: 5383432636661007001}
   m_Layer: 13
   m_Name: IndustrialFogCar
   m_TagString: Vehicle
@@ -137,6 +138,23 @@ MonoBehaviour:
   ammo: 10
   autoResetAmmoOnEnable: 1
   oneRollPerCollider: 1
+--- !u!114 &5383432636661007001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2948579226618137670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1483412f114c4d8c519dc8c4745963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ruedas:
+  - {fileID: 196637101581137488}
+  - {fileID: 1724418072597986475}
+  velocidadRotacion: 360
+  ejeRotacion: {x: 1, y: 0, z: 0}
 --- !u!1 &4420189184600680933
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,6 +359,16 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ee2e19e74f7b1854e9992d374da705ad, type: 3}
+--- !u!1 &196637101581137488 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7776385648103959926, guid: ee2e19e74f7b1854e9992d374da705ad, type: 3}
+  m_PrefabInstance: {fileID: 7589090858461911846}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1724418072597986475 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9133160357336852365, guid: ee2e19e74f7b1854e9992d374da705ad, type: 3}
+  m_PrefabInstance: {fileID: 7589090858461911846}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9163237784245112112 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1620031264551032342, guid: ee2e19e74f7b1854e9992d374da705ad, type: 3}
