@@ -6521,6 +6521,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1025046408}
   m_CullTransparentMesh: 1
+--- !u!1 &1030443029
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1030443030}
+  m_Layer: 0
+  m_Name: SpawnPointVFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1030443030
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030443029}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -260.56, y: 229.64, z: 236.35526}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &1035896613 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5609417247491379696, guid: 3a5054450548d4440854a00973a4b017, type: 3}
@@ -12232,6 +12263,30 @@ PrefabInstance:
       propertyPath: infiniteLifetime
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -8360299195911474682, guid: d43cbed232d4a69409dc812f6f2c5dba, type: 3}
+      propertyPath: bridgeGrids.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8360299195911474682, guid: d43cbed232d4a69409dc812f6f2c5dba, type: 3}
+      propertyPath: 'bridgeGrids.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1410363238}
+    - target: {fileID: -8360299195911474682, guid: d43cbed232d4a69409dc812f6f2c5dba, type: 3}
+      propertyPath: activationVfxPrefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8360299195911474682, guid: d43cbed232d4a69409dc812f6f2c5dba, type: 3}
+      propertyPath: 'activationVfxPrefabs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 104829970813648393, guid: 70a697a1a5b23cd4d9bb3e173ffab2ea, type: 3}
+    - target: {fileID: -8360299195911474682, guid: d43cbed232d4a69409dc812f6f2c5dba, type: 3}
+      propertyPath: activationVfxSpawnPoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8360299195911474682, guid: d43cbed232d4a69409dc812f6f2c5dba, type: 3}
+      propertyPath: 'activationVfxSpawnPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1030443030}
     - target: {fileID: 878979549410298085, guid: d43cbed232d4a69409dc812f6f2c5dba, type: 3}
       propertyPath: m_Name
       value: PowerUpRitualGranFuego
@@ -13242,3 +13297,4 @@ SceneRoots:
   - {fileID: 1825684225}
   - {fileID: 2022153482}
   - {fileID: 441442481}
+  - {fileID: 1030443030}

@@ -9159,6 +9159,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &1416728392
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1416728393}
+  m_Layer: 0
+  m_Name: SpawnPointVFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1416728393
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416728392}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -260.56, y: 229.64, z: 236.35526}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1418385938
 GameObject:
   m_ObjectHideFlags: 0
@@ -11095,6 +11126,22 @@ PrefabInstance:
       propertyPath: timeToLive
       value: 99999
       objectReference: {fileID: 0}
+    - target: {fileID: 3061969297140542942, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
+      propertyPath: activationVfxPrefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3061969297140542942, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
+      propertyPath: 'activationVfxPrefabs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 104829970813648393, guid: 70a697a1a5b23cd4d9bb3e173ffab2ea, type: 3}
+    - target: {fileID: 3061969297140542942, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
+      propertyPath: activationVfxSpawnPoints.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3061969297140542942, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
+      propertyPath: 'activationVfxSpawnPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1416728393}
     - target: {fileID: 5060500621107348281, guid: f9ee96343e395ae409bafc27754447c0, type: 3}
       propertyPath: m_Name
       value: StatueInteractable
@@ -15135,3 +15182,4 @@ SceneRoots:
   - {fileID: 1575710940}
   - {fileID: 1637816712}
   - {fileID: 1329867490}
+  - {fileID: 1416728393}

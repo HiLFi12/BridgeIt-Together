@@ -27,10 +27,22 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable
     private int carbonesActuales = 0;
 
     [Header("Construcción Automática")]
-    [Tooltip("Grid de puente sobre el que aplicar construcción automática al finalizar Calor Humano.")]
-    [SerializeField] private BridgeConstructionGrid bridgeGrid;
-    [Tooltip("Índice de capa máximo a construir (0=Base, 1=Soporte, 2=Superficie). Igual que RitualGranFuego.")]
+    [Tooltip("Lista de grids de puente sobre los que aplicar construcción automática al finalizar Calor Humano.")]
+    [SerializeField] private BridgeConstructionGrid[] bridgeGrids;
+    [Tooltip("Si está activo y la lista está vacía, autodescubre todos los BridgeConstructionGrid en la escena al iniciar.")]
+    [SerializeField] private bool autoFindBridgeGrids = true;
+    [Tooltip("Índice de capa máximo a construir (0=Base, 1=Soporte, 2=Superficie) aplicado a cada grid.")]
     [SerializeField, Range(0, 2)] private int buildUpToLayer = 2;
+
+    [Header("VFX de Activación")]
+    [Tooltip("Lista de efectos VFX a instanciar al activarse el power-up.")]
+    [SerializeField] private GameObject[] activationVfxPrefabs;
+    [Tooltip("Puntos de spawn para cada VFX; índice i corresponde a activationVfxPrefabs[i]. Si falta, usa la posición de este objeto.")]
+    [SerializeField] private Transform[] activationVfxSpawnPoints;
+    [Tooltip("Si está activo, el VFX se parenta al spawnpoint correspondiente (si existe). Útil para efectos adheridos a la escena.")]
+    [SerializeField] private bool parentVfxToSpawn = false;
+    [Tooltip("Si > 0, destruye automáticamente cada VFX tras estos segundos.")]
+    [SerializeField] private float vfxAutoDestroyAfter = -1f;
 
     [Header("Interacción (Carbón)")]
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
@@ -96,6 +108,15 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable
     {
         shadow.SetActive(false);
         UpdateUI();
+
+        if ((bridgeGrids == null || bridgeGrids.Length == 0) && autoFindBridgeGrids)
+        {
+#if UNITY_2023_1_OR_NEWER
+            bridgeGrids = FindObjectsByType<BridgeConstructionGrid>(FindObjectsSortMode.None);
+#else
+            bridgeGrids = FindObjectsOfType<BridgeConstructionGrid>();
+#endif
+        }
     }
 
     private void Update() { /* activación ahora sucede en TryAddCoal / InsertarCarbon */ }
@@ -115,6 +136,9 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable
         // Ocultar / actualizar UI al activarse
         UpdateUI();
 
+        // Instanciar efectos de activación en sus spawnpoints
+        SpawnActivationVfx();
+
         // Construir automáticamente, igual que RitualGranFuego
         ConstructBridgeAutomatically();
 
@@ -124,26 +148,68 @@ public class PowerUpCalorHumano : PowerUpBase, IInteractable
     }
 
     /// <summary>
+    /// Instancia los VFX de activación mapeando por índice a sus spawnpoints.
+    /// </summary>
+    private void SpawnActivationVfx()
+    {
+        if (activationVfxPrefabs == null || activationVfxPrefabs.Length == 0) return;
+
+        int count = activationVfxPrefabs.Length;
+        for (int i = 0; i < count; i++)
+        {
+            var prefab = activationVfxPrefabs[i];
+            if (prefab == null) continue;
+
+            Transform sp = (activationVfxSpawnPoints != null && i < activationVfxSpawnPoints.Length)
+                ? activationVfxSpawnPoints[i]
+                : null;
+
+            Vector3 pos = sp != null ? sp.position : transform.position;
+            Quaternion rot = sp != null ? sp.rotation : transform.rotation;
+
+            GameObject vfx = Instantiate(prefab, pos, rot);
+            if (parentVfxToSpawn && sp != null)
+            {
+                vfx.transform.SetParent(sp, true);
+            }
+
+            if (vfxAutoDestroyAfter > 0f)
+            {
+                Destroy(vfx, vfxAutoDestroyAfter);
+            }
+
+            if (debugLogs)
+            {
+                Debug.Log($"[CalorHumano] VFX instanciado: {prefab.name} en {(sp != null ? sp.name : name)}", this);
+            }
+        }
+    }
+
+    /// <summary>
     /// Construye automáticamente los cuadrantes del puente hasta la capa indicada en buildUpToLayer,
     /// reutilizando la misma lógica que PowerUpRitualGranFuego.
     /// </summary>
     private void ConstructBridgeAutomatically()
     {
-        if (bridgeGrid == null) return;
+        if (bridgeGrids == null || bridgeGrids.Length == 0) return;
 
-        int maxGridLayer = (bridgeGrid.layerHeights != null)
-            ? Mathf.Max(0, bridgeGrid.layerHeights.Length - 1)
-            : 2;
-
-        int targetMax = Mathf.Clamp(buildUpToLayer, 0, maxGridLayer);
-
-        for (int x = 0; x < bridgeGrid.gridWidth; x++)
+        foreach (var grid in bridgeGrids)
         {
-            for (int z = 0; z < bridgeGrid.gridLength; z++)
+            if (grid == null) continue;
+
+            int maxGridLayer = (grid.layerHeights != null)
+                ? Mathf.Max(0, grid.layerHeights.Length - 1)
+                : 2;
+            int targetMax = Mathf.Clamp(buildUpToLayer, 0, maxGridLayer);
+
+            for (int x = 0; x < grid.gridWidth; x++)
             {
-                for (int layerIndex = 0; layerIndex <= targetMax; layerIndex++)
+                for (int z = 0; z < grid.gridLength; z++)
                 {
-                    bridgeGrid.TryBuildLayer(x, z, layerIndex, null);
+                    for (int layerIndex = 0; layerIndex <= targetMax; layerIndex++)
+                    {
+                        grid.TryBuildLayer(x, z, layerIndex, null);
+                    }
                 }
             }
         }
