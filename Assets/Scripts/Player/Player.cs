@@ -43,6 +43,10 @@ public class Player : MonoBehaviour, IHitable
     [SerializeField] private Image dashKeyUI;
     [SerializeField] private Image dashPadUI;
 
+    [Header("Respawn Settings")]
+    [SerializeField] private Transform respawnPoint;
+    [SerializeField] private GameObject respawnEffectPrefab;
+
     private bool usePadUI = false;
     private Image CurrentInteractionUI => usePadUI ? interactionPadUI : interactionKeyUI;
     private Image CurrentBuildUI => usePadUI ? buildPadUI : buildKeyUI;
@@ -660,6 +664,61 @@ public class Player : MonoBehaviour, IHitable
         if (audio != null)
         {
             audio.PlaySFX(dashSfxIndex);
+        }
+    }
+    
+    public void Respawn()
+    {
+        if (respawnPoint == null)
+        {
+            Debug.LogWarning("[Player] No se puede hacer respawn: respawnPoint no está asignado.");
+            return;
+        }
+
+        // Guardar posición actual para el efecto de desaparición
+        Vector3 currentPosition = transform.position;
+
+        // Instanciar efecto en la posición donde el player desaparece
+        if (respawnEffectPrefab != null)
+        {
+            Instantiate(respawnEffectPrefab, currentPosition, Quaternion.identity);
+        }
+
+        // Crear un nuevo Vector3 con la posición del respawn point
+        Vector3 posicionDestino = new Vector3(respawnPoint.position.x, respawnPoint.position.y, respawnPoint.position.z);
+
+        // Verificar si tiene CharacterController (requiere tratamiento especial)
+        if (characterController != null)
+        {
+            // Desactivar temporalmente para poder mover
+            characterController.enabled = false;
+            transform.position = posicionDestino;
+            characterController.enabled = true;
+            Debug.Log($"[Player] Respawneado (con CharacterController) de {currentPosition} a {transform.position}");
+        }
+        else
+        {
+            // Teletransportar al respawn point usando new Vector3
+            transform.position = posicionDestino;
+            Debug.Log($"[Player] Respawneado de {currentPosition} a {transform.position}");
+        }
+
+        // Si tiene Rigidbody, resetear velocidad
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+#if UNITY_6000_0_OR_NEWER
+            rb.linearVelocity = Vector3.zero;
+#else
+            rb.velocity = Vector3.zero;
+#endif
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        // Instanciar efecto en el respawn point
+        if (respawnEffectPrefab != null)
+        {
+            Instantiate(respawnEffectPrefab, respawnPoint.position, Quaternion.identity);
         }
     }
 }
