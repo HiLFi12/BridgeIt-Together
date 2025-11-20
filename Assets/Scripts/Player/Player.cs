@@ -14,7 +14,7 @@ public class Player : MonoBehaviour, IHitable
     [SerializeField] private LayerMask interactionLayer;
 
     [SerializeField] private KeyCode interactKey = KeyCode.E;
-    // Nota: con el esquema unificado, Drop/Build no tienen teclas dedicadas; todo va con Interact
+    [SerializeField] private KeyCode dropKey = KeyCode.Q; // Tecla dedicada para soltar objeto
     
     [Header("Dash Settings")]
     [SerializeField] private KeyCode dashKey = KeyCode.LeftShift;
@@ -43,18 +43,16 @@ public class Player : MonoBehaviour, IHitable
     [SerializeField] private Image dashKeyUI;
     [SerializeField] private Image dashPadUI;
 
-    [Header("Respawn Settings")]
-    [SerializeField] private Transform respawnPoint;
-    [SerializeField] private GameObject respawnEffectPrefab;
-    [SerializeField] private float manualRespawnCooldown = 3f;
-    [SerializeField] private float shakeIntensityMax = 0.5f;
-    [SerializeField] private float shakeFrequency = 20f;
-    [SerializeField] private KeyCode manualRespawnKey = KeyCode.F;
-
     private bool usePadUI = false;
     private Image CurrentInteractionUI => usePadUI ? interactionPadUI : interactionKeyUI;
     private Image CurrentBuildUI => usePadUI ? buildPadUI : buildKeyUI;
     private Image CurrentDashUI => usePadUI ? dashPadUI : dashKeyUI;
+
+    // Exponer referencias de UI para PlayerUIManager
+    public Image InteractionKeyUI => interactionKeyUI;
+    public Image InteractionPadUI => interactionPadUI;
+    public Image BuildKeyUI => buildKeyUI;
+    public Image BuildPadUI => buildPadUI;
 
     private GameConditionManager gameConditionManager;
     private PlayerObjectHolder objectHolder;
@@ -64,11 +62,11 @@ public class Player : MonoBehaviour, IHitable
     private PlayerController playerController;
     private PlayerInput playerInput;
     private InputAction interactAction;
+    private InputAction dropAction;
     
     private InputAction dashAction;
     
     private InputAction pauseAction;
-    private InputAction dropAction;
 
     // Dash state
     private bool isDashing = false;
@@ -77,20 +75,8 @@ public class Player : MonoBehaviour, IHitable
     private Vector3 dashDirection;
     private float dashTimer = 0f;
     
-    // Manual Respawn state
-    private float manualRespawnTimer = 0f;
-    private bool isHoldingRespawn = false;
-    private Vector3 originalPosition;
-    private bool isShaking = false;
-    
     public PlayerInput PlayerInput => playerInput;
     public PlayerController PlayerController => playerController;
-    
-    // Propiedades para acceder a las UIs desde PlayerUIManager
-    public Image InteractionKeyUI => interactionKeyUI;
-    public Image InteractionPadUI => interactionPadUI;
-    public Image BuildKeyUI => buildKeyUI;
-    public Image BuildPadUI => buildPadUI;
 
     public delegate void PlayerInteractedHandler();
     public event PlayerInteractedHandler OnPlayerInteracted;
@@ -116,9 +102,9 @@ public class Player : MonoBehaviour, IHitable
         if (playerInput != null)
         {
             interactAction = playerInput.actions.FindAction("Interact");
+            dropAction = playerInput.actions.FindAction("Drop");
             dashAction = playerInput.actions.FindAction("Dash");
             pauseAction = playerInput.actions.FindAction("Pause");
-            dropAction = playerInput.actions.FindAction("Drop");
         }
         
         // Intentar auto-asignar grid si no se arrastró en inspector
@@ -183,9 +169,6 @@ public class Player : MonoBehaviour, IHitable
             TryStartDash();
         }
 
-        // Sistema de respawn manual
-        UpdateManualRespawn();
-
         TryInteract();
 
         if (pauseAction.triggered)
@@ -193,7 +176,7 @@ public class Player : MonoBehaviour, IHitable
             gameConditionManager.PauseGame();
         }
 
-        // Nota: Build/Drop ahora se manejan dentro de TryInteract() como fallback del botón Interact
+        // Nota: Build ahora se maneja dentro de TryInteract() como fallback del botón Interact
 
         // Mostrar/ocultar BuildUI según condiciones
         UpdateBuildUI();
@@ -343,6 +326,22 @@ public class Player : MonoBehaviour, IHitable
             {
                 ActivarSombra(shadowActive, false);
             }
+
+            // Si no hay interactuables cerca y se pulsa Interact, intentar construir
+            if (bridgeInteraction != null && objectHolder != null &&
+                (interactAction.triggered || Input.GetKeyDown(interactKey)))
+            {
+                bool hasObject = objectHolder.HasObjectInHand();
+                bool targetInRange = bridgeInteraction.HasTargetQuadrantInRange();
+                if (hasObject && targetInRange)
+                {
+                    bridgeInteraction.TryInteractWithQuadrant();
+                    if (playerAnimator != null)
+                    {
+                        playerAnimator.TriggerBuildAnimation();
+                    }
+                }
+            }
             
             return;
         }
@@ -403,7 +402,7 @@ public class Player : MonoBehaviour, IHitable
         if (candidatos.Count > 0)
         {
             ShowInteractionUI();
-
+            
             // Activar sombra de los interactables candidatos
             foreach (var candidato in candidatos)
             {
@@ -423,12 +422,7 @@ public class Player : MonoBehaviour, IHitable
                 {
                     seleccionado.Interact(this.gameObject);
 
-                    // No ignorar objetos que deben ser siempre interactuables
-                    if (!IsAlwaysInteractable(seleccionado))
-                    {
-                        ignoredInteractables.Add(seleccionado);
-                    }
-                    
+                    ignoredInteractables.Add(seleccionado);
                     OnPlayerInteracted?.Invoke();
                 }
             }
@@ -436,35 +430,22 @@ public class Player : MonoBehaviour, IHitable
         else
         {
             HideInteractionUI();
-
-            // Fallback unificado al presionar el botón de Interact: intentar construir, si no, dropear
-            if (interactAction.triggered || Input.GetKeyDown(interactKey))
+            
+            // Sin interactuables válidos pero con algo cerca (colliders que no implementan IInteractable):
+            // permitir que el botón de Interact intente construir igualmente.
+            if (bridgeInteraction != null && objectHolder != null &&
+                (interactAction.triggered || Input.GetKeyDown(interactKey)))
             {
-                bool intentoHecho = false;
-
-                // 1) Intentar construir si hay cuadrante objetivo válido y tenemos material en mano
-                if (!intentoHecho && bridgeInteraction != null && objectHolder != null)
+                bool hasObject = objectHolder.HasObjectInHand();
+                bool targetInRange = bridgeInteraction.HasTargetQuadrantInRange();
+                if (hasObject && targetInRange)
                 {
-                    bool hasObject = objectHolder.HasObjectInHand();
-                    bool targetInRange = bridgeInteraction.HasTargetQuadrantInRange();
-                    if (hasObject && targetInRange)
+                    bridgeInteraction.TryInteractWithQuadrant();
+                    if (playerAnimator != null)
                     {
-                        bridgeInteraction.TryInteractWithQuadrant();
-                        if (playerAnimator != null)
-                        {
-                            playerAnimator.TriggerBuildAnimation();
-                        }
-                        intentoHecho = true;
+                        playerAnimator.TriggerBuildAnimation();
                     }
                 }
-
-                // 2) Si no construyó y hay un objeto en mano, dropear
-                if (!intentoHecho && objectHolder != null && objectHolder.HasObjectInHand())
-                {
-                    TryDropObject();
-                    intentoHecho = true;
-                }
-                // 3) Si no hay nada en mano y no hubo interactables, no hacemos nada extra
             }
         }
 
@@ -483,6 +464,15 @@ public class Player : MonoBehaviour, IHitable
             if (!candidatos.Contains(shadowActive))
             {
                 ActivarSombra(shadowActive, false);
+            }
+        }
+
+        // Input dedicado para dropear (separado de Interact)
+        if ((dropAction != null && dropAction.triggered) || Input.GetKeyDown(dropKey))
+        {
+            if (objectHolder != null && objectHolder.HasObjectInHand())
+            {
+                TryDropObject();
             }
         }
     }
@@ -544,27 +534,12 @@ public class Player : MonoBehaviour, IHitable
         return false;
     }
 
-    /// <summary>
-    /// Determina si un interactable debe ser siempre detectable (no ignorarse después de interactuar).
-    /// Catapult, Ballista y WagonLeverInteractable son excepciones que siempre deben estar disponibles.
-    /// </summary>
-    private bool IsAlwaysInteractable(IInteractable interactable)
-    {
-        if (interactable == null) return false;
-        var comp = interactable as Component;
-        if (comp == null) return false;
-        
-        // Verificar si es uno de los tipos que debe ser siempre interactuable
-        if (comp.GetComponentInParent<Catapult>() != null) return true;
-        if (comp.GetComponentInParent<Ballista>() != null) return true;
-        if (comp.GetComponentInParent<WagonLeverInteractable>() != null) return true;
-        if (comp.GetComponentInParent<Wagon>() != null) return true;
-        
-        return false;
-    }
     private void ShowInteractionUI()
     {
-        CurrentInteractionUI.gameObject.SetActive(true);
+        if (CurrentInteractionUI != null && !CurrentInteractionUI.gameObject.activeInHierarchy)
+        {
+            CurrentInteractionUI.gameObject.SetActive(true);
+        }
     }
 
     private void HideInteractionUI()
@@ -681,176 +656,12 @@ public class Player : MonoBehaviour, IHitable
             audio.PlaySFX(dashSfxIndex);
         }
     }
-    
+
+    // Respawn básico para compatibilidad con RespawnTrigger
     public void Respawn()
     {
-        if (respawnPoint == null)
-        {
-            Debug.LogWarning("[Player] No se puede hacer respawn: respawnPoint no está asignado.");
-            return;
-        }
-
-        // Guardar posición actual para el efecto de desaparición
-        Vector3 currentPosition = transform.position;
-
-        // Instanciar efecto en la posición donde el player desaparece
-        if (respawnEffectPrefab != null)
-        {
-            Instantiate(respawnEffectPrefab, currentPosition, Quaternion.identity);
-        }
-
-        // Crear un nuevo Vector3 con la posición del respawn point
-        Vector3 posicionDestino = new Vector3(respawnPoint.position.x, respawnPoint.position.y, respawnPoint.position.z);
-
-        // Verificar si tiene CharacterController (requiere tratamiento especial)
-        if (characterController != null)
-        {
-            // Desactivar temporalmente para poder mover
-            characterController.enabled = false;
-            transform.position = posicionDestino;
-            characterController.enabled = true;
-            Debug.Log($"[Player] Respawneado (con CharacterController) de {currentPosition} a {transform.position}");
-        }
-        else
-        {
-            // Teletransportar al respawn point usando new Vector3
-            transform.position = posicionDestino;
-            Debug.Log($"[Player] Respawneado de {currentPosition} a {transform.position}");
-        }
-
-        // Si tiene Rigidbody, resetear velocidad
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-#if UNITY_6000_0_OR_NEWER
-            rb.linearVelocity = Vector3.zero;
-#else
-            rb.velocity = Vector3.zero;
-#endif
-            rb.angularVelocity = Vector3.zero;
-        }
-
-        // Instanciar efecto en el respawn point
-        if (respawnEffectPrefab != null)
-        {
-            Instantiate(respawnEffectPrefab, respawnPoint.position, Quaternion.identity);
-        }
-        
-        // Resetear el timer de respawn manual
-        manualRespawnTimer = 0f;
-        isHoldingRespawn = false;
-        isShaking = false;
-    }
-
-    /// <summary>
-    /// Actualiza el sistema de respawn manual que se activa manteniendo presionado el botón Drop.
-    /// </summary>
-    private void UpdateManualRespawn()
-    {
-        // Verificar si el botón está siendo presionado (InputAction o KeyCode)
-        bool isPressed = false;
-        
-        if (dropAction != null)
-        {
-            isPressed = dropAction.ReadValue<float>() > 0.1f;
-        }
-        
-        // Fallback a KeyCode si no hay InputAction o no está presionado
-        if (!isPressed)
-        {
-            isPressed = Input.GetKey(manualRespawnKey);
-        }
-
-        if (isPressed)
-        {
-            if (!isHoldingRespawn)
-            {
-                // Comenzar a mantener presionado
-                isHoldingRespawn = true;
-                manualRespawnTimer = manualRespawnCooldown;
-                isShaking = false;
-                Debug.Log("[Player] Iniciando cooldown de respawn manual");
-            }
-
-            // Guardar la posición base antes de aplicar el temblor (solo la primera vez)
-            if (!isShaking)
-            {
-                originalPosition = transform.position;
-                isShaking = true;
-                
-                // Desactivar CharacterController al inicio del shake
-                if (characterController != null)
-                {
-                    characterController.enabled = false;
-                }
-            }
-
-            // Reducir el timer
-            manualRespawnTimer -= Time.deltaTime;
-
-            // Aplicar temblor según el progreso
-            float progress = 1f - Mathf.Clamp01(manualRespawnTimer / manualRespawnCooldown);
-            ApplyShake(progress);
-
-            // Cuando el timer llega a 0, ejecutar respawn
-            if (manualRespawnTimer <= 0f)
-            {
-                // Reactivar CharacterController antes del respawn
-                if (characterController != null && !characterController.enabled)
-                {
-                    characterController.enabled = true;
-                }
-                
-                Debug.Log($"[Player] {gameObject.name} - Cooldown de respawn manual completado, ejecutando respawn");
-                Respawn();
-                // El método Respawn() ya resetea las variables
-            }
-        }
-        else
-        {
-            if (isHoldingRespawn)
-            {
-                Debug.Log($"[Player] {gameObject.name} - Respawn manual cancelado, reseteando cooldown");
-                manualRespawnTimer = 0f;
-                isHoldingRespawn = false;
-                
-                // Detener el temblor y restaurar posición
-                if (isShaking)
-                {
-                    // Reactivar CharacterController si estaba desactivado
-                    if (characterController != null && !characterController.enabled)
-                    {
-                        characterController.enabled = true;
-                    }
-                    
-                    transform.position = originalPosition;
-                    isShaking = false;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Aplica un efecto de temblor al jugador basado en el progreso del respawn manual.
-    /// El temblor se aplica como un offset desde la posición original sin mover al jugador.
-    /// </summary>
-    /// <param name="progress">Progreso de 0 a 1, donde 1 es máximo temblor</param>
-    private void ApplyShake(float progress)
-    {
-        // Calcular intensidad del temblor basado en el progreso
-        float intensity = Mathf.Lerp(0f, shakeIntensityMax, progress);
-
-        // Generar offset aleatorio usando ruido de Perlin para un movimiento más suave
-        float time = Time.time * shakeFrequency;
-        float offsetX = (Mathf.PerlinNoise(time, 0f) - 0.5f) * 2f * intensity;
-        float offsetY = (Mathf.PerlinNoise(0f, time) - 0.5f) * 2f * intensity;
-        float offsetZ = (Mathf.PerlinNoise(time, time + 100f) - 0.5f) * 2f * intensity;
-
-        // Aplicar el temblor como offset desde la posición original
-        Vector3 shakeOffset = new Vector3(offsetX, offsetY, offsetZ);
-        
-        // Aplicar directamente el offset a la posición
-        // UpdateManualRespawn ya desactivó el CharacterController si es necesario
-        transform.position = originalPosition + shakeOffset;
+        // Por ahora solo logueamos; la lógica real de respawn
+        // puede implementarse más adelante (checkpoints, etc.).
+        Debug.Log("[Player] Respawn() llamado - implementar lógica de respawn aquí si es necesario.");
     }
 }
