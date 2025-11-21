@@ -18,6 +18,10 @@ public class TutorialManager : MonoBehaviour
     [Header("Tutorial Steps")]
     [SerializeField] private List<TutorialStep> tutorialSteps = new List<TutorialStep>();
 
+    [Header("End Tutorial UI")]
+    [Tooltip("Array de Imágenes a mostrar cuando todos los tutoriales se completen")]
+    [SerializeField] private Image[] endUI;
+
     [Header("Player Reference")]
     [SerializeField] private Player player;
 
@@ -27,6 +31,15 @@ public class TutorialManager : MonoBehaviour
     private void Start()
     {
         if (player == null) player = GetComponent<Player>();
+
+        // Desactivar endUI al inicio
+        foreach (var ui in endUI)
+        {
+            if (ui != null)
+            {
+                ui.gameObject.SetActive(false);
+            }
+        }
 
         // Inicializar todos los TutorialSO clonados
         clonedTutorials.Clear();
@@ -105,6 +118,15 @@ public class TutorialManager : MonoBehaviour
         {
             _currentStepIndex = -1;
             Debug.Log("Tutorial completado.");
+            
+            // Activar endUI cuando todos los tutoriales estén completos
+            foreach (var ui in endUI)
+            {
+                if (ui != null)
+                {
+                    ui.gameObject.SetActive(true);
+                }
+            }
         }
         else
         {
@@ -132,6 +154,15 @@ public class TutorialManager : MonoBehaviour
             }
             _currentStepIndex = -1;
             Debug.Log("Tutorial completado.");
+            
+            // Activar endUI cuando todos los tutoriales estén completos
+            foreach (var ui in endUI)
+            {
+                if (ui != null)
+                {
+                    ui.gameObject.SetActive(true);
+                }
+            }
             return;
         }
 
@@ -203,6 +234,15 @@ public class TutorialManager : MonoBehaviour
                 {
                     ui.gameObject.SetActive(false);
                 }
+            }
+        }
+
+        // Desactivar endUI
+        foreach (var ui in endUI)
+        {
+            if (ui != null)
+            {
+                ui.gameObject.SetActive(false);
             }
         }
 
