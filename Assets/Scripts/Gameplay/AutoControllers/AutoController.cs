@@ -123,18 +123,9 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         {
             if (!isInitialized) return;
 
-            // Si colisiona con un jugador
-            if (collision.collider.GetComponent<PlayerController>() != null)
-            {
-                // Ignorar respuesta física del motor
-                Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
+            // Ignorar respuesta física del motor para todos los objetos
+            Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
 
-                // Lanzar el player hacia un punto aleatorio (misma lógica que TryLaunchHitable)
-                TryLaunchHitable(collision.collider);
-
-                // El auto sigue sin perder velocidad ni dirección
-                return;
-            }
 
             // Resto de comportamiento normal
             if (TryHandleQuadrantCollision(collision.collider)) return;
