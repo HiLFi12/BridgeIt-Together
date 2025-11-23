@@ -56,6 +56,8 @@ MonoBehaviour:
   activateSfxIndex: -1
   leftTorchCollider: {fileID: 3991762860544308919}
   rightTorchCollider: {fileID: 7616528472772056046}
+  bridgeGrids:
+  - {fileID: 0}
   bridgeGrid: {fileID: 0}
   torchActiveTime: 999999
   torchFireEffectPrefab: {fileID: 3863016212730197731, guid: da5327b0ffd9bb849b596274a49961c3, type: 3}
@@ -65,6 +67,10 @@ MonoBehaviour:
   attachDieEffect: 0
   infiniteLifetime: 0
   buildUpToLayer: 2
+  activationVfxPrefabs: []
+  activationVfxSpawnPoints: []
+  parentVfxToSpawn: 0
+  vfxAutoDestroyAfter: -1
 --- !u!136 &2629408831071568527
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -393,8 +399,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.5412277, y: 0.91882944, z: 1.29828}
-  m_Center: {x: 0.27061385, y: -0.38945627, z: -0.06653899}
+  m_Size: {x: 0.83662784, y: 0.91882944, z: 0.27390733}
+  m_Center: {x: 0.01604724, y: -0.38945627, z: -0.094019465}
 --- !u!114 &4046831122907294055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -627,8 +633,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.3532451, y: 0.91882944, z: 1.4547997}
-  m_Center: {x: -0.14261198, y: -0.38945627, z: -0.018434644}
+  m_Size: {x: 0.83662784, y: 0.91882944, z: 0.27390733}
+  m_Center: {x: 0.01604724, y: -0.38945627, z: -0.094019465}
 --- !u!114 &7036981601641062061
 MonoBehaviour:
   m_ObjectHideFlags: 0
