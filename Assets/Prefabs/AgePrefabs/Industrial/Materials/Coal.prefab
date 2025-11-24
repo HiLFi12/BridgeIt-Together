@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 657022713135411419}
-  - component: {fileID: 6314364078036361177}
   - component: {fileID: -337008737179098045}
   - component: {fileID: 4152158384830814756}
   - component: {fileID: 4062413299853606017}
+  - component: {fileID: 7198521463540667993}
   m_Layer: 3
   m_Name: Coal
   m_TagString: Untagged
@@ -30,34 +30,13 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7111322626840654194}
   - {fileID: 2055546710666941848}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &6314364078036361177
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8251136370303857422}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.0476675, y: 1.9160949, z: 2.1248915}
-  m_Center: {x: -0.10444254, y: 0.5328327, z: -0.34423554}
 --- !u!114 &-337008737179098045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,6 +97,27 @@ MonoBehaviour:
     m_Bits: 4294967295
   debugLogs: 0
   uiIndex: 3
+--- !u!135 &7198521463540667993
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8251136370303857422}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.49308962
+  m_Center: {x: 0, y: -0.0071330667, z: -0.28943652}
 --- !u!1001 &1517396711287987833
 PrefabInstance:
   m_ObjectHideFlags: 0
