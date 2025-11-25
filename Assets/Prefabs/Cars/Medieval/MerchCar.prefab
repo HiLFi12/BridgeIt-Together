@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 747d749c6a0f6ea4aaff2f33415fbe37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidadBase: 5
+  velocidadBase: 4
   direccionInicial: {x: 1, y: 0, z: 0}
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
@@ -111,6 +111,7 @@ MonoBehaviour:
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
+  ignoreCollisionDuration: 0.5
 --- !u!114 &7236148492619856147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,6 +338,7 @@ MonoBehaviour:
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 0
+  damageAmount: 1
   medievalDamageAmount: 10
 --- !u!4 &8724069432829763031 stripped
 Transform:
