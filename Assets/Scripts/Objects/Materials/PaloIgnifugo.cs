@@ -7,6 +7,7 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
 {
     [Header("Configuración")]
     [SerializeField] private GameObject efectoFuego;
+    [SerializeField] private Transform fuegoSpawnPoint;
     [SerializeField] private float tiempoEncendido = 9999f;
 
     [Header("UI Configuration")]
@@ -22,6 +23,13 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
     private void Start()
     {
         playerUIManager = FindFirstObjectByType<PlayerUIManager>();
+        // Recolocar el efecto de fuego en el spawn point si está asignado
+        if (efectoFuego != null && fuegoSpawnPoint != null)
+        {
+            efectoFuego.transform.SetParent(fuegoSpawnPoint, false);
+            efectoFuego.transform.localPosition = Vector3.zero;
+            efectoFuego.transform.localRotation = Quaternion.identity;
+        }
         SetEncendido(false);
     }
 

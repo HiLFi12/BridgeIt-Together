@@ -3269,6 +3269,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6794124959495141859, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9131316214125464037, guid: 1aeb1f55e3107d74b87053194d1d8d32, type: 3}
       propertyPath: activationVfxPrefabs.Array.size
       value: 3
@@ -6052,7 +6056,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &646342129
 Transform:
   m_ObjectHideFlags: 0
@@ -12165,6 +12169,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9cc67946fa86fba409fbc1932c7103a6, type: 3}
+--- !u!114 &1131315912 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2409680370782379909, guid: 9cc67946fa86fba409fbc1932c7103a6, type: 3}
+  m_PrefabInstance: {fileID: 1131315911}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68521fa88bab252489fd8b15cf1bd1bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1132100277
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12384,7 +12399,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2769124932103928955, guid: 4ab3110d84e211c4fb606352c997fc28, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -249.49924
+      value: -249.04
       objectReference: {fileID: 0}
     - target: {fileID: 2769124932103928955, guid: 4ab3110d84e211c4fb606352c997fc28, type: 3}
       propertyPath: m_LocalPosition.y
@@ -12426,6 +12441,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Lever
       objectReference: {fileID: 0}
+    - target: {fileID: 8119211219641280341, guid: 4ab3110d84e211c4fb606352c997fc28, type: 3}
+      propertyPath: targetWagon
+      value: 
+      objectReference: {fileID: 1131315912}
     - target: {fileID: 8295503352203136014, guid: 4ab3110d84e211c4fb606352c997fc28, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0
@@ -13758,6 +13777,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Lever (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 8119211219641280341, guid: 4ab3110d84e211c4fb606352c997fc28, type: 3}
+      propertyPath: targetWagon
+      value: 
+      objectReference: {fileID: 1131315912}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -19955,7 +19978,7 @@ PrefabInstance:
       objectReference: {fileID: 1096737037}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaInicial
-      value: 60
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaEntreRondas
