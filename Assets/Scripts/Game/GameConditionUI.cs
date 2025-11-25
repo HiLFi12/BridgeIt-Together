@@ -14,6 +14,7 @@ public class GameConditionUI : MonoBehaviour
     [SerializeField] private Button botonReiniciar;
     [SerializeField] private TextMeshProUGUI textoRondas;
     [SerializeField] private TextMeshProUGUI textoTimerRondas;
+    [SerializeField] private Image imagenFillTimerRondas;
     
     [Header("Configuración")]
     [SerializeField] private bool actualizarAutomaticamente = true;
@@ -21,6 +22,8 @@ public class GameConditionUI : MonoBehaviour
     [SerializeField] private Color colorDerrota = Color.red;
     [SerializeField] private Color colorNormal = Color.white;
     [SerializeField] private Color colorTimer = Color.yellow;
+    [SerializeField] private bool usarFillImageTimer = true;
+    [SerializeField] private bool fillImageDecreciente = true; // true = se vacía con el tiempo, false = se llena con el tiempo
     
     [Header("Mensajes")]
     [SerializeField] private string formatoVictoria = "Vehicles remaining: {0}/{1}";
@@ -236,26 +239,54 @@ public class GameConditionUI : MonoBehaviour
     
     private void ActualizarTextoTimer()
     {
-        if (textoTimerRondas == null || gameManager == null) return;
+        if (gameManager == null) return;
         
         // Verificar si se está mostrando el timer entre rondas
-        if (!gameManager.IsMostrandoTimerEntreRondas())
+        bool mostrandoTimer = gameManager.IsMostrandoTimerEntreRondas();
+        
+        if (!mostrandoTimer)
         {
-            textoTimerRondas.text = "";
+            if (textoTimerRondas != null) textoTimerRondas.text = "";
+            if (imagenFillTimerRondas != null) imagenFillTimerRondas.gameObject.SetActive(false);
             return;
         }
         
         int tiempoRestante = gameManager.GetTiempoRestanteEntreRondas();
+        float tiempoTotal = gameManager.GetTiempoTotalEntreRondas();
         
         if (tiempoRestante > 0)
         {
-            string texto = string.Format(formatoTimer, tiempoRestante);
-            textoTimerRondas.text = texto;
-            textoTimerRondas.color = colorTimer;
+            // Actualizar texto
+            if (textoTimerRondas != null)
+            {
+                string texto = string.Format(formatoTimer, tiempoRestante);
+                textoTimerRondas.text = texto;
+                textoTimerRondas.color = colorTimer;
+            }
+            
+            // Actualizar fill image
+            if (usarFillImageTimer && imagenFillTimerRondas != null && tiempoTotal > 0)
+            {
+                imagenFillTimerRondas.gameObject.SetActive(true);
+                
+                // Calcular porcentaje de llenado
+                float porcentaje = tiempoRestante / tiempoTotal;
+                
+                // Invertir si es decreciente (se vacía con el tiempo)
+                if (fillImageDecreciente)
+                {
+                    imagenFillTimerRondas.fillAmount = porcentaje;
+                }
+                else
+                {
+                    imagenFillTimerRondas.fillAmount = 1f - porcentaje;
+                }
+            }
         }
         else
         {
-            textoTimerRondas.text = "";
+            if (textoTimerRondas != null) textoTimerRondas.text = "";
+            if (imagenFillTimerRondas != null) imagenFillTimerRondas.gameObject.SetActive(false);
         }
     }
     

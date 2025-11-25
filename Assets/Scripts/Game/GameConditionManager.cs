@@ -639,6 +639,15 @@ public class GameConditionManager : MonoBehaviour
     }
     
     /// <summary>
+    /// Obtiene el tiempo total entre rondas
+    /// </summary>
+    public float GetTiempoTotalEntreRondas()
+    {
+        if (roundController == null) return 0f;
+        return roundController.GetTiempoTotalEntreRondas();
+    }
+    
+    /// <summary>
     /// Obtiene si se está mostrando el timer entre rondas
     /// </summary>
     public bool IsMostrandoTimerEntreRondas()

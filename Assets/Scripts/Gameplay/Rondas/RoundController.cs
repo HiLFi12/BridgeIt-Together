@@ -203,6 +203,7 @@ namespace BridgeItTogether.Gameplay.Rondas
         public int GetRondaActual() => rondaActual;
         public int GetTotalRondas() => configuracionRondas?.Length ?? 0;
         public int GetTiempoRestanteEntreRondas() => tiempoRestanteEntreRondas;
+        public float GetTiempoTotalEntreRondas() => (rondaActual == 0) ? tiempoEsperaInicial : tiempoEsperaEntreRondas;
         public bool IsMostrandoTimerEntreRondas() => mostrandoTimerEntreRondas;
         public bool IsEsperandoInicioDeRonda() => esperandoInicioDeRonda;
         public int GetTotalVehiclesForLevel()
