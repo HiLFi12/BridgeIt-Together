@@ -75,6 +75,43 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &638532882233888716
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 773390949318633742}
+  m_Layer: 5
+  m_Name: LifeBarRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &773390949318633742
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638532882233888716}
+  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 97}
+  m_LocalScale: {x: 1.000028, y: 1.000028, z: 1.000028}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7174191132056741492}
+  - {fileID: 2313413135740962094}
+  m_Father: {fileID: 8655055891123051446}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 163, y: -338}
+  m_SizeDelta: {x: 100, y: 482.62}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &743470466611498014
 GameObject:
   m_ObjectHideFlags: 0
@@ -146,6 +183,81 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &2159019256740958567
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2313413135740962094}
+  - component: {fileID: 4633080965757480208}
+  - component: {fileID: 3193922477676088899}
+  m_Layer: 5
+  m_Name: LifeBar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2313413135740962094
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2159019256740958567}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 773390949318633742}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0.00011444}
+  m_SizeDelta: {x: 100, y: 482.62}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &4633080965757480208
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2159019256740958567}
+  m_CullTransparentMesh: 1
+--- !u!114 &3193922477676088899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2159019256740958567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 07df4bf2d4475d54b9a907d66bf870b0, type: 3}
+  m_Type: 3
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 1
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -333,6 +445,7 @@ RectTransform:
   m_LocalScale: {x: 0.0045544174, y: 0.0050098593, z: 0.0050098593}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 773390949318633742}
   - {fileID: 5829464027740216417}
   - {fileID: 6055365110350959933}
   - {fileID: 5609417247491379696}
@@ -417,6 +530,7 @@ GameObject:
   - component: {fileID: 588336534601320837}
   - component: {fileID: 3260419197091596640}
   - component: {fileID: 7275111815693375836}
+  - component: {fileID: 1620550309588067903}
   m_Layer: 6
   m_Name: BridgeQuadrantPrefab
   m_TagString: BridgeQuadrant
@@ -477,6 +591,38 @@ MonoBehaviour:
   layer1UI: {fileID: 4718597791364422687}
   layer2UI: {fileID: 6669979299662036838}
   grid: {fileID: 0}
+--- !u!114 &1620550309588067903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7059573964150791199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf48f1a202fa1374da7f384d0baedb0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  quadrantSO: {fileID: 11400000, guid: 77890f5d67c601246b7fb7adfcc8ff49, type: 2}
+  lifeBarImage: {fileID: 3193922477676088899}
+  lifeBarBackground: {fileID: 1459202885602224625}
+  useAbsoluteLifeThresholds: 1
+  greenLifeAbsolute: 4
+  yellowLifeAbsolute: 3
+  greenLifeThreshold: 0.51
+  yellowLifeThreshold: 0.26
+  highLifeColor: {r: 0.62688696, g: 1, b: 0, a: 1}
+  mediumLifeColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  lowLifeColor: {r: 1, g: 0, b: 0, a: 1}
+  validateHeatByProbing: 1
+  heatCheckRadius: 1.6
+  heatLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  probeInterval: 0.15
+  heatLoseGraceSeconds: 0.5
+  debugHeatProbe: 0
+  probeGizmoColor: {r: 1, g: 0.5, b: 0, a: 0.25}
 --- !u!1 &7384028988917113441
 GameObject:
   m_ObjectHideFlags: 0
@@ -543,6 +689,81 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 86c36443d2082c34ebfa804437f225d7, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &7647667634136416470
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7174191132056741492}
+  - component: {fileID: 2157892909416063475}
+  - component: {fileID: 1459202885602224625}
+  m_Layer: 5
+  m_Name: LifeBarBackground
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7174191132056741492
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7647667634136416470}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 773390949318633742}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0.00011444}
+  m_SizeDelta: {x: 100, y: 482.62}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &2157892909416063475
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7647667634136416470}
+  m_CullTransparentMesh: 1
+--- !u!114 &1459202885602224625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7647667634136416470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 28b5d2fd75c853f48b2314237ef36823, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
