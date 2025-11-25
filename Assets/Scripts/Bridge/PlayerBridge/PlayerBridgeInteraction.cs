@@ -154,7 +154,7 @@ public class PlayerBridgeInteraction : MonoBehaviour
         // Reparación de última capa (superficie): aceptar adoquín o, como fallback, cualquier material de la capa superior
         {
             BridgeQuadrantSO targetQuadrant = currentTargetGrid.GetQuadrantSO(targetX, targetZ);
-            if (targetQuadrant != null && targetQuadrant.IsDamaged())
+            if (targetQuadrant != null && targetQuadrant.NeedsRepair())
             {
                 int lastIdx = (targetQuadrant.requiredLayers != null && targetQuadrant.requiredLayers.Length > 0)
                     ? targetQuadrant.requiredLayers.Length - 1
@@ -281,7 +281,7 @@ public class PlayerBridgeInteraction : MonoBehaviour
     private bool TryRepairQuadrant(BridgeQuadrantSO quadrant, GameObject materialObject)
     {
         if (quadrant == null || materialObject == null) return false;
-        if (!quadrant.IsDamaged()) return false;
+    if (!quadrant.NeedsRepair()) return false;
 
         BridgeMaterialInfo materialInfo = materialObject.GetComponent<BridgeMaterialInfo>();
         int lastIdx = (quadrant.requiredLayers != null && quadrant.requiredLayers.Length > 0)
@@ -418,7 +418,7 @@ public class PlayerBridgeInteraction : MonoBehaviour
 
         int nextLayer = GetNextCorrectLayerIndex(g, x, z);
         bool isRepair = false;
-        if (nextLayer == -1 && so.IsDamaged())
+    if (nextLayer == -1 && so.NeedsRepair())
         {
             int lastIdx = Mathf.Max(0, so.requiredLayers.Length - 1);
             if (matInfo != null)

@@ -257,16 +257,17 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
 
         if (requiredLayers[layerIndex].isCompleted)
         {
-            if (layerIndex == requiredLayers.Length - 1 && lastLayerState == LastLayerState.Damaged)
+            // Nuevo criterio: permitir reparación si es última capa y vida/batería no está al máximo
+            if (layerIndex == requiredLayers.Length - 1 && NeedsRepair())
             {
-                Debug.Log($"Reparando última capa dañada (capa {layerIndex})");
+                Debug.Log($"Reparando última capa por vida incompleta (capa {layerIndex})");
                 lastLayerState = LastLayerState.Complete;
-                ResetEraSpecificState();
+                ResetEraSpecificState(); // restaura vida / batería
                 PlayRepairSfx();
                 return true;
             }
-            
-            Debug.LogError($"ERROR: Capa {layerIndex} ya está completada y no necesita reparación.");
+
+            Debug.LogError($"ERROR: Capa {layerIndex} ya está completada y vida completa, no requiere reparación.");
             return false;
         }
         
@@ -599,6 +600,22 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     }
 
     /// <summary>
+    /// Indica si el cuadrante tiene vida/batería por debajo del máximo y podría ser reparado.
+    /// No cuenta como reparable si está destruido.
+    /// </summary>
+    public bool NeedsRepair()
+    {
+        if (lastLayerState == LastLayerState.Destroyed) return false;
+        switch (era)
+        {
+            case EraType.Futuristic:
+                return batteryLife < 100f;
+            default:
+                return currentLife < maxLife;
+        }
+    }
+
+    /// <summary>
     /// Obtiene el estado actual de la última capa
     /// </summary>
     /// <returns>Estado de la última capa</returns>
@@ -625,9 +642,9 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     public bool TryAddLayer(MaterialType materialType, int cantidad)
     {
         // Para la compatibilidad con el sistema de reparación
-        if (materialType == MaterialType.Adoquin && lastLayerState == LastLayerState.Damaged)
+        if (materialType == MaterialType.Adoquin && NeedsRepair())
         {
-            Debug.Log($"Reparando con material adoquín - cantidad: {cantidad}");
+            Debug.Log($"Reparando con material adoquín - vida/batería incompleta. Cantidad: {cantidad}");
             lastLayerState = LastLayerState.Complete;
             ResetEraSpecificState();
             PlayRepairSfx();
