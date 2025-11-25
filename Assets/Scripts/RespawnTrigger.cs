@@ -9,7 +9,6 @@ public class RespawnTrigger : MonoBehaviour
         
         if (player != null)
         {
-            Debug.Log($"[RespawnTrigger] Player detectado, llamando a Respawn()");
             player.Respawn();
         }
     }
