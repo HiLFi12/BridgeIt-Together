@@ -281,28 +281,27 @@ public class PlayerBridgeInteraction : MonoBehaviour
     private bool TryRepairQuadrant(BridgeQuadrantSO quadrant, GameObject materialObject)
     {
         if (quadrant == null || materialObject == null) return false;
-    if (!quadrant.NeedsRepair()) return false;
+	if (!quadrant.NeedsRepair()) return false;
 
         BridgeMaterialInfo materialInfo = materialObject.GetComponent<BridgeMaterialInfo>();
         int lastIdx = (quadrant.requiredLayers != null && quadrant.requiredLayers.Length > 0)
             ? quadrant.requiredLayers.Length - 1
             : 2;
 
-        // Aceptar reparación si: es adoquín, o es material de la capa superior (por compatibilidad)
+        // SOLO permitir reparación si el material corresponde a la capa superior (layerIndex == lastIdx, normalmente 2)
         bool isValidRepairMaterial = false;
         if (materialInfo != null)
         {
-            isValidRepairMaterial =
-                materialInfo.materialType == BridgeQuadrantSO.MaterialType.Adoquin ||
-                materialInfo.layerIndex == lastIdx;
+            isValidRepairMaterial = materialInfo.layerIndex == lastIdx;
         }
-        else if (materialObject.tag == $"BridgeLayer{lastIdx}")
+
+        if (!isValidRepairMaterial)
         {
-            isValidRepairMaterial = true;
+            Debug.Log($"TryRepairQuadrant: material inválido para reparar. Se requiere layerIndex {lastIdx}. Material actual: {(materialInfo != null ? materialInfo.layerIndex.ToString() : "sin BridgeMaterialInfo")}");
+            return false;
         }
 
-        if (!isValidRepairMaterial) return false;
-
+        // El tipo concreto se usa solo como canal de reparación en el SO; la restricción real ya la pone el layerIndex
         return quadrant.TryAddLayer(BridgeQuadrantSO.MaterialType.Adoquin, 1);
     }
 

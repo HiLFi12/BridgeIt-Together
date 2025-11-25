@@ -70,6 +70,17 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     public bool isTurned { get; private set; } // Estado visible para otros sistemas, controlado por ITurnable/agua
     [Tooltip("Marcador interno de si hay una fuente de calor aplicando (ignora agua).")]
     public bool heatActive = false;
+    [Tooltip("Indica si el cuadrante está actualmente mojado por agua.")]
+    public bool isWet = false;
+
+    [Header("Daño por Agua + Calor (Industrial)")]
+    [Tooltip("Daño por segundo cuando el cuadrante está mojado y recibiendo calor.")]
+    public float wetHeatDamagePerSecond = 1f;
+    [Tooltip("Tiempo en segundos que permanece mojado después del último contacto con agua.")]
+    public float wetDurationAfterWater = 3f;
+
+    // Temporizador interno para limpiar el estado mojado
+    private float _wetTimer = 0f;
 
     [Header("Debug Vida (Industrial)")]
     [Tooltip("Si está activo, loggea periódicamente la vida del puente como currentTemperature/maxTemperature.")]
@@ -137,6 +148,10 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         // Inicializar vida unificada
         currentLife = maxLife;
         // Futurista/Industrial usan sus propios depósitos (battery/temperature), pero el ratio de vida se obtiene de ellos.
+
+        // Estado de humedad
+        isWet = false;
+        _wetTimer = 0f;
     }
 
     private void ResetEraSpecificState()
@@ -257,17 +272,9 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
 
         if (requiredLayers[layerIndex].isCompleted)
         {
-            // Nuevo criterio: permitir reparación si es última capa y vida/batería no está al máximo
-            if (layerIndex == requiredLayers.Length - 1 && NeedsRepair())
-            {
-                Debug.Log($"Reparando última capa por vida incompleta (capa {layerIndex})");
-                lastLayerState = LastLayerState.Complete;
-                ResetEraSpecificState(); // restaura vida / batería
-                PlayRepairSfx();
-                return true;
-            }
-
-            Debug.LogError($"ERROR: Capa {layerIndex} ya está completada y vida completa, no requiere reparación.");
+            // Reparación directa de la última capa SOLO debe hacerse vía TryAddLayer(MaterialType,...)
+            // aquí rechazamos cualquier intento genérico para evitar que "cualquier material" la repare.
+            Debug.LogError($"ERROR: Capa {layerIndex} ya está completada. Usa TryAddLayer(MaterialType, ...) para reparaciones válidas.");
             return false;
         }
         
@@ -399,6 +406,24 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
 
     public void UpdateQuadrantState(float deltaTime)
     {
+        // Actualizar temporizador de humedad: si está mojado, cuenta hacia atrás y se seca solo
+        if (isWet)
+        {
+            if (wetDurationAfterWater <= 0f)
+            {
+                // Si la duración configurada es 0 o negativa, se seca inmediatamente
+                isWet = false;
+            }
+            else
+            {
+                _wetTimer -= deltaTime;
+                if (_wetTimer <= 0f)
+                {
+                    isWet = false;
+                }
+            }
+        }
+
         if (!hasCollision) return;
 
         switch (era)
@@ -412,9 +437,17 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
                         break;
                     }
 
+                    // 1) Daño por falta de calor (si no está recibiendo calor)
                     if (!isTurned)
                     {
                         currentLife -= temperatureDecayRate * deltaTime; // reutilizamos temperatureDecayRate como decay de vida
+                        if (currentLife < 0f) currentLife = 0f;
+                    }
+
+                    // 2) Daño adicional por estar mojado + recibiendo calor
+                    if (isWet && isTurned && wetHeatDamagePerSecond > 0f)
+                    {
+                        currentLife -= wetHeatDamagePerSecond * deltaTime;
                         if (currentLife < 0f) currentLife = 0f;
                     }
 
@@ -519,8 +552,10 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     /// </summary>
     public void AddWaterBlocker()
     {
-        // Deprecated: mantenido para compatibilidad si otros scripts aún llaman.
-        RemoveHeat(); // fuerza apagado si agua antigua llama este método
+        // Nuevo comportamiento: marcar cuadrante como mojado. El daño real se aplica en UpdateQuadrantState.
+        isWet = true;
+        _wetTimer = wetDurationAfterWater;
+        RecalculateTurned();
     }
 
     /// <summary>
@@ -528,14 +563,15 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     /// </summary>
     public void RemoveWaterBlocker()
     {
-        // Deprecated: si se usaba, al salir agua re-evaluará turned (ya gestionado fuera)
+        // Al dejar de tocar agua, simplemente dejamos que el temporizador agote el estado mojado.
+        // (isWet se pondrá en false automáticamente cuando _wetTimer llegue a 0 en UpdateQuadrantState).
         RecalculateTurned();
     }
 
     private void RecalculateTurned()
     {
         // isTurned true solo si hay calor activo y no está bloqueado por agua.
-        bool newTurned = heatActive; // Sin waterBlockers; agua se maneja externamente
+        bool newTurned = heatActive; // Agua ya no bloquea el calor; solo agrega daño si isWet
         isTurned = newTurned;
     }
 
@@ -641,18 +677,19 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
     /// <returns>True si se pudo agregar</returns>
     public bool TryAddLayer(MaterialType materialType, int cantidad)
     {
-        // Para la compatibilidad con el sistema de reparación
-        if (materialType == MaterialType.Adoquin && NeedsRepair())
+        // REPARACIÓN: solo se permite reparar la ÚLTIMA capa y únicamente con el material tipo 3 (Adoquín).
+        int lastIndex = requiredLayers != null && requiredLayers.Length > 0 ? requiredLayers.Length - 1 : -1;
+
+        if (lastIndex >= 0 && requiredLayers[lastIndex].isCompleted && materialType == MaterialType.Adoquin && NeedsRepair())
         {
-            Debug.Log($"Reparando con material adoquín - vida/batería incompleta. Cantidad: {cantidad}");
+            Debug.Log($"Reparando última capa con material tipo 3 (Adoquín). Cantidad: {cantidad}");
             lastLayerState = LastLayerState.Complete;
             ResetEraSpecificState();
             PlayRepairSfx();
             return true;
         }
 
-        // Para construcción normal, usar el método existente
-        // Buscar la primera capa incompleta
+        // CONSTRUCCIÓN normal: solo cuando aún hay capas incompletas.
         for (int i = 0; i < requiredLayers.Length; i++)
         {
             if (!requiredLayers[i].isCompleted)
@@ -661,6 +698,7 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
             }
         }
 
+        Debug.Log("TryAddLayer(MaterialType): todas las capas están completas y no se cumplen condiciones de reparación.");
         return false;
     }
 }

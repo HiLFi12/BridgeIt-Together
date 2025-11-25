@@ -103,7 +103,12 @@ public class Water : MonoBehaviour
                     if (!_activeWaterContacts.ContainsKey(inst)) _activeWaterContacts[inst] = 0;
                     _activeWaterContacts[inst]++;
                     if (debugLogs) Debug.Log($"[Water] Contacto NUEVO con {inst.name} (countGlobal={_activeWaterContacts[inst]})", this);
-                    inst.TurnOff();
+
+                    // Marcar agua en el SO: el cuadrante pasa a estar "mojado".
+                    if (inst.quadrantSO != null)
+                    {
+                        inst.quadrantSO.AddWaterBlocker();
+                    }
                 }
                 else if (debugLogs)
                 {
@@ -128,6 +133,7 @@ public class Water : MonoBehaviour
                     if (_activeWaterContacts[inst] <= 0)
                     {
                         _activeWaterContacts.Remove(inst);
+                        // Se fue toda el agua de este cuadrante: re-evaluar calor según HeatSphere/otras fuentes.
                         inst.ReevaluateHeatAfterWater();
                         if (debugLogs) Debug.Log($"[Water] Última salida de {inst.name}. Re-evaluando calor.", this);
                     }
