@@ -28,12 +28,16 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         [SerializeField] private bool kinematicDuringLaunch = true;
         [SerializeField] private float minLaunchDistance = 0.05f;
 
+        [Header("Collision Ignore Settings")]
+        [SerializeField] private float ignoreCollisionDuration = 0.5f; // Tiempo para re-habilitar colisiones después del impacto con IHitable
+
         // Estado
         private Rigidbody rb;
         private bool isInitialized;
         private bool isPaused;
         private Vector3 direccionMovimiento;
         private readonly Dictionary<Transform, Coroutine> activeLaunches = new();
+        private readonly HashSet<Collider> currentlyIgnoredColliders = new HashSet<Collider>();
 
         private void Awake()
         {
@@ -123,11 +127,20 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         {
             if (!isInitialized) return;
 
-            // Ignorar respuesta física del motor para todos los objetos
-            Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
+            // Solo procesar colisiones con objetos IHitable (players, etc.)
+            var hitable = collision.collider.GetComponentInParent<IHitable>();
+            if (hitable == null)
+            {
+                // No es IHitable: dejar que la física actúe normalmente (suelo, puente, etc.)
+                // Solo procesar cuadrantes si aplica
+                TryHandleQuadrantCollision(collision.collider);
+                return;
+            }
 
+            // Es IHitable: ignorar colisiones temporalmente para evitar bugs de colisión repetida
+            StartCoroutine(TemporarilyIgnoreCollision(collision.collider));
 
-            // Resto de comportamiento normal
+            // Resto de comportamiento normal para IHitable
             if (TryHandleQuadrantCollision(collision.collider)) return;
             TryLaunchHitable(collision.collider);
         }
@@ -358,6 +371,35 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Ignora temporalmente las colisiones con el collider especificado (solo IHitable) y luego las restaura.
+        /// Esto evita bugs de colisión repetida mientras permite que el auto vuelva a chocar más adelante.
+        /// </summary>
+        private IEnumerator TemporarilyIgnoreCollision(Collider otherCollider)
+        {
+            if (otherCollider == null) yield break;
+
+            var myCollider = GetComponent<Collider>();
+            if (myCollider == null) yield break;
+
+            // Si ya estamos ignorando este collider, no duplicar la coroutine
+            if (currentlyIgnoredColliders.Contains(otherCollider)) yield break;
+
+            // Ignorar colisiones
+            Physics.IgnoreCollision(otherCollider, myCollider, true);
+            currentlyIgnoredColliders.Add(otherCollider);
+
+            // Esperar el tiempo configurado
+            yield return new WaitForSeconds(ignoreCollisionDuration);
+
+            // Restaurar colisiones (si ambos colliders siguen existiendo)
+            if (otherCollider != null && myCollider != null)
+            {
+                Physics.IgnoreCollision(otherCollider, myCollider, false);
+                currentlyIgnoredColliders.Remove(otherCollider);
+            }
         }
     }
 }
