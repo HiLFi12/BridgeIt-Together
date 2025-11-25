@@ -39,6 +39,12 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // No intentar mover si el CharacterController está desactivado (ej. durante respawn/shake)
+        if (!controller.enabled)
+        {
+            return;
+        }
+        
         groundedPlayer = controller.isGrounded;
         
         // Restablecer la velocidad vertical cuando estamos en el suelo
