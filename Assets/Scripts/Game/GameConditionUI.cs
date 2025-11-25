@@ -15,6 +15,7 @@ public class GameConditionUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textoRondas;
     [SerializeField] private TextMeshProUGUI textoTimerRondas;
     [SerializeField] private Image imagenFillTimerRondas;
+    [SerializeField] private GameObject[] objetosTimerRondas; // Array de GameObjects a mostrar/ocultar con el timer
     
     [Header("Configuración")]
     [SerializeField] private bool actualizarAutomaticamente = true;
@@ -241,13 +242,24 @@ public class GameConditionUI : MonoBehaviour
     {
         if (gameManager == null) return;
         
-        // Verificar si se está mostrando el timer entre rondas
         bool mostrandoTimer = gameManager.IsMostrandoTimerEntreRondas();
         
         if (!mostrandoTimer)
         {
             if (textoTimerRondas != null) textoTimerRondas.text = "";
             if (imagenFillTimerRondas != null) imagenFillTimerRondas.gameObject.SetActive(false);
+            
+            // Ocultar todos los objetos del array
+            if (objetosTimerRondas != null)
+            {
+                foreach (var obj in objetosTimerRondas)
+                {
+                    if (obj != null)
+                    {
+                        obj.SetActive(false);
+                    }
+                }
+            }
             return;
         }
         
@@ -256,6 +268,18 @@ public class GameConditionUI : MonoBehaviour
         
         if (tiempoRestante > 0)
         {
+            // Mostrar todos los objetos del array
+            if (objetosTimerRondas != null)
+            {
+                foreach (var obj in objetosTimerRondas)
+                {
+                    if (obj != null)
+                    {
+                        obj.SetActive(true);
+                    }
+                }
+            }
+            
             // Actualizar texto
             if (textoTimerRondas != null)
             {
@@ -287,6 +311,18 @@ public class GameConditionUI : MonoBehaviour
         {
             if (textoTimerRondas != null) textoTimerRondas.text = "";
             if (imagenFillTimerRondas != null) imagenFillTimerRondas.gameObject.SetActive(false);
+            
+            // Ocultar todos los objetos del array
+            if (objetosTimerRondas != null)
+            {
+                foreach (var obj in objetosTimerRondas)
+                {
+                    if (obj != null)
+                    {
+                        obj.SetActive(false);
+                    }
+                }
+            }
         }
     }
     
