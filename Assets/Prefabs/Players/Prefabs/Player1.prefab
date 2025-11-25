@@ -1184,9 +1184,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   holdAnchor: {fileID: 8100890160145977295}
+  objectLocalPosition: {x: 0, y: 0, z: 0}
   objectLocalRotation: {x: 0, y: 0, z: 0}
-  paloIgnifugoRotation: {x: 0, y: 0, z: 90}
-  material1Rotation: {x: 0, y: 0, z: 90}
+  overrides:
+  - referencePrefab: {fileID: 403930078715100155, guid: 9ef303b3e2850aa45858dbd15885333d, type: 3}
+    nameContains: 
+    localPosition: {x: 0.002, y: -0.085, z: 0.797}
+    localRotation: {x: 0, y: 0, z: 90}
+  - referencePrefab: {fileID: 8865839102335078775, guid: e49e274337bc8b443821656844c32a97, type: 3}
+    nameContains: 
+    localPosition: {x: 0.314, y: 0.188, z: 0.095}
+    localRotation: {x: 0, y: 0, z: 2.392}
+  - referencePrefab: {fileID: 187256071978650319, guid: 2a12b9b1fc327fe4a8fd7c9203c50431, type: 3}
+    nameContains: 
+    localPosition: {x: 0, y: 0, z: 0.218}
+    localRotation: {x: 0, y: 0, z: 0}
+  - referencePrefab: {fileID: 8251136370303857422, guid: f993e8b12d573bb4984521fb9d19da5e, type: 3}
+    nameContains: 
+    localPosition: {x: 0, y: 0, z: 0.384}
+    localRotation: {x: 0, y: 0, z: 0}
   playerUIManager: {fileID: 642243233456435620}
   pickUpSfxIndex: 4
   dropSfxIndex: 5

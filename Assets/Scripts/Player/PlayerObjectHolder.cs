@@ -9,12 +9,23 @@ public class PlayerObjectHolder : MonoBehaviour
     [Header("Ancla para sostener (opcional)")]
     [SerializeField] private Transform holdAnchor;
 
-    [Header("Rotación por defecto (genéricos)")]
+    [Header("Transform por defecto (genéricos)")]
+    [SerializeField] private Vector3 objectLocalPosition = Vector3.zero;
     [SerializeField] private Vector3 objectLocalRotation = Vector3.zero;
 
+    [System.Serializable]
+    private class HolderOverride
+    {
+        [Tooltip("Prefab o referencia para detectar el tipo de objeto")]
+        public GameObject referencePrefab;
+        [Tooltip("Nombre contiene (fallback si referencePrefab es nulo)")]
+        public string nameContains;
+        public Vector3 localPosition = Vector3.zero;
+        public Vector3 localRotation = Vector3.zero;
+    }
+
     [Header("Overrides por tipo de objeto")]
-    [SerializeField] private Vector3 paloIgnifugoRotation = new Vector3(0f, 0f, -90f);
-    [SerializeField] private Vector3 material1Rotation = new Vector3(0f, 0f, -90f);
+    [SerializeField] private HolderOverride[] overrides;
     
     [Header("UI Manager")]
     [SerializeField] private PlayerUIManager playerUIManager;
@@ -62,6 +73,7 @@ public class PlayerObjectHolder : MonoBehaviour
         }
 
         heldObject = objectInstance;
+        // Mantener posición/rotación/escala en mundo al parentear para no deformar el objeto
         heldObject.transform.SetParent(Anchor, true);
 
         heldRigidbody = heldObject.GetComponent<Rigidbody>();
@@ -158,23 +170,42 @@ public class PlayerObjectHolder : MonoBehaviour
     private void ApplyPickupPositioning(GameObject instance)
     {
         if (instance == null) return;
+        Vector3 targetPos = objectLocalPosition;
+        Vector3 targetRot = objectLocalRotation;
 
-        bool esPaloIgnifugo = instance.GetComponent<PaloIgnifugo>() != null || instance.name.Contains("PaloIgnifugo");
-        bool esPrefabMaterial1 = instance.GetComponent<MaterialTipo1>() != null || instance.name.Contains("PrefabMaterial1");
-
-        Vector3 targetRotation = objectLocalRotation;
-
-        if (esPaloIgnifugo)
+        // Buscar override específico por referencia o por nombre
+        if (overrides != null)
         {
-            targetRotation = paloIgnifugoRotation;
-        }
-        else if (esPrefabMaterial1)
-        {
-            targetRotation = material1Rotation;
+            for (int i = 0; i < overrides.Length; i++)
+            {
+                var ov = overrides[i];
+                if (ov == null) continue;
+
+                bool match = false;
+
+                if (ov.referencePrefab != null)
+                {
+                    // Comparar por nombre de prefab (instancias clonadas comparten nombre base)
+                    if (instance.name.StartsWith(ov.referencePrefab.name))
+                        match = true;
+                }
+                else if (!string.IsNullOrEmpty(ov.nameContains))
+                {
+                    if (instance.name.Contains(ov.nameContains))
+                        match = true;
+                }
+
+                if (match)
+                {
+                    targetPos = ov.localPosition;
+                    targetRot = ov.localRotation;
+                    break;
+                }
+            }
         }
 
-        instance.transform.localPosition = Vector3.zero;
-        instance.transform.localRotation = Quaternion.Euler(targetRotation);
+        instance.transform.localPosition = targetPos;
+        instance.transform.localRotation = Quaternion.Euler(targetRot);
     }
 
     private void UpdateHeldObjectUI()
