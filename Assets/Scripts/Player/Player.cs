@@ -105,6 +105,12 @@ public class Player : MonoBehaviour, IHitable
             dropAction = playerInput.actions.FindAction("Drop");
             dashAction = playerInput.actions.FindAction("Dash");
             pauseAction = playerInput.actions.FindAction("Pause");
+
+            // Subscribe so a single press reliably triggers the dash (prevents needing multiple presses on some devices)
+            if (dashAction != null)
+            {
+                dashAction.performed += OnDashPerformed;
+            }
         }
         
         // Intentar auto-asignar grid si no se arrastró en inspector
@@ -663,5 +669,22 @@ public class Player : MonoBehaviour, IHitable
         // Por ahora solo logueamos; la lógica real de respawn
         // puede implementarse más adelante (checkpoints, etc.).
         Debug.Log("[Player] Respawn() llamado - implementar lógica de respawn aquí si es necesario.");
+    }
+
+    private void OnDashPerformed(InputAction.CallbackContext ctx)
+    {
+        if (canDash)
+        {
+            TryStartDash();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Unsubscribe to avoid leaks or duplicate callbacks
+        if (dashAction != null)
+        {
+            dashAction.performed -= OnDashPerformed;
+        }
     }
 }
