@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3520341992789812808}
   - component: {fileID: 3806788104195669443}
   - component: {fileID: 6288222256539824584}
+  - component: {fileID: 1239320042215040979}
   m_Layer: 13
   m_Name: RoyalCar
   m_TagString: Vehicle
@@ -111,6 +112,25 @@ MonoBehaviour:
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
   ignoreCollisionDuration: 0.1
+--- !u!114 &1239320042215040979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248325544060308125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1483412f114c4d8c519dc8c4745963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ruedas:
+  - {fileID: 3188227926590146936}
+  - {fileID: 6932955777536940079}
+  - {fileID: 6984392211289431462}
+  - {fileID: 5616377760840660937}
+  velocidadRotacion: 360
+  ejeRotacion: {x: 1, y: 0, z: 0}
 --- !u!1 &1035723051881866574
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,8 +356,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
+--- !u!1 &3188227926590146936 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5544227849194355686, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
+  m_PrefabInstance: {fileID: 6976024914321765022}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5616377760840660937 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3260237123758048599, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
+  m_PrefabInstance: {fileID: 6976024914321765022}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6820142271937426092 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4497357631376638002, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
+  m_PrefabInstance: {fileID: 6976024914321765022}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6932955777536940079 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 70121624274774705, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
+  m_PrefabInstance: {fileID: 6976024914321765022}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6984392211289431462 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9669126318796600, guid: c847e0060f5b09a4381a7072bbee4ca9, type: 3}
   m_PrefabInstance: {fileID: 6976024914321765022}
   m_PrefabAsset: {fileID: 0}
