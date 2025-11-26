@@ -27,8 +27,6 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         [SerializeField, Min(0.1f)] private float launchGravity = 9.81f;
         [SerializeField] private bool kinematicDuringLaunch = true;
         [SerializeField] private float minLaunchDistance = 0.05f;
-
-        [Header("Collision Ignore Settings")]
         [SerializeField] private float ignoreCollisionDuration = 0.5f; // Tiempo para re-habilitar colisiones después del impacto con IHitable
 
         // Estado
@@ -264,57 +262,130 @@ namespace BridgeItTogether.Gameplay.AutoControllers
                 target.SetParent(null, true);
 
             Vector3 start = target.position;
-            Vector3 startXZ = new Vector3(start.x, 0f, start.z);
-            Vector3 endXZ = new Vector3(destino.x, 0f, destino.z);
-            Vector3 flat = endXZ - startXZ;
-            float distance = flat.magnitude;
-
-            if (distance < minLaunchDistance)
+            Vector3 end = destino;
+            
+            // Calcular distancia horizontal y diferencia de altura
+            Vector3 horizontalDisplacement = new Vector3(end.x - start.x, 0f, end.z - start.z);
+            float horizontalDistance = horizontalDisplacement.magnitude;
+            
+            if (horizontalDistance < minLaunchDistance)
             {
-                target.position = destino;
                 activeLaunches.Remove(target);
                 yield break;
             }
 
-            Vector3 dir = flat / Mathf.Max(distance, 0.0001f);
-
-            float angleRad = launchAngleDeg * Mathf.Deg2Rad;
-            float v = Mathf.Max(0.01f, launchSpeed);
-            float cos = Mathf.Cos(angleRad);
-            float tan = Mathf.Tan(angleRad);
+            Vector3 horizontalDir = horizontalDisplacement / horizontalDistance;
+            float heightDifference = end.y - start.y;
+            
+            // Calcular velocidad inicial necesaria para llegar EXACTAMENTE al destino
+            // Fórmula balística: v = sqrt(g * d^2 / (2 * cos^2(θ) * (d * tan(θ) - h)))
             float g = Mathf.Max(0.01f, launchGravity);
-
-            float totalTime = distance / (v * cos);
-
-            Rigidbody trb = target.GetComponent<Rigidbody>();
-            bool hadRB = trb != null;
-            bool prevKinematic = false;
-            if (hadRB && kinematicDuringLaunch)
+            float angleRad = launchAngleDeg * Mathf.Deg2Rad;
+            float tanAngle = Mathf.Tan(angleRad);
+            float cosAngle = Mathf.Cos(angleRad);
+            
+            float denominator = 2f * cosAngle * cosAngle * (horizontalDistance * tanAngle - heightDifference);
+            
+            if (denominator <= 0f)
             {
-                prevKinematic = trb.isKinematic;
+                // No hay solución física con este ángulo, usar velocidad fija como fallback
+                Debug.LogWarning($"[AutoController] No se puede calcular trayectoria exacta con ángulo {launchAngleDeg}°. Usando fallback.");
+                activeLaunches.Remove(target);
+                yield break;
+            }
+            
+            float velocitySquared = (g * horizontalDistance * horizontalDistance) / denominator;
+            float velocity = Mathf.Sqrt(velocitySquared);
+            
+            // Calcular tiempo de vuelo
+            float totalTime = horizontalDistance / (velocity * cosAngle);
+            
+            // Detectar si tiene CharacterController (Players) o Rigidbody (Materiales, objetos)
+            CharacterController charController = target.GetComponent<CharacterController>();
+            Rigidbody trb = target.GetComponent<Rigidbody>();
+            
+            bool hasCharController = charController != null;
+            bool hasRigidbody = trb != null;
+            
+            bool prevCharControllerEnabled = false;
+            bool prevRigidbodyKinematic = false;
+            
+            // Deshabilitar CharacterController durante lanzamiento (Players)
+            if (hasCharController)
+            {
+                prevCharControllerEnabled = charController.enabled;
+                charController.enabled = false;
+            }
+            
+            // Hacer kinematic el Rigidbody durante lanzamiento (Materiales/objetos con física)
+            if (hasRigidbody && kinematicDuringLaunch)
+            {
+                prevRigidbodyKinematic = trb.isKinematic;
+#if UNITY_6000_0_OR_NEWER
+                trb.linearVelocity = Vector3.zero;
+#else
+                trb.velocity = Vector3.zero;
+#endif
+                trb.angularVelocity = Vector3.zero;
                 trb.isKinematic = true;
             }
 
+            // Ejecutar parábola balística exacta
             float t = 0f;
+            Vector3 lastPosition = start;
+            
             while (t < totalTime && target != null)
             {
                 t += Time.deltaTime;
-                float ct = Mathf.Min(t, totalTime);
-                float x = v * cos * ct;
-                float yOffset = x * tan - (g * x * x) / (2f * v * v * cos * cos);
-
-                Vector3 pos = start + dir * x;
-                pos.y = start.y + yOffset;
-                target.position = pos;
+                float ct = Mathf.Clamp(t, 0f, totalTime);
+                
+                // Posición horizontal (movimiento uniforme)
+                float horizontalProgress = velocity * cosAngle * ct;
+                
+                // Posición vertical (movimiento parabólico)
+                float verticalProgress = velocity * Mathf.Sin(angleRad) * ct - 0.5f * g * ct * ct;
+                
+                lastPosition = target.position;
+                Vector3 newPosition = start + horizontalDir * horizontalProgress;
+                newPosition.y = start.y + verticalProgress;
+                
+                target.position = newPosition;
 
                 yield return null;
             }
 
-            if (target != null)
-                target.position = destino;
+            // Calcular velocidad final de la trayectoria para que continúe cayendo naturalmente
+            Vector3 finalVelocity = Vector3.zero;
+            if (target != null && Time.deltaTime > 0f)
+            {
+                finalVelocity = (target.position - lastPosition) / Time.deltaTime;
+            }
 
-            if (hadRB && kinematicDuringLaunch && trb != null)
-                trb.isKinematic = prevKinematic;
+            // Restaurar CharacterController (caerá por gravedad natural)
+            if (hasCharController && charController != null)
+            {
+                charController.enabled = prevCharControllerEnabled;
+            }
+
+            // Restaurar Rigidbody y aplicar velocidad final para continuar la trayectoria
+            if (hasRigidbody && trb != null)
+            {
+                if (kinematicDuringLaunch)
+                {
+                    trb.isKinematic = prevRigidbodyKinematic;
+                }
+                
+                // Aplicar velocidad solo si no es kinematic
+                if (!trb.isKinematic)
+                {
+#if UNITY_6000_0_OR_NEWER
+                    trb.linearVelocity = finalVelocity;
+#else
+                    trb.velocity = finalVelocity;
+#endif
+                }
+            }
+
 
             if (target != null)
                 activeLaunches.Remove(target);
