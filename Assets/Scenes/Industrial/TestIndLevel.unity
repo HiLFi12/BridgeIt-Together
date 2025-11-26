@@ -5483,8 +5483,12 @@ MonoBehaviour:
   damagedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   showLifeInScene: 1
   lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
+  shakerLifeThreshold: 1
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
+  usarUmbralesAbsolutosGrietas: 1
+  valorGrieta1: 43
+  valorGrieta2: 3
 --- !u!4 &985317587
 Transform:
   m_ObjectHideFlags: 0
@@ -7978,6 +7982,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   quadrantSO: {fileID: 11400000, guid: b338c7d0318145546978c7258e063255, type: 2}
+  lifeBarImage: {fileID: 0}
+  lifeBarBackground: {fileID: 0}
+  useAbsoluteLifeThresholds: 1
+  greenLifeAbsolute: 43
+  yellowLifeAbsolute: 3
+  greenLifeThreshold: 0.51
+  yellowLifeThreshold: 0.26
+  highLifeColor: {r: 0, g: 1, b: 0, a: 1}
+  mediumLifeColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  lowLifeColor: {r: 1, g: 0, b: 0, a: 1}
   validateHeatByProbing: 1
   heatCheckRadius: 12.16
   heatLayerMask:
@@ -10349,8 +10363,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: constructAllQuadrants
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10830,6 +10848,10 @@ PrefabInstance:
       propertyPath: spawner
       value: 
       objectReference: {fileID: 1096737037}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: tiempoEsperaInicial
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaEntreRondas
       value: 5
@@ -13872,9 +13894,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   holdAnchor: {fileID: 0}
+  objectLocalPosition: {x: 0, y: 0, z: 0}
   objectLocalRotation: {x: 0, y: 0, z: 0}
-  paloIgnifugoRotation: {x: 0, y: 0, z: -45}
-  material1Rotation: {x: 0, y: 0, z: -90}
+  overrides: []
   playerUIManager: {fileID: 0}
   pickUpSfxIndex: -1
   dropSfxIndex: -1
@@ -13922,6 +13944,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   interactKey: 112
+  dropKey: 113
   dashKey: 304
   dashDistance: 5
   dashDuration: 0.2
@@ -13961,6 +13984,12 @@ MonoBehaviour:
   buildPadUI: {fileID: 0}
   dashKeyUI: {fileID: 0}
   dashPadUI: {fileID: 0}
+  respawnPoint: {fileID: 0}
+  respawnEffectPrefab: {fileID: 0}
+  manualRespawnCooldown: 3
+  shakeIntensityMax: 0.5
+  shakeFrequency: 20
+  manualRespawnKey: 102
   enableFillBridgeHotkey: 0
   fillBridgeKey: 103
   bridgeGrid: {fileID: 0}
