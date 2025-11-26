@@ -151,7 +151,7 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
 
     /// <summary>
     /// Construye automáticamente los cuadrantes del puente hasta la capa indicada en buildUpToLayer,
-    /// reutilizando la misma lógica que PowerUpRitualGranFuego.
+    /// usando el mismo patrón que PowerUpRitualGranFuego y PowerUpCalorHumano.
     /// </summary>
     private void ConstructBridgeAutomatically()
     {
@@ -170,17 +170,12 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
             {
                 for (int z = 0; z < grid.gridLength; z++)
                 {
-                    var so = grid.GetQuadrantSO(x, z);
-                    if (so == null || so.requiredLayers == null) continue;
-
-                    for (int layerIndex = 0; layerIndex <= targetMax && layerIndex < so.requiredLayers.Length; layerIndex++)
+                    for (int layerIndex = 0; layerIndex <= targetMax; layerIndex++)
                     {
-                        if (!so.requiredLayers[layerIndex].isCompleted)
-                        {
-                            so.requiredLayers[layerIndex].isCompleted = true;
-                        }
+                        // Usar TryBuildLayer del grid (igual que los otros power-ups)
+                        // Esto actualiza automáticamente el SO, el currentLayer, visuales y sonidos
+                        grid.TryBuildLayer(x, z, layerIndex, null);
                     }
-                    grid.RefreshQuadrantVisuals(x, z);
                 }
             }
         }
