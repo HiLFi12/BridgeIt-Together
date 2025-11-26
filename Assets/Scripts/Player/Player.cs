@@ -447,7 +447,11 @@ public class Player : MonoBehaviour, IHitable
                 {
                     seleccionado.Interact(this.gameObject);
 
-                    ignoredInteractables.Add(seleccionado);
+                    // No ignorar ciertos interactables que deben poder ser interactuados repetidamente
+                    if (!ShouldNeverIgnore(seleccionado))
+                    {
+                        ignoredInteractables.Add(seleccionado);
+                    }
                     OnPlayerInteracted?.Invoke();
                 }
             }
@@ -556,6 +560,21 @@ public class Player : MonoBehaviour, IHitable
             if (lname.Contains("pickup") || lname.Contains("generator") || lname.Contains("spawner") || lname.Contains("spawn"))
                 return true;
         }
+        return false;
+    }
+
+    // Determina si un interactable nunca debe ser ignorado (debe poder ser interactuado repetidamente)
+    private bool ShouldNeverIgnore(IInteractable interactable)
+    {
+        if (interactable == null) return false;
+        var comp = interactable as Component;
+        if (comp == null) return false;
+        
+        // Excepciones: Ballista, Catapult y Furnace nunca deben ser ignorados
+        if (comp.GetComponentInParent<Ballista>() != null) return true;
+        if (comp.GetComponentInParent<Catapult>() != null) return true;
+        if (comp.GetComponentInParent<Furnace>() != null) return true;
+        
         return false;
     }
 
