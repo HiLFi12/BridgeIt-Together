@@ -10,6 +10,10 @@ public class VehicleReturnTrigger : MonoBehaviour
     [SerializeField] private bool destroyNonVehicles = false;
     [SerializeField] private bool showDebugMessages = true;
     
+    [Header("Efecto Visual al Desaparecer Vehículo")]
+    [SerializeField] private GameObject efectoDesaparicionPrefab = null;
+    [SerializeField] private bool spawnearEfectoAlDesaparecer = true;
+    
     [Header("Tags Protegidos (No se destruirán)")]
     [SerializeField] private string[] additionalProtectedTags = new string[0];
     
@@ -129,6 +133,9 @@ public class VehicleReturnTrigger : MonoBehaviour
         // Si tiene componentes de vehículo, enviar al pool
         if (autoMovement != null || vehicleCollision != null || autoController != null)
         {
+            // Spawnear efecto visual antes de enviar al pool
+            SpawnearEfectoDesaparicion(other.transform.position);
+            
             manager.OnVehicleTriggered(targetObject, triggerCollider);
         }
         else
@@ -141,6 +148,9 @@ public class VehicleReturnTrigger : MonoBehaviour
                          ?? rb.GetComponentInParent<BridgeItTogether.Gameplay.AutoControllers.AutoController>();
                 if (ac != null)
                 {
+                    // Spawnear efecto visual antes de enviar al pool
+                    SpawnearEfectoDesaparicion(other.transform.position);
+                    
                     manager.OnVehicleTriggered(ac.gameObject, triggerCollider);
                     return;
                 }
@@ -165,6 +175,37 @@ public class VehicleReturnTrigger : MonoBehaviour
                     Debug.Log($"⚠️ No se desactiva por ser parte de un vehículo: {other.gameObject.name}");
                 }
             }
+        }
+    }
+    
+    /// <summary>
+    /// Instancia el efecto visual de desaparición en la posición especificada
+    /// </summary>
+    /// <param name="posicion">Posición donde spawnear el efecto</param>
+    private void SpawnearEfectoDesaparicion(Vector3 posicion)
+    {
+        // Solo spawnear si está habilitado y tenemos el prefab asignado
+        if (!spawnearEfectoAlDesaparecer || efectoDesaparicionPrefab == null) return;
+        
+        // Instanciar el efecto en la posición del vehículo
+        GameObject efecto = Instantiate(efectoDesaparicionPrefab, posicion, Quaternion.identity);
+        
+        if (showDebugMessages)
+        {
+            Debug.Log($"💨 Efecto de desaparición spawneado en posición: {posicion}");
+        }
+        
+        // Si el efecto tiene un ParticleSystem, destruirlo después de que termine
+        ParticleSystem particleSystem = efecto.GetComponent<ParticleSystem>();
+        if (particleSystem != null)
+        {
+            float duracion = particleSystem.main.duration + particleSystem.main.startLifetime.constantMax;
+            Destroy(efecto, duracion);
+        }
+        else
+        {
+            // Si no tiene ParticleSystem, destruirlo después de 5 segundos por defecto
+            Destroy(efecto, 5f);
         }
     }
       /// <summary>
