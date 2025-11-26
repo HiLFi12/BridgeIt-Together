@@ -4774,13 +4774,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1957269874}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
+      propertyPath: autoPrefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'autoPrefabs.Array.data[0]'
       value: 
-      objectReference: {fileID: 3153354572346523118, guid: a9e0a90ec23c7834998ceb857f5aac2e, type: 3}
+      objectReference: {fileID: 248325544060308125, guid: 6447c1d329fbc774aa69beec85cb6ac6, type: 3}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'autoPrefabs.Array.data[1]'
       value: 
-      objectReference: {fileID: 248325544060308125, guid: 7343e7e8ac960bf44a616c51b049fc4a, type: 3}
+      objectReference: {fileID: 248325544060308125, guid: 181dd2111d415bf4d8114322b03ae22c, type: 3}
+    - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
+      propertyPath: 'autoPrefabs.Array.data[2]'
+      value: 
+      objectReference: {fileID: 248325544060308125, guid: 6447c1d329fbc774aa69beec85cb6ac6, type: 3}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: returnTriggers.Array.size
       value: 8
@@ -7917,7 +7925,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7947,11 +7955,11 @@ PrefabInstance:
       objectReference: {fileID: 1096737037}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaInicial
-      value: 50
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaEntreRondas
-      value: 20
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.size
@@ -8011,7 +8019,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[0].tiempoEntreAutos
-      value: 15
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].tiempoEntreAutos
@@ -8046,6 +8054,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[0].tiposVehiculoPorAuto.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].tiposVehiculoPorAuto.Array.size
       value: 4
       objectReference: {fileID: 0}
@@ -8062,8 +8074,12 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: 'configuracionRondas.Array.data[0].tiposVehiculoPorAuto.Array.data[1]'
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: 'configuracionRondas.Array.data[0].tiposVehiculoPorAuto.Array.data[2]'
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].posicionesCarrilPorAuto.Array.size
@@ -8557,7 +8573,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2063142653}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: d487b1520cf0c374f84e48ca64254878, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: 936eb0a5a6cc0ac488880c6a549aa401, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
@@ -8577,7 +8593,7 @@ VideoPlayer:
   - 1
   m_Url: 
   m_EnabledAudioTracks: 01
-  m_DirectAudioMutes: 01
+  m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1
   m_PlayOnAwake: 1
   m_SkipOnDrop: 1
