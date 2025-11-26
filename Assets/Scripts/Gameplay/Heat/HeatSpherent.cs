@@ -15,11 +15,9 @@ using System.Collections.Generic;
 [RequireComponent(typeof(SphereCollider))]
 public class HeatSpherent : MonoBehaviour
 {
-    [Header("Destrucción")]
-    [Tooltip("Destruir este objeto tras aplicar el efecto.")]
-    [SerializeField] private bool destroyAfterActivation = true;
-    [Tooltip("Retardo antes de destruir (permite spawn de partículas, etc.)")] 
-    [SerializeField] private float destroyDelay = 0f;
+    [Header("Cooldown Auto-destrucción")]
+    [Tooltip("Tiempo en segundos antes de que el HeatSpherent se autodestruya.")]
+    [SerializeField] private float destructionCooldown = 5f;
 
     [Header("Debug")] 
     [SerializeField] private bool debugLogs = false;
@@ -27,23 +25,61 @@ public class HeatSpherent : MonoBehaviour
 
     private bool _consumed = false;
     private SphereCollider _sphere;
+    private float _currentCooldown;
     private static readonly Collider[] _overlap = new Collider[128];
 
     private void Awake()
     {
         _sphere = GetComponent<SphereCollider>();
         if (_sphere != null) _sphere.isTrigger = true;
+        _currentCooldown = destructionCooldown;
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void Update()
     {
-        if (_consumed) return;
-        if (other == null) return;
+        // Detectar HeatSphere activamente
+        if (!_consumed)
+        {
+            DetectAndActivate();
+        }
 
-        // Verificamos si lo que entró corresponde (o simplemente procedemos y filtramos luego)
-        if (other.GetComponentInParent<HeatSphere>() == null) return; // sólo reaccionar cuando realmente entra un HeatSphere
+        // Sistema de cooldown auto-destrucción
+        if (_currentCooldown > 0f)
+        {
+            _currentCooldown -= Time.deltaTime;
 
-        ActivateAndConsume();
+            if (_currentCooldown <= 0f)
+            {
+                if (debugLogs)
+                {
+                    Debug.Log($"[HeatSpherent] Cooldown alcanzado, autodestruyendo.", this);
+                }
+                Destroy(gameObject);
+            }
+        }
+    }
+
+    private void DetectAndActivate()
+    {
+        if (_sphere == null) return;
+
+        float effectiveRadius = _sphere.radius * Mathf.Max(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
+        int count = Physics.OverlapSphereNonAlloc(transform.position + _sphere.center, effectiveRadius, _overlap, Physics.AllLayers, QueryTriggerInteraction.Collide);
+
+        // Buscar si hay alguna HeatSphere en el área
+        for (int i = 0; i < count; i++)
+        {
+            var col = _overlap[i];
+            if (col == null) continue;
+            
+            var hs = col.GetComponentInParent<HeatSphere>();
+            if (hs != null)
+            {
+                // Encontramos al menos una HeatSphere, activamos
+                ActivateAndConsume();
+                return;
+            }
+        }
     }
 
     private void ActivateAndConsume()
@@ -54,14 +90,6 @@ public class HeatSpherent : MonoBehaviour
         if (debugLogs)
         {
             Debug.Log($"[HeatSpherent] HeatSphere afectados: {affected}", this);
-        }
-
-        if (destroyAfterActivation)
-        {
-            if (destroyDelay <= 0f)
-                Destroy(gameObject);
-            else
-                Destroy(gameObject, destroyDelay);
         }
     }
 
