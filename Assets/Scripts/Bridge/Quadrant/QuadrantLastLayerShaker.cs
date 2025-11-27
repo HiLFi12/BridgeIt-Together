@@ -6,9 +6,9 @@ public class QuadrantLastLayerShaker : MonoBehaviour
     [Header("Fuente de Estado")]
     [SerializeField] private BridgeQuadrantSO quadrantSO;
 
-    [Header("Objetivos a agitar (solo visuals)")]
-    [Tooltip("Si está vacío, toma todos los Renderers hijos y usa sus transforms (sin mover colliders del root).")]
-    [SerializeField] private Transform[] targetTransforms;
+    [Header("Objetivo a agitar")]
+    [Tooltip("Root visual de la última capa (se moverá todo el árbol de hijos, incluidas las grietas).")]
+    [SerializeField] private Transform targetRoot;
 
     [Header("Parámetros de temblor")]
     [Tooltip("Amplitud de translación (metros)")]
@@ -28,14 +28,13 @@ public class QuadrantLastLayerShaker : MonoBehaviour
     [Tooltip("Si está activo, al pausar (timeScale=0) se detiene el temblor y se restauran las poses base.")]
     [SerializeField] private bool stopWhenPaused = true;
 
-    private Vector3[] _baseLocalPos;
-    private Quaternion[] _baseLocalRot;
-    private float[] _phase;
+    private Vector3 _baseLocalPos;
+    private Quaternion _baseLocalRot;
+    private float _phase;
     private bool _initialized;
 
     private void Awake()
     {
-        EnsureTargets();
         CaptureBases();
     }
 
@@ -51,7 +50,7 @@ public class QuadrantLastLayerShaker : MonoBehaviour
 
     private void Update()
     {
-        if (quadrantSO == null || targetTransforms == null || targetTransforms.Length == 0)
+        if (quadrantSO == null || targetRoot == null)
             return;
 
         // Evitar artefactos cuando el juego está pausado: restaurar y no aplicar offsets
@@ -80,24 +79,17 @@ public class QuadrantLastLayerShaker : MonoBehaviour
 
         // Usar tiempo escalado normal; si quisieras animar aún en pausa, cambia a Time.unscaledTime
         float t = Time.time;
-        for (int i = 0; i < targetTransforms.Length; i++)
-        {
-            var tf = targetTransforms[i];
-            if (tf == null) continue;
+        float w = 2f * Mathf.PI * frequency;
+        float s1 = Mathf.Sin(w * t + _phase);
+        float s2 = Mathf.Sin(w * 0.87f * t + _phase * 1.37f);
 
-            float ph = (_phase != null && i < _phase.Length) ? _phase[i] : 0f;
-            float w = 2f * Mathf.PI * frequency;
-            float s1 = Mathf.Sin(w * t + ph);
-            float s2 = Mathf.Sin(w * 0.87f * t + ph * 1.37f);
+        // Posición: pequeño jitter
+        Vector3 offset = new Vector3(s1, 0.35f * s2, -0.8f * s1) * positionAmplitude;
+        targetRoot.localPosition = _baseLocalPos + offset;
 
-            // Posición: pequeño jitter
-            Vector3 offset = new Vector3(s1, 0.35f * s2, -0.8f * s1) * positionAmplitude;
-            tf.localPosition = _baseLocalPos[i] + offset;
-
-            // Rotación: leve oscilación (componer sobre la base para evitar drift de euler)
-            Vector3 eulerOffset = new Vector3(0.35f * s2, 0.0f, 1.0f * s1) * rotationAmplitudeDeg;
-            tf.localRotation = _baseLocalRot[i] * Quaternion.Euler(eulerOffset);
-        }
+        // Rotación: leve oscilación (componer sobre la base para evitar drift de euler)
+        Vector3 eulerOffset = new Vector3(0.35f * s2, 0.0f, 1.0f * s1) * rotationAmplitudeDeg;
+        targetRoot.localRotation = _baseLocalRot * Quaternion.Euler(eulerOffset);
     }
 
     private float GetLifePoints(BridgeQuadrantSO so)
@@ -110,50 +102,32 @@ public class QuadrantLastLayerShaker : MonoBehaviour
         }
     }
 
-    private void EnsureTargets()
-    {
-        if ((targetTransforms == null || targetTransforms.Length == 0) && autoFromRenderers)
-        {
-            var renderers = GetComponentsInChildren<Renderer>(true);
-            if (renderers != null && renderers.Length > 0)
-            {
-                targetTransforms = new Transform[renderers.Length];
-                for (int i = 0; i < renderers.Length; i++)
-                    targetTransforms[i] = renderers[i].transform;
-            }
-        }
-    }
-
     private void CaptureBases()
     {
-        EnsureTargets();
-        if (targetTransforms == null) return;
-        int n = targetTransforms.Length;
-        _baseLocalPos = new Vector3[n];
-        _baseLocalRot = new Quaternion[n];
-        _phase = new float[n];
-        for (int i = 0; i < n; i++)
+        if (targetRoot == null)
         {
-            var tf = targetTransforms[i];
-            if (tf == null) continue;
-            _baseLocalPos[i] = tf.localPosition;
-            _baseLocalRot[i] = tf.localRotation;
-            // Fase pseudo-única por transform
-            _phase[i] = Hash01(tf.GetInstanceID()) * Mathf.PI * 2f;
+            if (autoFromRenderers)
+            {
+                // Si no se asignó root explícito, usamos el propio transform de este componente
+                targetRoot = transform;
+            }
+            else
+            {
+                return;
+            }
         }
+
+        _baseLocalPos = targetRoot.localPosition;
+        _baseLocalRot = targetRoot.localRotation;
+        _phase = Hash01(targetRoot.GetInstanceID()) * Mathf.PI * 2f;
         _initialized = true;
     }
 
     private void RestoreBases()
     {
-        if (!_initialized || targetTransforms == null) return;
-        for (int i = 0; i < targetTransforms.Length; i++)
-        {
-            var tf = targetTransforms[i];
-            if (tf == null) continue;
-            tf.localPosition = _baseLocalPos[i];
-            tf.localRotation = _baseLocalRot[i];
-        }
+        if (!_initialized || targetRoot == null) return;
+        targetRoot.localPosition = _baseLocalPos;
+        targetRoot.localRotation = _baseLocalRot;
     }
 
     private float Hash01(int seed)
@@ -173,7 +147,10 @@ public class QuadrantLastLayerShaker : MonoBehaviour
     {
         quadrantSO = so;
         if (targets != null && targets.Length > 0)
-            targetTransforms = targets;
+        {
+            // Tomamos el root común (primer transform) como objetivo de temblor global
+            targetRoot = targets[0];
+        }
         _initialized = false;
         CaptureBases();
     }
@@ -186,13 +163,9 @@ public class QuadrantLastLayerShaker : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
-        if (!drawGizmos || targetTransforms == null) return;
+        if (!drawGizmos || targetRoot == null) return;
         Gizmos.color = Color.yellow;
-        foreach (var t in targetTransforms)
-        {
-            if (t == null) continue;
-            Gizmos.DrawWireSphere(t.position, 0.02f);
-        }
+        Gizmos.DrawWireSphere(targetRoot.position, 0.04f);
     }
 #endif
 }
