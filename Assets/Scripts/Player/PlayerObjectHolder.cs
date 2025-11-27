@@ -26,7 +26,7 @@ public class PlayerObjectHolder : MonoBehaviour
 
     [Header("Overrides por tipo de objeto")]
     [SerializeField] private HolderOverride[] overrides;
-
+    
     [Header("UI Manager")]
     [SerializeField] private PlayerUIManager playerUIManager;
 
@@ -50,7 +50,7 @@ public class PlayerObjectHolder : MonoBehaviour
         // Actualizar la UI del objeto en mano en cada frame
         UpdateHeldObjectUI();
     }
-
+    
     public void PickUp(GameObject objectInstance)
     {
         if (objectInstance == null)
@@ -62,7 +62,7 @@ public class PlayerObjectHolder : MonoBehaviour
         if (heldObject != null && heldObject != objectInstance)
         {
             DeactivateUIForObject(heldObject);
-
+            
             if (heldRigidbody != null)
             {
                 heldRigidbody.isKinematic = false;
@@ -104,11 +104,11 @@ public class PlayerObjectHolder : MonoBehaviour
     public void PickUpExistingInstance(GameObject objectInstance) => PickUp(objectInstance);
     public bool HasObjectInHand() => heldObject != null;
     public GameObject GetHeldObject() => heldObject;
-
+    
     public void DropObject()
     {
         if (heldObject == null) return;
-
+        
         DeactivateUIForObject(heldObject);
         lastUIIndex = -1;
         var dropped = heldObject;
@@ -125,14 +125,14 @@ public class PlayerObjectHolder : MonoBehaviour
         // Notificar
         try { OnDropped?.Invoke(dropped); } catch { }
     }
-
+    
     public void UseHeldObject()
     {
         if (heldObject == null) return;
-
+        
         DeactivateUIForObject(heldObject);
         var used = heldObject;
-
+        
         if (heldRigidbody != null)
         {
             heldRigidbody.isKinematic = false;
@@ -144,22 +144,22 @@ public class PlayerObjectHolder : MonoBehaviour
         // Notificar
         try { OnUsed?.Invoke(used); } catch { }
     }
-
+    
     private void ActivateUIForObject(GameObject obj)
     {
         if (playerUIManager == null || obj == null) return;
-
+        
         IUIActivatable uiActivatable = obj.GetComponent<IUIActivatable>();
         if (uiActivatable != null && uiActivatable.UIIndex >= 0)
         {
             playerUIManager.TurnOnUI(uiActivatable.UIIndex);
         }
     }
-
+    
     private void DeactivateUIForObject(GameObject obj)
     {
         if (playerUIManager == null || obj == null) return;
-
+        
         IUIActivatable uiActivatable = obj.GetComponent<IUIActivatable>();
         if (uiActivatable != null && uiActivatable.UIIndex >= 0)
         {
@@ -211,7 +211,7 @@ public class PlayerObjectHolder : MonoBehaviour
     private void UpdateHeldObjectUI()
     {
         if (playerUIManager == null || heldObject == null) return;
-
+        
         IUIActivatable uiActivatable = heldObject.GetComponent<IUIActivatable>();
         if (uiActivatable != null && uiActivatable.UIIndex >= 0)
         {
