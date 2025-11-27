@@ -37,7 +37,11 @@ namespace Tutorials
 
         private void OnTriggerEnter(Collider other)
         {
-            wall.SetActive(true);
+            // Solo activar la pared si detecta un AutoController
+            if (other.GetComponent<BridgeItTogether.Gameplay.AutoControllers.AutoController>() != null)
+            {
+                wall.SetActive(true);
+            }
         }
 
         private void OnDestroy()
