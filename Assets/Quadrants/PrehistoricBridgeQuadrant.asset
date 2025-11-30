@@ -37,6 +37,9 @@ MonoBehaviour:
   batteryLife: 2
   batteryDrainRate: 5
   heatActive: 0
+  isWet: 0
+  wetHeatDamagePerSecond: 1
+  wetDurationAfterWater: 3
   debugLife: 0
   debugLifeInterval: 0.5
   damagedMaterial: {fileID: 2100000, guid: 25a76c028a5fca048800dd297963835a, type: 2}
@@ -48,7 +51,7 @@ MonoBehaviour:
   buildLayer0SfxIndex: 1
   buildLayer1SfxIndex: 2
   buildLayer2SfxIndex: 3
-  repairSfxIndex: 1
+  repairSfxIndex: 3
   destroySfxIndex: 6
   damageSfxIndex: -1
   maxLife: 5
