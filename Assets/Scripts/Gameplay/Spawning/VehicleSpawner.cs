@@ -161,7 +161,6 @@ namespace BridgeItTogether.Gameplay.Spawning
             var rb = auto.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.constraints = RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezePositionZ;
                 rb.linearVelocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
             }
