@@ -14,6 +14,10 @@ public class VehicleReturnTrigger : MonoBehaviour
     [SerializeField] private GameObject efectoDesaparicionPrefab = null;
     [SerializeField] private bool spawnearEfectoAlDesaparecer = true;
     
+    [Header("Efecto Visual al Destruir Objetos")]
+    [SerializeField] private GameObject efectoDestruccionPrefab = null;
+    [SerializeField] private bool spawnearEfectoAlDestruir = true;
+    
     [Header("Tags Protegidos (No se destruirán)")]
     [SerializeField] private string[] additionalProtectedTags = new string[0];
     
@@ -208,6 +212,37 @@ public class VehicleReturnTrigger : MonoBehaviour
             Destroy(efecto, 5f);
         }
     }
+    
+    /// <summary>
+    /// Instancia el efecto visual de destrucción en la posición especificada
+    /// </summary>
+    /// <param name="posicion">Posición donde spawnear el efecto</param>
+    private void SpawnearEfectoDestruccion(Vector3 posicion)
+    {
+        // Solo spawnear si está habilitado y tenemos el prefab asignado
+        if (!spawnearEfectoAlDestruir || efectoDestruccionPrefab == null) return;
+        
+        // Instanciar el efecto en la posición del objeto destruido
+        GameObject efecto = Instantiate(efectoDestruccionPrefab, posicion, Quaternion.identity);
+        
+        if (showDebugMessages)
+        {
+            Debug.Log($"💥 Efecto de destrucción spawneado en posición: {posicion}");
+        }
+        
+        // Si el efecto tiene un ParticleSystem, destruirlo después de que termine
+        ParticleSystem particleSystem = efecto.GetComponent<ParticleSystem>();
+        if (particleSystem != null)
+        {
+            float duracion = particleSystem.main.duration + particleSystem.main.startLifetime.constantMax;
+            Destroy(efecto, duracion);
+        }
+        else
+        {
+            // Si no tiene ParticleSystem, destruirlo después de 5 segundos por defecto
+            Destroy(efecto, 5f);
+        }
+    }
       /// <summary>
     /// Destruye objetos que no son vehículos cuando colisionan con el trigger
     /// </summary>
@@ -219,6 +254,9 @@ public class VehicleReturnTrigger : MonoBehaviour
         {
             if (showDebugMessages)
                 Debug.Log($"🗑️ Destruyendo objeto no-vehículo: {obj.name} (Tag: {obj.tag})");
+            
+            // Spawnear efecto visual antes de destruir
+            SpawnearEfectoDestruccion(obj.transform.position);
             
             Destroy(obj);
         }
