@@ -6116,11 +6116,19 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1957269874}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
+      propertyPath: autoPrefabs.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'autoPrefabs.Array.data[0]'
       value: 
       objectReference: {fileID: 2948579226618137670, guid: 2c90771b04d00da4182af535a7b8763e, type: 3}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'autoPrefabs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2948579226618137670, guid: 2c90771b04d00da4182af535a7b8763e, type: 3}
+    - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
+      propertyPath: 'autoPrefabs.Array.data[2]'
       value: 
       objectReference: {fileID: 2948579226618137670, guid: 2c90771b04d00da4182af535a7b8763e, type: 3}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
@@ -10368,7 +10376,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10850,7 +10858,7 @@ PrefabInstance:
       objectReference: {fileID: 1096737037}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaInicial
-      value: 10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: tiempoEsperaEntreRondas
@@ -10858,7 +10866,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.size
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[0].nombreRonda
@@ -10879,6 +10887,10 @@ PrefabInstance:
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[4].nombreRonda
       value: Ronda 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
+      propertyPath: configuracionRondas.Array.data[0].cantidadAutos
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].cantidadAutos
@@ -13984,12 +13996,6 @@ MonoBehaviour:
   buildPadUI: {fileID: 0}
   dashKeyUI: {fileID: 0}
   dashPadUI: {fileID: 0}
-  respawnPoint: {fileID: 0}
-  respawnEffectPrefab: {fileID: 0}
-  manualRespawnCooldown: 3
-  shakeIntensityMax: 0.5
-  shakeFrequency: 20
-  manualRespawnKey: 102
   enableFillBridgeHotkey: 0
   fillBridgeKey: 103
   bridgeGrid: {fileID: 0}
