@@ -8,6 +8,7 @@ public class TutorialPopup : MonoBehaviour
     public TMP_Text contador;        
     public Button botonSiguiente;
     public Button botonAnterior;
+    [SerializeField] private GameObject objectToDisable;
 
     private int paginaActual = 0;
 
@@ -27,6 +28,11 @@ public class TutorialPopup : MonoBehaviour
         previousTimeScale = Time.timeScale;
         Time.timeScale = 0f;
         pausedByPopup = true;
+
+        if (objectToDisable != null)
+        {
+            objectToDisable.SetActive(false);
+        }
 
         paginaActual = 0;
         if (paginas != null && paginas.Length > 0)
@@ -87,6 +93,11 @@ public class TutorialPopup : MonoBehaviour
 
     public void CloseTutorial()
     {
+        if (objectToDisable != null)
+        {
+            objectToDisable.SetActive(true);
+        }
+        
         gameObject.SetActive(false);
     }
 }
