@@ -66,10 +66,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 0
   showDebugMessages: 1
-  efectoDesaparicionPrefab: {fileID: 104829970813648393, guid: a6a6ee34c2d1aa64eb05240d7aa85da8, type: 3}
-  spawnearEfectoAlDesaparecer: 1
-  additionalProtectedTags:
+  efectoDestruccionPrefab: {fileID: 104829970813648393, guid: a6a6ee34c2d1aa64eb05240d7aa85da8, type: 3}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 104829970813648393, guid: bf8e1e805eecef548b1d9c7963c9ed8f, type: 3}
+  spawnearEfectoVehiculo: 1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
   - InvisibleWall
-  - PowerUp

@@ -1,328 +1,180 @@
 using UnityEngine;
 
 /// <summary>
-/// Componente que se agrega a cada trigger individual para detectar vehículos
-/// Los vehículos se envían al pool, otros objetos se destruyen
+/// Trigger que destruye cualquier objeto que lo toque,
+/// mostrando efectos visuales y respetando una lista de tags protegidos.
 /// </summary>
+[DisallowMultipleComponent]
 public class VehicleReturnTrigger : MonoBehaviour
 {
-    [Header("Configuración del Trigger")]
-    [SerializeField] private bool destroyNonVehicles = false;
+    [Header("Debug")]
     [SerializeField] private bool showDebugMessages = true;
-    
-    [Header("Efecto Visual al Desaparecer Vehículo")]
-    [SerializeField] private GameObject efectoDesaparicionPrefab = null;
-    [SerializeField] private bool spawnearEfectoAlDesaparecer = true;
-    
-    [Header("Efecto Visual al Destruir Objetos")]
+
+    [Header("Efecto al destruir objetos")]
     [SerializeField] private GameObject efectoDestruccionPrefab = null;
     [SerializeField] private bool spawnearEfectoAlDestruir = true;
-    
-    [Header("Tags Protegidos (No se destruirán)")]
-    [SerializeField] private string[] additionalProtectedTags = new string[0];
-    
-    private VehicleReturnTriggerManager manager;
-    private bool isActive = true;
-    private Collider triggerCollider;
-    
-    /// <summary>
-    /// Inicializa el trigger con referencia al manager
-    /// </summary>
-    /// <param name="triggerManager">Manager que maneja este trigger</param>
-    public void Initialize(VehicleReturnTriggerManager triggerManager)
+
+    [Header("Efecto al destruir vehículos (tag 'Vehicle')")]
+    [SerializeField] private GameObject efectoDestruccionVehiculoPrefab = null;
+    [SerializeField] private bool spawnearEfectoVehiculo = true;
+
+    [Header("Tags protegidos (no se destruyen)")]
+    [SerializeField] private string[] protectedTags = new string[]
     {
-        manager = triggerManager;
+        "Player",
+        "MainCamera",
+        "GameController",
+        "UI",
+        "BridgeQuadrant",
+        "Ground",
+        "Platform",
+        "Respawn",
+        "Finish",
+        "EditorOnly"
+    };
+
+    private Collider triggerCollider;
+    private bool isActive = true;
+
+    private void Awake()
+    {
         triggerCollider = GetComponent<Collider>();
-        
-        // Asegurar que es un trigger
         if (triggerCollider != null)
         {
             triggerCollider.isTrigger = true;
         }
     }
-    
+
     /// <summary>
-    /// Activa o desactiva este trigger
+    /// Inicializa el trigger desde un manager externo (compatibilidad legacy).
+    /// Actualmente solo asegura el collider como trigger.
     /// </summary>
-    /// <param name="active">Estado activo/inactivo</param>
+    public void Initialize(VehicleReturnTriggerManager triggerManager)
+    {
+        // El manager ya no es necesario para la destrucción,
+        // pero mantenemos este método para no romper referencias existentes.
+        triggerCollider = GetComponent<Collider>();
+        if (triggerCollider != null)
+        {
+            triggerCollider.isTrigger = true;
+        }
+    }
+
+    /// <summary>
+    /// Activa o desactiva este trigger.
+    /// </summary>
     public void SetActive(bool active)
     {
         isActive = active;
-        
-        // También controlar el collider
         if (triggerCollider != null)
-        {
             triggerCollider.enabled = active;
-        }
     }
-      /// <summary>
-    /// Verifica si el trigger está activo
-    /// </summary>
-    /// <returns>True si está activo</returns>
+
     public bool IsActive()
     {
         return isActive && triggerCollider != null && triggerCollider.enabled;
     }
-    
+
     /// <summary>
-    /// Activa o desactiva la destrucción de objetos no-vehículos
+    /// Compatibilidad legacy: en la nueva lógica todos los objetos no protegidos se destruyen,
+    /// así que este flag ya no tiene efecto directo, pero lo conservamos para no romper llamadas.
     /// </summary>
-    /// <param name="enabled">True para activar destrucción, False para desactivar</param>
     public void SetDestroyNonVehicles(bool enabled)
     {
-        destroyNonVehicles = enabled;
-        if (showDebugMessages)
-        {
-            Debug.Log($"Destrucción de no-vehículos {(enabled ? "activada" : "desactivada")} en trigger {gameObject.name}");
-        }
+        // La lógica actual ya destruye todo lo que no está protegido;
+        // podríamos usar este flag para futuros refinamientos si hace falta.
     }
-    
+
     /// <summary>
-    /// Activa o desactiva los mensajes de debug
+    /// Activa o desactiva los mensajes de debug (compatibilidad con configurador).
     /// </summary>
-    /// <param name="enabled">True para mostrar mensajes, False para ocultarlos</param>
     public void SetDebugMessages(bool enabled)
     {
         showDebugMessages = enabled;
     }
-    
+
     /// <summary>
-    /// Añade tags adicionales que deben estar protegidos de la destrucción
+    /// Añade tags protegidos adicionales (compatibilidad con configurador).
     /// </summary>
-    /// <param name="newProtectedTags">Array de tags a proteger</param>
     public void AddProtectedTags(string[] newProtectedTags)
     {
         if (newProtectedTags == null || newProtectedTags.Length == 0) return;
-        
-        // Combinar tags existentes con los nuevos
-        System.Collections.Generic.List<string> allTags = new System.Collections.Generic.List<string>();
-        
-        if (additionalProtectedTags != null)
+
+        var all = new System.Collections.Generic.List<string>();
+        if (protectedTags != null) all.AddRange(protectedTags);
+
+        foreach (var tag in newProtectedTags)
         {
-            allTags.AddRange(additionalProtectedTags);
-        }
-        
-        foreach (string tag in newProtectedTags)
-        {
-            if (!string.IsNullOrEmpty(tag) && !allTags.Contains(tag))
+            if (!string.IsNullOrEmpty(tag) && !all.Contains(tag))
             {
-                allTags.Add(tag);
+                all.Add(tag);
             }
         }
-        
-        additionalProtectedTags = allTags.ToArray();
-        
+
+        protectedTags = all.ToArray();
+
         if (showDebugMessages)
         {
-            Debug.Log($"Tags protegidos actualizados en trigger {gameObject.name}: {string.Join(", ", additionalProtectedTags)}");
-        }
-    }private void OnTriggerEnter(Collider other)
-    {
-        // Solo procesar si el trigger está activo
-        if (!isActive || manager == null) return;
-        
-        // Verificar si el objeto que entró es un vehículo
-        GameObject targetObject = other.gameObject;
-        
-        // Buscar componentes de vehículo en el objeto o en su jerarquía
-        AutoMovement autoMovement = targetObject.GetComponent<AutoMovement>() ?? targetObject.GetComponentInParent<AutoMovement>();
-        VehicleBridgeCollision vehicleCollision = targetObject.GetComponent<VehicleBridgeCollision>() ?? targetObject.GetComponentInParent<VehicleBridgeCollision>();
-        BridgeItTogether.Gameplay.AutoControllers.AutoController autoController = targetObject.GetComponent<BridgeItTogether.Gameplay.AutoControllers.AutoController>() ?? targetObject.GetComponentInParent<BridgeItTogether.Gameplay.AutoControllers.AutoController>();
-
-        // Si encontramos algún componente de vehículo, usamos el GameObject raíz del vehículo
-        if (autoController != null) targetObject = autoController.gameObject;
-        else if (autoMovement != null) targetObject = autoMovement.gameObject;
-        else if (vehicleCollision != null) targetObject = vehicleCollision.gameObject;
-
-        // Si tiene componentes de vehículo, enviar al pool
-        if (autoMovement != null || vehicleCollision != null || autoController != null)
-        {
-            // Spawnear efecto visual antes de enviar al pool
-            SpawnearEfectoDesaparicion(other.transform.position);
-            
-            manager.OnVehicleTriggered(targetObject, triggerCollider);
-        }
-        else
-        {
-            // Intento extra: si el collider pertenece a un Rigidbody vinculado a un AutoController, tratarlo como vehículo
-            var rb = other.attachedRigidbody;
-            if (rb != null)
-            {
-                var ac = rb.GetComponent<BridgeItTogether.Gameplay.AutoControllers.AutoController>()
-                         ?? rb.GetComponentInParent<BridgeItTogether.Gameplay.AutoControllers.AutoController>();
-                if (ac != null)
-                {
-                    // Spawnear efecto visual antes de enviar al pool
-                    SpawnearEfectoDesaparicion(other.transform.position);
-                    
-                    manager.OnVehicleTriggered(ac.gameObject, triggerCollider);
-                    return;
-                }
-            }
-
-            // Si NO es un vehículo, destruir el objeto (si está habilitado)
-            // Por defecto no destruimos para evitar eliminar partes de vehículos u objetos compartidos
-            if (destroyNonVehicles)
-            {
-                DestroyNonVehicleObject(other.gameObject);
-            }
-            else
-            {
-                // fallback: desactivar objeto si es temporal, pero nunca si es hijo de un vehículo
-                if (!EsParteDeVehiculo(other.gameObject))
-                {
-                    other.gameObject.SetActive(false);
-                    if (showDebugMessages) Debug.Log($"⏸️ Objeto no-vehículo desactivado: {other.gameObject.name}");
-                }
-                else if (showDebugMessages)
-                {
-                    Debug.Log($"⚠️ No se desactiva por ser parte de un vehículo: {other.gameObject.name}");
-                }
-            }
+            Debug.Log($"Tags protegidos actualizados en trigger {gameObject.name}: {string.Join(", ", protectedTags)}");
         }
     }
-    
-    /// <summary>
-    /// Instancia el efecto visual de desaparición en la posición especificada
-    /// </summary>
-    /// <param name="posicion">Posición donde spawnear el efecto</param>
-    private void SpawnearEfectoDesaparicion(Vector3 posicion)
+
+    private void OnTriggerEnter(Collider other)
     {
-        // Solo spawnear si está habilitado y tenemos el prefab asignado
-        if (!spawnearEfectoAlDesaparecer || efectoDesaparicionPrefab == null) return;
-        
-        // Instanciar el efecto en la posición del vehículo
-        GameObject efecto = Instantiate(efectoDesaparicionPrefab, posicion, Quaternion.identity);
-        
-        if (showDebugMessages)
-        {
-            Debug.Log($"💨 Efecto de desaparición spawneado en posición: {posicion}");
-        }
-        
-        // Si el efecto tiene un ParticleSystem, destruirlo después de que termine
-        ParticleSystem particleSystem = efecto.GetComponent<ParticleSystem>();
-        if (particleSystem != null)
-        {
-            float duracion = particleSystem.main.duration + particleSystem.main.startLifetime.constantMax;
-            Destroy(efecto, duracion);
-        }
-        else
-        {
-            // Si no tiene ParticleSystem, destruirlo después de 5 segundos por defecto
-            Destroy(efecto, 5f);
-        }
-    }
-    
-    /// <summary>
-    /// Instancia el efecto visual de destrucción en la posición especificada
-    /// </summary>
-    /// <param name="posicion">Posición donde spawnear el efecto</param>
-    private void SpawnearEfectoDestruccion(Vector3 posicion)
-    {
-        // Solo spawnear si está habilitado y tenemos el prefab asignado
-        if (!spawnearEfectoAlDestruir || efectoDestruccionPrefab == null) return;
-        
-        // Instanciar el efecto en la posición del objeto destruido
-        GameObject efecto = Instantiate(efectoDestruccionPrefab, posicion, Quaternion.identity);
-        
-        if (showDebugMessages)
-        {
-            Debug.Log($"💥 Efecto de destrucción spawneado en posición: {posicion}");
-        }
-        
-        // Si el efecto tiene un ParticleSystem, destruirlo después de que termine
-        ParticleSystem particleSystem = efecto.GetComponent<ParticleSystem>();
-        if (particleSystem != null)
-        {
-            float duracion = particleSystem.main.duration + particleSystem.main.startLifetime.constantMax;
-            Destroy(efecto, duracion);
-        }
-        else
-        {
-            // Si no tiene ParticleSystem, destruirlo después de 5 segundos por defecto
-            Destroy(efecto, 5f);
-        }
-    }
-      /// <summary>
-    /// Destruye objetos que no son vehículos cuando colisionan con el trigger
-    /// </summary>
-    /// <param name="obj">El objeto a destruir</param>
-    private void DestroyNonVehicleObject(GameObject obj)
-    {
-        // Verificar que no sea un jugador u otros objetos importantes que no deben destruirse
-        if (ShouldDestroyObject(obj))
+        if (!isActive) return;
+        if (other == null) return;
+
+        GameObject obj = other.gameObject;
+
+        // No destruir este mismo trigger
+        if (obj == gameObject) return;
+
+        if (!DebeDestruir(obj))
         {
             if (showDebugMessages)
-                Debug.Log($"🗑️ Destruyendo objeto no-vehículo: {obj.name} (Tag: {obj.tag})");
-            
-            // Spawnear efecto visual antes de destruir
+                Debug.Log($"⚠️ Objeto protegido, no se destruye: {obj.name} (Tag: {obj.tag})", obj);
+            return;
+        }
+
+        // Elegir efecto según si es vehículo o no
+        if (obj.CompareTag("Vehicle") && spawnearEfectoVehiculo && efectoDestruccionVehiculoPrefab != null)
+        {
+            SpawnearEfectoDestruccionEspecifico(obj.transform.position, efectoDestruccionVehiculoPrefab, true);
+        }
+        else
+        {
             SpawnearEfectoDestruccion(obj.transform.position);
-            
-            Destroy(obj);
         }
-        else
-        {
-            if (showDebugMessages)
-                Debug.Log($"⚠️ Objeto {obj.name} (Tag: {obj.tag}) protegido - no se destruye");
-        }
-    }
-    
-    /// <summary>
-    /// Determina si un objeto debe ser destruido o no
-    /// </summary>
-    /// <param name="obj">El objeto a evaluar</param>
-    /// <returns>True si debe destruirse, False si debe ignorarse</returns>
-    private bool ShouldDestroyObject(GameObject obj)
-    {
-    if (EsParteDeVehiculo(obj)) return false;
-        
 
-        // Lista de tags que NO deben destruirse (tags básicos del sistema)
-        string[] defaultProtectedTags = { 
-            "Player", 
-            "MainCamera", 
-            "GameController",
-            "UI",
-            "BridgeQuadrant",
-            "Ground",
-            "Platform",
-            "Respawn",
-            "Finish",
-            "EditorOnly"
-        };
-        
-        // Verificar tags protegidos por defecto
-        foreach (string protectedTag in defaultProtectedTags)
+        if (showDebugMessages)
+            Debug.Log($"🗑️ Destruyendo objeto: {obj.name} (Tag: {obj.tag})", obj);
+
+        Destroy(obj);
+    }
+
+    private bool DebeDestruir(GameObject obj)
+    {
+        // Tags protegidos
+        if (!string.IsNullOrEmpty(obj.tag) && obj.tag != "Untagged")
         {
-            if (obj.CompareTag(protectedTag))
+            for (int i = 0; i < protectedTags.Length; i++)
             {
-                return false;
-            }
-        }
-        
-        // Verificar tags adicionales configurados en el inspector
-        if (additionalProtectedTags != null)
-        {
-            foreach (string protectedTag in additionalProtectedTags)
-            {
-                if (!string.IsNullOrEmpty(protectedTag) && obj.CompareTag(protectedTag))
-                {
+                var t = protectedTags[i];
+                if (!string.IsNullOrEmpty(t) && obj.CompareTag(t))
                     return false;
-                }
             }
         }
-        
-        // No destruir objetos que tengan componentes importantes del sistema
+
+        // No destruir sistemas importantes
         if (obj.GetComponent<Camera>() != null ||
             obj.GetComponent<Light>() != null ||
             obj.GetComponent<AudioListener>() != null ||
             obj.GetComponentInParent<Canvas>() != null ||
-            obj.GetComponent<VehicleReturnTrigger>() != null ||
-            obj.GetComponent<VehicleReturnTriggerManager>() != null)
+            obj.GetComponent<VehicleReturnTrigger>() != null)
         {
             return false;
         }
-        
+
         // No destruir objetos que sean parte del sistema de puentes
         if (obj.GetComponent<BridgeConstructionGrid>() != null ||
             obj.GetComponentInChildren<BridgeConstructionGrid>() != null ||
@@ -330,59 +182,80 @@ public class VehicleReturnTrigger : MonoBehaviour
         {
             return false;
         }
-        
-        // Si llegamos aquí, es seguro destruir el objeto
+
         return true;
     }
 
-    private bool EsParteDeVehiculo(GameObject obj)
+    private void SpawnearEfectoDestruccion(Vector3 posicion)
     {
-        if (obj.GetComponentInParent<BridgeItTogether.Gameplay.AutoControllers.AutoController>() != null)
-            return true;
-        var rb = obj.GetComponent<Rigidbody>();
-        if (rb != null)
+        if (!spawnearEfectoAlDestruir || efectoDestruccionPrefab == null) return;
+
+        GameObject efecto = Instantiate(efectoDestruccionPrefab, posicion, Quaternion.identity);
+
+        if (showDebugMessages)
+            Debug.Log($"💥 Efecto de destrucción spawneado en posición: {posicion}", efecto);
+
+        var ps = efecto.GetComponent<ParticleSystem>();
+        if (ps != null)
         {
-            var ac = rb.GetComponent<BridgeItTogether.Gameplay.AutoControllers.AutoController>()
-                     ?? rb.GetComponentInParent<BridgeItTogether.Gameplay.AutoControllers.AutoController>();
-            if (ac != null) return true;
+            float duracion = ps.main.duration + ps.main.startLifetime.constantMax;
+            Destroy(efecto, duracion);
         }
-        return false;
+        else
+        {
+            Destroy(efecto, 5f);
+        }
     }
-    
-    // Método opcional para debugging - mostrar el trigger en la escena
+
+    private void SpawnearEfectoDestruccionEspecifico(Vector3 posicion, GameObject prefab, bool esVehiculo)
+    {
+        if (prefab == null) return;
+
+        GameObject efecto = Instantiate(prefab, posicion, Quaternion.identity);
+
+        if (showDebugMessages)
+        {
+            string tipo = esVehiculo ? "vehículo" : "objeto";
+            Debug.Log($"💥 Efecto de destrucción ({tipo}) spawneado en posición: {posicion}", efecto);
+        }
+
+        var ps = efecto.GetComponent<ParticleSystem>();
+        if (ps != null)
+        {
+            float duracion = ps.main.duration + ps.main.startLifetime.constantMax;
+            Destroy(efecto, duracion);
+        }
+        else
+        {
+            Destroy(efecto, 5f);
+        }
+    }
+
     private void OnDrawGizmos()
     {
-        if (triggerCollider != null && isActive)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            
-            if (triggerCollider is BoxCollider box)
-            {
-                Gizmos.DrawWireCube(box.center, box.size);
-            }
-            else if (triggerCollider is SphereCollider sphere)
-            {
-                Gizmos.DrawWireSphere(sphere.center, sphere.radius);
-            }
-        }
+        if (triggerCollider == null) triggerCollider = GetComponent<Collider>();
+        if (triggerCollider == null) return;
+
+        Gizmos.color = isActive ? new Color(1f, 0f, 0f, 0.4f) : new Color(0.5f, 0.5f, 0.5f, 0.2f);
+        Gizmos.matrix = transform.localToWorldMatrix;
+
+        if (triggerCollider is BoxCollider box)
+            Gizmos.DrawWireCube(box.center, box.size);
+        else if (triggerCollider is SphereCollider sphere)
+            Gizmos.DrawWireSphere(sphere.center, sphere.radius);
     }
-    
+
     private void OnDrawGizmosSelected()
     {
-        if (triggerCollider != null)
-        {
-            Gizmos.color = isActive ? Color.green : Color.gray;
-            Gizmos.matrix = transform.localToWorldMatrix;
-            
-            if (triggerCollider is BoxCollider box)
-            {
-                Gizmos.DrawCube(box.center, box.size);
-            }
-            else if (triggerCollider is SphereCollider sphere)
-            {
-                Gizmos.DrawSphere(sphere.center, sphere.radius);
-            }
-        }
+        if (triggerCollider == null) triggerCollider = GetComponent<Collider>();
+        if (triggerCollider == null) return;
+
+        Gizmos.color = isActive ? Color.green : Color.gray;
+        Gizmos.matrix = transform.localToWorldMatrix;
+
+        if (triggerCollider is BoxCollider box)
+            Gizmos.DrawCube(box.center, box.size);
+        else if (triggerCollider is SphereCollider sphere)
+            Gizmos.DrawSphere(sphere.center, sphere.radius);
     }
 }

@@ -3250,11 +3250,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  efectoDesaparicionPrefab: {fileID: 0}
-  spawnearEfectoAlDesaparecer: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!114 &314051777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8414,6 +8425,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 1849599667374541353, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_TagString
+      value: InvisibleWall
+      objectReference: {fileID: 0}
     - target: {fileID: 2174769494411797431, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_Layer
       value: 12
@@ -8437,6 +8452,14 @@ PrefabInstance:
     - target: {fileID: 2198179508157654912, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_LocalPosition.z
       value: -34.5152
+      objectReference: {fileID: 0}
+    - target: {fileID: 2530789380865124168, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_TagString
+      value: InvisibleWall
+      objectReference: {fileID: 0}
+    - target: {fileID: 2684786342081640846, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_TagString
+      value: InvisibleWall
       objectReference: {fileID: 0}
     - target: {fileID: 4504146982958957589, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8477,6 +8500,10 @@ PrefabInstance:
     - target: {fileID: 4504146982958957589, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266375863056210715, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
+      propertyPath: m_TagString
+      value: InvisibleWall
       objectReference: {fileID: 0}
     - target: {fileID: 5862562084820167150, guid: b0ecbca7fdb576b47ab55094cbc1f881, type: 3}
       propertyPath: m_Layer
@@ -8767,11 +8794,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  efectoDesaparicionPrefab: {fileID: 104829970813648393, guid: a6a6ee34c2d1aa64eb05240d7aa85da8, type: 3}
-  spawnearEfectoAlDesaparecer: 1
-  additionalProtectedTags:
+  efectoDestruccionPrefab: {fileID: 104829970813648393, guid: eb61ed8fab4f1d24c841c576afdde460, type: 3}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 104829970813648393, guid: bf8e1e805eecef548b1d9c7963c9ed8f, type: 3}
+  spawnearEfectoVehiculo: 1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
   - InvisibleWall
 --- !u!114 &820535931
 MonoBehaviour:
@@ -11480,11 +11518,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  efectoDesaparicionPrefab: {fileID: 0}
-  spawnearEfectoAlDesaparecer: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!114 &1067452247
 MonoBehaviour:
   m_ObjectHideFlags: 0
