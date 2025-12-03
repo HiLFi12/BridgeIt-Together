@@ -30,6 +30,14 @@
             </PendingDiffInfo>
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/Assets/Scripts/UI/ToggleObjectOnEnable.cs">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/Assets/Scripts/UI/ToggleObjectOnEnable.cs" />
+              <option name="updatedContent" value="using UnityEngine;&#10;&#10;public class ToggleObjectOnEnable : MonoBehaviour&#10;{&#10;    [SerializeField] private GameObject objectToDisable;&#10;&#10;    private void OnEnable()&#10;    {&#10;        if (objectToDisable != null)&#10;        {&#10;            objectToDisable.SetActive(false);&#10;        }&#10;    }&#10;&#10;    private void OnDisable()&#10;    {&#10;        if (objectToDisable != null)&#10;        {&#10;            objectToDisable.SetActive(true);&#10;        }&#10;    }&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
