@@ -19,6 +19,12 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
 
     public int UIIndex { get; private set; }
 
+    private void Awake()
+    {
+        // Inicializar UIIndex ANTES de que cualquier sistema lo lea
+        UIIndex = turnedOffIndex;
+    }
+
     private void Start()
     {
         // Recolocar el efecto de fuego en el spawn point si está asignado
@@ -28,13 +34,12 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
             efectoFuego.transform.localPosition = Vector3.zero;
             efectoFuego.transform.localRotation = Quaternion.identity;
         }
-        // Inicializar estado sin llamar a RefreshHeldObjectUI (aún no está en mano del player)
+        // Inicializar estado visual
         estaEncendido = false;
         if (efectoFuego != null)
         {
             efectoFuego.SetActive(false);
         }
-        UIIndex = turnedOffIndex;
     }
 
     public void SetEncendido(bool encendido)
