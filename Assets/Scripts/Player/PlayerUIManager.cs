@@ -422,18 +422,19 @@ public class PlayerUIManager : MonoBehaviour
             
             Debug.Log($"Jugador en X={playerPos.x:F1}, Borde izq X={leftEdgePosX:F1}, Borde der X={rightEdgePosX:F1}, Player cerca del borde: {(playerNearLeftEdge ? "IZQUIERDO" : "DERECHO")}");
             
-            // Recorrer desde el borde del jugador hacia el centro, columna por columna
+            // Determinar desde qué lado comenzar el recorrido y en qué dirección
             int startX = playerNearLeftEdge ? leftEdgeX : rightEdgeX;
             int direction = playerNearLeftEdge ? 1 : -1; // 1 = hacia derecha, -1 = hacia izquierda
             int activatedCount = 0;
             
-            // Para cada columna desde el borde del jugador
-            for (int x = startX; x >= 0 && x < grid.gridWidth; x += direction)
+            // CAMBIO: Recorrer por FILAS Z primero, y para cada fila, buscar la primera columna X disponible
+            // Esto asegura que se active solo UN cuadrante por fila Z (el más cercano al jugador en X)
+            for (int z = 0; z < grid.gridLength; z++)
             {
-                bool columnHasAccessible = false;
+                bool foundInThisRow = false;
                 
-                // Para cada fila en esta columna
-                for (int z = 0; z < grid.gridLength; z++)
+                // Para cada columna X desde el borde del jugador
+                for (int x = startX; x >= 0 && x < grid.gridWidth; x += direction)
                 {
                     BridgeQuadrant quadrant = FindQuadrantAt(quadrants, x, z);
                     
@@ -443,23 +444,23 @@ public class PlayerUIManager : MonoBehaviour
                         if (layerUI != null)
                         {
                             layerUI.gameObject.SetActive(true);
-                            columnHasAccessible = true;
+                            foundInThisRow = true;
                             activatedCount++;
-                            
+
                             // Registrar este cuadrante como activado por ESTE jugador
                             myQuadrants.Add(quadrant);
+
+                            Debug.Log($"  ✓ Activado cuadrante [{x},{z}] (primer disponible en fila Z={z})");
                             
-                            Debug.Log($"  ✓ Activado cuadrante [{x},{z}]");
+                            // IMPORTANTE: Detener la búsqueda en esta fila una vez encontrado el primero
+                            break;
                         }
                     }
                 }
                 
-                // Si esta columna no tiene ningún cuadrante accesible, detener la búsqueda
-                // (el puente no ha progresado hasta aquí todavía)
-                if (!columnHasAccessible && x != startX)
+                if (!foundInThisRow)
                 {
-                    Debug.Log($"  ✗ Columna {x} no tiene cuadrantes accesibles, deteniendo búsqueda");
-                    break;
+                    Debug.Log($"  ✗ Fila Z={z} no tiene cuadrantes accesibles desde borde X={startX}");
                 }
             }
             
