@@ -47,19 +47,8 @@ public class PaloIgnifugoGenerator : MonoBehaviour, IInteractable
             // Generar una nueva instancia del palo ignífugo en la escena
             GameObject nuevoPaloIgnifugo = Instantiate(paloIgnifugoPrefab, transform.position + Vector3.up * 0.5f, transform.rotation);
 
-            // Obtener el UIIndex desde el propio UIIndexSetter del generador
-            UIIndexSetter sourceIndexSetter = GetComponent<UIIndexSetter>();
-            int indexToAssign = sourceIndexSetter != null ? sourceIndexSetter.UIIndex : -1;
-
-            // Asignar el UIIndex al palo ignífugo generado
-            UIIndexSetter paloUIIndexSetter = nuevoPaloIgnifugo.GetComponent<UIIndexSetter>();
-            if (paloUIIndexSetter == null)
-            {
-                paloUIIndexSetter = nuevoPaloIgnifugo.AddComponent<UIIndexSetter>();
-            }
-            paloUIIndexSetter.SetUIIndex(indexToAssign);
-
             // Hacer que el jugador recoja la instancia recién creada
+            // El PaloIgnifugo ya implementa IUIActivatable y maneja su propia UI dinámicamente
             playerObjectHolder.PickUpExistingInstance(nuevoPaloIgnifugo);
 
             StartCoroutine(Recargar());

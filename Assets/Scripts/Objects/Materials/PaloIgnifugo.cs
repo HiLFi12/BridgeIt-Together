@@ -13,7 +13,6 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
     [Header("UI Configuration")]
     [SerializeField] private int turnedOffIndex = 3;
     [SerializeField] private int turnedOnIndex = 4;
-    private PlayerUIManager playerUIManager;
 
     private bool estaEncendido = false;
     private float tiempoRestante = 0f;
@@ -22,7 +21,6 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
 
     private void Start()
     {
-        playerUIManager = FindFirstObjectByType<PlayerUIManager>();
         // Recolocar el efecto de fuego en el spawn point si está asignado
         if (efectoFuego != null && fuegoSpawnPoint != null)
         {
@@ -30,7 +28,13 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
             efectoFuego.transform.localPosition = Vector3.zero;
             efectoFuego.transform.localRotation = Quaternion.identity;
         }
-        SetEncendido(false);
+        // Inicializar estado sin llamar a RefreshHeldObjectUI (aún no está en mano del player)
+        estaEncendido = false;
+        if (efectoFuego != null)
+        {
+            efectoFuego.SetActive(false);
+        }
+        UIIndex = turnedOffIndex;
     }
 
     public void SetEncendido(bool encendido)
@@ -43,6 +47,9 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
         tiempoRestante = encendido ? tiempoEncendido : 0f;
         int index = encendido ? turnedOnIndex : turnedOffIndex;
         SetUIIndex(index);
+        
+        // Actualizar la UI del jugador que lo sostiene
+        PlayerUIManager playerUIManager = GetHoldingPlayerUIManager();
         if (playerUIManager != null)
         {
             playerUIManager.RefreshHeldObjectUI(index);
@@ -51,11 +58,32 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
 
     public void SetUIIndex(int index)
     {
+        UIIndex = index;
+        
+        // Actualizar la UI del jugador que lo sostiene
+        PlayerUIManager playerUIManager = GetHoldingPlayerUIManager();
         if (playerUIManager != null)
         {
             playerUIManager.RefreshHeldObjectUI(index);
         }
-        UIIndex = index;
+    }
+    
+    /// <summary>
+    /// Obtiene el PlayerUIManager del jugador que actualmente está sosteniendo este objeto.
+    /// </summary>
+    private PlayerUIManager GetHoldingPlayerUIManager()
+    {
+        // Buscar al jugador que está sosteniendo este objeto
+        PlayerObjectHolder[] holders = FindObjectsByType<PlayerObjectHolder>(FindObjectsSortMode.None);
+        foreach (var holder in holders)
+        {
+            if (holder.GetHeldObject() == gameObject)
+            {
+                // Encontramos al jugador que sostiene este objeto
+                return holder.GetComponent<PlayerUIManager>();
+            }
+        }
+        return null;
     }
 
     public bool EstaEncendido()

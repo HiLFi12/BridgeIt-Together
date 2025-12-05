@@ -21,8 +21,6 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
     // Override UIIndex para devolver el índice correcto según el estado de isReady
     public override int UIIndex => isReady ? readyUIIndex : notReadyUIIndex;
 
-    private PlayerUIManager playerUIManager;
-
     protected override void Awake()
     {
         base.Awake();
@@ -33,10 +31,6 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
         AplicarEstadoVisual();
     }
 
-    private void Start()
-    {
-        playerUIManager = FindFirstObjectByType<PlayerUIManager>();
-    }
 
     protected override void PostEnsure()
     {
@@ -85,6 +79,7 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
         PlayReadySfx();
         
         // Notificar al PlayerUIManager sobre el cambio de estado
+        PlayerUIManager playerUIManager = GetHoldingPlayerUIManager();
         if (playerUIManager != null)
         {
             playerUIManager.RefreshHeldObjectUI(UIIndex);
@@ -108,11 +103,30 @@ public class MaterialTipo2Ready : MaterialTipo2Base, IHitable
             PlayReadySfx();
             
             // Notificar al PlayerUIManager sobre el cambio de estado
+            PlayerUIManager playerUIManager = GetHoldingPlayerUIManager();
             if (playerUIManager != null)
             {
                 playerUIManager.RefreshHeldObjectUI(UIIndex);
             }
         }
+    }
+    
+    /// <summary>
+    /// Obtiene el PlayerUIManager del jugador que actualmente está sosteniendo este objeto.
+    /// </summary>
+    private PlayerUIManager GetHoldingPlayerUIManager()
+    {
+        // Buscar al jugador que está sosteniendo este objeto
+        PlayerObjectHolder[] holders = FindObjectsByType<PlayerObjectHolder>(FindObjectsSortMode.None);
+        foreach (var holder in holders)
+        {
+            if (holder.GetHeldObject() == gameObject)
+            {
+                // Encontramos al jugador que sostiene este objeto
+                return holder.GetComponent<PlayerUIManager>();
+            }
+        }
+        return null;
     }
 
     private void PlayReadySfx()
