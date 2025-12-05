@@ -368,7 +368,7 @@ public class Player : MonoBehaviour, IHitable
             var col = interactables[i];
             if (col == null) continue;
 
-            // Ignorar el objeto que está en la mano
+            // Ignorar el objeto que está en la mano de este jugador
             if (holder != null && holder.HasObjectInHand())
             {
                 var heldObj = holder.GetHeldObject();
@@ -376,6 +376,11 @@ public class Player : MonoBehaviour, IHitable
                 {
                     continue;
                 }
+            }
+
+            if (IsObjectHeldByAnyPlayer(col.gameObject))
+            {
+                continue;
             }
 
             var candidato = col.GetComponentInParent<IInteractable>();
@@ -668,5 +673,30 @@ public class Player : MonoBehaviour, IHitable
         // Por ahora solo logueamos; la lógica real de respawn
         // puede implementarse más adelante (checkpoints, etc.).
         Debug.Log("[Player] Respawn() llamado - implementar lógica de respawn aquí si es necesario.");
+    }
+
+    /// <summary>
+    /// Verifica si un objeto está siendo sostenido por cualquier jugador en la escena.
+    /// </summary>
+    private bool IsObjectHeldByAnyPlayer(GameObject obj)
+    {
+        if (obj == null) return false;
+
+        // Buscar todos los PlayerObjectHolder en la escena
+        PlayerObjectHolder[] allHolders = FindObjectsByType<PlayerObjectHolder>(FindObjectsSortMode.None);
+        
+        foreach (var holder in allHolders)
+        {
+            if (holder != null && holder.HasObjectInHand())
+            {
+                var heldObj = holder.GetHeldObject();
+                if (heldObj != null && (obj == heldObj || obj.transform.IsChildOf(heldObj.transform)))
+                {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 }
