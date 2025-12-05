@@ -6,6 +6,10 @@ public class PlayerUIManager : MonoBehaviour
 {
     private static List<PlayerUIManager> _allManagers = new List<PlayerUIManager>();
     private static Dictionary<int, int> _sharedActiveCount = new Dictionary<int, int>();
+    
+    // Diccionario estático para contar cuántos jugadores tienen activado cada cuadrante individual
+    // Key: (index, quadrant) → Value: cantidad de jugadores que lo tienen activado
+    private static Dictionary<(int, BridgeQuadrant), int> _sharedQuadrantCount = new Dictionary<(int, BridgeQuadrant), int>();
 
     [System.Serializable]
     public class UIGroup
@@ -285,10 +289,31 @@ public class PlayerUIManager : MonoBehaviour
             {
                 if (quadrant != null)
                 {
-                    Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
-                    if (layerUI != null)
+                    var key = (index, quadrant);
+                    
+                    // Decrementar el contador compartido
+                    if (_sharedQuadrantCount.ContainsKey(key))
                     {
-                        layerUI.gameObject.SetActive(false);
+                        _sharedQuadrantCount[key]--;
+                        
+                        // Solo apagar la UI si ningún jugador la está usando (contador <= 0)
+                        if (_sharedQuadrantCount[key] <= 0)
+                        {
+                            Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
+                            if (layerUI != null)
+                            {
+                                layerUI.gameObject.SetActive(false);
+                            }
+                            
+                            // Limpiar del diccionario
+                            _sharedQuadrantCount.Remove(key);
+                            
+                            Debug.Log($"PlayerUIManager ({gameObject.name}): Apagado cuadrante {quadrant.name} (contador llegó a 0)");
+                        }
+                        else
+                        {
+                            Debug.Log($"PlayerUIManager ({gameObject.name}): Cuadrante {quadrant.name} mantiene UI activa (contador: {_sharedQuadrantCount[key]})");
+                        }
                     }
                 }
             }
@@ -296,7 +321,7 @@ public class PlayerUIManager : MonoBehaviour
             // Limpiar el registro de cuadrantes activados por este jugador
             myQuadrants.Clear();
             
-            Debug.Log($"PlayerUIManager ({gameObject.name}): Desactivados cuadrantes del puente para índice {index}");
+            Debug.Log($"PlayerUIManager ({gameObject.name}): Procesados cuadrantes del puente para índice {index}");
         }
     }
 
@@ -443,14 +468,28 @@ public class PlayerUIManager : MonoBehaviour
                         Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
                         if (layerUI != null)
                         {
-                            layerUI.gameObject.SetActive(true);
+                            // Incrementar el contador compartido para este cuadrante
+                            var key = (index, quadrant);
+                            if (!_sharedQuadrantCount.ContainsKey(key))
+                            {
+                                _sharedQuadrantCount[key] = 0;
+                            }
+                            _sharedQuadrantCount[key]++;
+                            
+                            // Solo activar la UI si es la primera vez que se activa (contador == 1)
+                            // O si ya estaba activada, mantenerla activada
+                            if (!layerUI.gameObject.activeInHierarchy)
+                            {
+                                layerUI.gameObject.SetActive(true);
+                            }
+                            
                             foundInThisRow = true;
                             activatedCount++;
 
                             // Registrar este cuadrante como activado por ESTE jugador
                             myQuadrants.Add(quadrant);
 
-                            Debug.Log($"  ✓ Activado cuadrante [{x},{z}] (primer disponible en fila Z={z})");
+                            Debug.Log($"  ✓ Activado cuadrante [{x},{z}] (primer disponible en fila Z={z}), contador compartido: {_sharedQuadrantCount[key]}");
                             
                             // IMPORTANTE: Detener la búsqueda en esta fila una vez encontrado el primero
                             break;
