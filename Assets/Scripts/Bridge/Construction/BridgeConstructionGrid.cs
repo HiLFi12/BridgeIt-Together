@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class BridgeConstructionGrid : MonoBehaviour
 {
+    // Instancia estática para acceso global
+    private static BridgeConstructionGrid _instance;
+    public static BridgeConstructionGrid Instance => _instance;
+    
     [Header("Configuración de la Grilla")]
     public int gridWidth = 5;
     public int gridLength = 10;
@@ -65,8 +69,20 @@ public class BridgeConstructionGrid : MonoBehaviour
     }
 
     // Matriz que representa la grilla de construcción
-    private QuadrantInfo[,] constructionGrid;    private void Awake()
+    private QuadrantInfo[,] constructionGrid;
+    
+    private void Awake()
     {
+        // Establecer instancia estática
+        if (_instance == null)
+        {
+            _instance = this;
+        }
+        else if (_instance != this)
+        {
+            Debug.LogWarning("Ya existe una instancia de BridgeConstructionGrid. Se mantendrá la primera.");
+        }
+        
         InitializeGrid();
         
         // Aplicar escalas configuradas a las capas existentes después de la inicialización
@@ -1001,6 +1017,28 @@ public class BridgeConstructionGrid : MonoBehaviour
                 }
             }
         }
+        
+        // Actualizar el currentLayer en el componente BridgeQuadrant basándose en las capas completadas
+        GameObject quadrantObj = info.quadrantObject;
+        if (quadrantObj != null)
+        {
+            BridgeQuadrant bridgeQuadrant = quadrantObj.GetComponent<BridgeQuadrant>();
+            if (bridgeQuadrant != null)
+            {
+                // Encontrar la última capa completada
+                int lastCompletedLayer = -1;
+                for (int i = 0; i < info.quadrantSO.requiredLayers.Length; i++)
+                {
+                    if (info.quadrantSO.requiredLayers[i].isCompleted)
+                    {
+                        lastCompletedLayer = i;
+                    }
+                }
+                bridgeQuadrant.SetCurrentLayer(lastCompletedLayer);
+                
+                Debug.Log($"UpdateQuadrantVisuals [{x},{z}]: currentLayer actualizado a {lastCompletedLayer}");
+            }
+        }
     }
 
     // Método de depuración para dibujar la grilla
@@ -1206,6 +1244,30 @@ public class BridgeConstructionGrid : MonoBehaviour
             return constructionGrid[x, z].quadrantSO;
 
         return null;
+    }
+
+    /// <summary>
+    /// Método estático público para forzar la actualización de visuales de todos los cuadrantes.
+    /// Se llama desde BridgeQuadrantSO antes de refrescar las UIs cuando un cuadrante se destruye.
+    /// </summary>
+    public static void ForceUpdateAllQuadrantVisuals()
+    {
+        if (_instance == null)
+        {
+            Debug.LogWarning("No hay instancia de BridgeConstructionGrid disponible.");
+            return;
+        }
+        
+        Debug.Log("ForceUpdateAllQuadrantVisuals llamado - actualizando visuales de todos los cuadrantes");
+        
+        // Actualizar las visuales de todos los cuadrantes
+        for (int x = 0; x < _instance.gridWidth; x++)
+        {
+            for (int z = 0; z < _instance.gridLength; z++)
+            {
+                _instance.UpdateQuadrantVisuals(x, z);
+            }
+        }
     }
 
     // C#

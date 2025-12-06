@@ -594,6 +594,56 @@ public class PlayerUIManager : MonoBehaviour
         // Activar la UI del índice deseado
         TurnOnPlayerUIOnly(index);
     }
+
+    /// <summary>
+    /// Método estático para refrescar todas las UIs de cuadrantes activas cuando el estado del puente cambia.
+    /// Se llama desde BridgeQuadrantSO cuando un cuadrante se destruye.
+    /// </summary>
+    public static void RefreshAllActiveQuadrantUIs()
+    {
+        Debug.Log($"RefreshAllActiveQuadrantUIs llamado. Total managers: {_allManagers.Count}");
+        
+        foreach (PlayerUIManager manager in _allManagers)
+        {
+            if (manager != null)
+            {
+                manager.RefreshMyActiveQuadrantUIs();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Refresca las UIs de cuadrantes que este jugador tiene activas actualmente.
+    /// </summary>
+    private void RefreshMyActiveQuadrantUIs()
+    {
+        // Encontrar todos los índices que tienen UIs activas (contador > 0)
+        List<int> activeIndices = new List<int>();
+        
+        foreach (var kvp in _sharedActiveCount)
+        {
+            if (kvp.Value > 0)
+            {
+                // Verificar si este manager tiene cuadrantes activados para este índice
+                if (_myActivatedQuadrants.ContainsKey(kvp.Key) && _myActivatedQuadrants[kvp.Key].Count > 0)
+                {
+                    activeIndices.Add(kvp.Key);
+                }
+            }
+        }
+        
+        Debug.Log($"RefreshMyActiveQuadrantUIs ({gameObject.name}): Refrescando {activeIndices.Count} índices activos");
+        
+        // Para cada índice activo, desactivar y reactivar los cuadrantes
+        foreach (int index in activeIndices)
+        {
+            // Desactivar los cuadrantes actuales
+            TurnOffBridgeQuadrantsOnly(index);
+            
+            // Reactivar con el estado actualizado
+            TurnOnBridgeQuadrantsOnly(index);
+        }
+    }
 }
 
 

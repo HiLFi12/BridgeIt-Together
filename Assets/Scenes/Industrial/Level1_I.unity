@@ -5250,6 +5250,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2528647417704479156, guid: 402672b5a1221044ab299c15430e2f2b, type: 3}
   m_PrefabInstance: {fileID: 742755163}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &746062470 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4761885275262972976, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
+  m_PrefabInstance: {fileID: 1038009714}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &752726192
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5495,7 +5506,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &777630860
 Transform:
   m_ObjectHideFlags: 0
@@ -7857,15 +7868,15 @@ PrefabInstance:
     - target: {fileID: 2821179013681228699, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
       propertyPath: uiGroups.Array.data[0].playerUI
       value: 
-      objectReference: {fileID: 1828134660}
+      objectReference: {fileID: 746062470}
     - target: {fileID: 2821179013681228699, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
       propertyPath: uiGroups.Array.data[1].playerUI
       value: 
-      objectReference: {fileID: 1828134660}
+      objectReference: {fileID: 746062470}
     - target: {fileID: 2821179013681228699, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
       propertyPath: uiGroups.Array.data[2].playerUI
       value: 
-      objectReference: {fileID: 1828134660}
+      objectReference: {fileID: 1780526792}
     - target: {fileID: 2821179013681228699, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
       propertyPath: uiGroups.Array.data[3].playerUI
       value: 
@@ -7939,6 +7950,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7515175371030062618, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8056041652425464649, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -13659,17 +13674,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1828134660 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5852655376535277029, guid: 6507902bdce269c478d0cc71b124ceb6, type: 3}
-  m_PrefabInstance: {fileID: 1557511703}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1831657724
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16718,6 +16722,8 @@ MonoBehaviour:
   showDebugMessages: 1
   efectoDestruccionPrefab: {fileID: 0}
   spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
   protectedTags:
   - Player
   - MainCamera
@@ -17172,6 +17178,8 @@ MonoBehaviour:
   showDebugMessages: 1
   efectoDestruccionPrefab: {fileID: 0}
   spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
   protectedTags:
   - Player
   - MainCamera

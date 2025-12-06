@@ -593,6 +593,13 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         }
         
         CheckIfAllLayersCompleted();
+        
+        // IMPORTANTE: Forzar actualización de visuales ANTES de refrescar las UIs
+        // Esto asegura que currentLayer esté actualizado cuando se evalúe CanBuildLayer
+        BridgeConstructionGrid.ForceUpdateAllQuadrantVisuals();
+        
+        // Refrescar las UIs de todos los jugadores cuando se destruye la última capa
+        PlayerUIManager.RefreshAllActiveQuadrantUIs();
     }
 
     private void DestroyQuadrant()
@@ -614,6 +621,13 @@ public class BridgeQuadrantSO : ScriptableObject, ITurnable
         {
             Debug.Log("Efecto de colapso disponible para reproducir");
         }
+        
+        // IMPORTANTE: Forzar actualización de visuales ANTES de refrescar las UIs
+        // Esto asegura que currentLayer esté actualizado cuando se evalúe CanBuildLayer
+        BridgeConstructionGrid.ForceUpdateAllQuadrantVisuals();
+        
+        // Refrescar las UIs de todos los jugadores cuando se destruye un cuadrante
+        PlayerUIManager.RefreshAllActiveQuadrantUIs();
     }
 
     /// <summary>
