@@ -43,6 +43,14 @@ public class Player : MonoBehaviour, IHitable
     [SerializeField] private Image dashKeyUI;
     [SerializeField] private Image dashPadUI;
 
+    [Header("Respawn Settings")]
+    [SerializeField] private Transform respawnPoint;
+    [SerializeField] private GameObject respawnEffectPrefab;
+    [SerializeField] private float manualRespawnCooldown = 3f;
+    [SerializeField] private float shakeIntensityMax = 0.5f;
+    [SerializeField] private float shakeFrequency = 20f;
+    [SerializeField] private KeyCode manualRespawnKey = KeyCode.F;
+
     private bool usePadUI = false;
     private Image CurrentInteractionUI => usePadUI ? interactionPadUI : interactionKeyUI;
     private Image CurrentBuildUI => usePadUI ? buildPadUI : buildKeyUI;
@@ -67,6 +75,7 @@ public class Player : MonoBehaviour, IHitable
     private InputAction dashAction;
     
     private InputAction pauseAction;
+    private InputAction buildAction;
 
     // Dash state
     private bool isDashing = false;
@@ -74,6 +83,12 @@ public class Player : MonoBehaviour, IHitable
     private float dashCooldownTimer = 0f;
     private Vector3 dashDirection;
     private float dashTimer = 0f;
+    
+    // Manual Respawn state
+    private float manualRespawnTimer = 0f;
+    private bool isHoldingRespawn = false;
+    private Vector3 originalPosition;
+    private bool isShaking = false;
     
     public PlayerInput PlayerInput => playerInput;
     public PlayerController PlayerController => playerController;
@@ -105,6 +120,7 @@ public class Player : MonoBehaviour, IHitable
             dropAction = playerInput.actions.FindAction("Drop");
             dashAction = playerInput.actions.FindAction("Dash");
             pauseAction = playerInput.actions.FindAction("Pause");
+            buildAction = playerInput.actions.FindAction("Build");
         }
         
         // Intentar auto-asignar grid si no se arrastró en inspector
@@ -168,6 +184,9 @@ public class Player : MonoBehaviour, IHitable
         {
             TryStartDash();
         }
+
+        // Sistema de respawn manual
+        UpdateManualRespawn();
 
         TryInteract();
 
@@ -619,6 +638,19 @@ public class Player : MonoBehaviour, IHitable
             EndDash();
         }
         
+        // Resetear el timer de respawn manual al ser lanzado
+        manualRespawnTimer = 0f;
+        isHoldingRespawn = false;
+        if (isShaking)
+        {
+            // Reactivar CharacterController si estaba desactivado
+            if (characterController != null && !characterController.enabled)
+            {
+                characterController.enabled = true;
+            }
+            isShaking = false;
+        }
+        
         // Ya no soltamos el objeto al ser lanzados: el holder mantiene el objeto en la mano.
         // Por seguridad, si hay algo en la mano, reafirmamos su estado físico (kinematic + sin gravedad).
         if (objectHolder != null && objectHolder.HasObjectInHand())
@@ -676,9 +708,174 @@ public class Player : MonoBehaviour, IHitable
     // Respawn básico para compatibilidad con RespawnTrigger
     public void Respawn()
     {
-        // Por ahora solo logueamos; la lógica real de respawn
-        // puede implementarse más adelante (checkpoints, etc.).
-        Debug.Log("[Player] Respawn() llamado - implementar lógica de respawn aquí si es necesario.");
+        if (respawnPoint == null)
+        {
+            Debug.LogWarning("[Player] No se puede hacer respawn: respawnPoint no está asignado.");
+            return;
+        }
+
+        // Guardar posición actual para el efecto de desaparición
+        Vector3 currentPosition = transform.position;
+
+        // Instanciar efecto en la posición donde el player desaparece
+        if (respawnEffectPrefab != null)
+        {
+            Instantiate(respawnEffectPrefab, currentPosition, Quaternion.identity);
+        }
+
+        // Crear un nuevo Vector3 con la posición del respawn point
+        Vector3 posicionDestino = new Vector3(respawnPoint.position.x, respawnPoint.position.y, respawnPoint.position.z);
+
+        // Verificar si tiene CharacterController (requiere tratamiento especial)
+        if (characterController != null)
+        {
+            // Desactivar temporalmente para poder mover
+            characterController.enabled = false;
+            transform.position = posicionDestino;
+            characterController.enabled = true;
+            Debug.Log($"[Player] Respawneado (con CharacterController) de {currentPosition} a {transform.position}");
+        }
+        else
+        {
+            // Teletransportar al respawn point usando new Vector3
+            transform.position = posicionDestino;
+            Debug.Log($"[Player] Respawneado de {currentPosition} a {transform.position}");
+        }
+
+        // Si tiene Rigidbody, resetear velocidad
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+#if UNITY_6000_0_OR_NEWER
+            rb.linearVelocity = Vector3.zero;
+#else
+            rb.velocity = Vector3.zero;
+#endif
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        // Instanciar efecto en el respawn point
+        if (respawnEffectPrefab != null)
+        {
+            Instantiate(respawnEffectPrefab, respawnPoint.position, Quaternion.identity);
+        }
+        
+        // Resetear el timer de respawn manual
+        manualRespawnTimer = 0f;
+        isHoldingRespawn = false;
+        isShaking = false;
+    }
+
+    /// <summary>
+    /// Actualiza el sistema de respawn manual que se activa manteniendo presionado el botón Build.
+    /// </summary>
+    private void UpdateManualRespawn()
+    {
+        // Verificar si el botón está siendo presionado (InputAction o KeyCode)
+        bool isPressed = false;
+        
+        if (buildAction != null)
+        {
+            isPressed = buildAction.ReadValue<float>() > 0.1f;
+        }
+        
+        // Fallback a KeyCode si no hay InputAction o no está presionado
+        if (!isPressed)
+        {
+            isPressed = Input.GetKey(manualRespawnKey);
+        }
+
+        if (isPressed)
+        {
+            if (!isHoldingRespawn)
+            {
+                // Comenzar a mantener presionado
+                isHoldingRespawn = true;
+                manualRespawnTimer = manualRespawnCooldown;
+                isShaking = false;
+                Debug.Log("[Player] Iniciando cooldown de respawn manual");
+            }
+
+            // Guardar la posición base antes de aplicar el temblor (solo la primera vez)
+            if (!isShaking)
+            {
+                originalPosition = transform.position;
+                isShaking = true;
+                
+                // Desactivar CharacterController al inicio del shake
+                if (characterController != null)
+                {
+                    characterController.enabled = false;
+                }
+            }
+
+            // Reducir el timer
+            manualRespawnTimer -= Time.deltaTime;
+
+            // Aplicar temblor según el progreso
+            float progress = 1f - Mathf.Clamp01(manualRespawnTimer / manualRespawnCooldown);
+            ApplyShake(progress);
+
+            // Cuando el timer llega a 0, ejecutar respawn
+            if (manualRespawnTimer <= 0f)
+            {
+                // Reactivar CharacterController antes del respawn
+                if (characterController != null && !characterController.enabled)
+                {
+                    characterController.enabled = true;
+                }
+                
+                Debug.Log($"[Player] {gameObject.name} - Cooldown de respawn manual completado, ejecutando respawn");
+                Respawn();
+                // El método Respawn() ya resetea las variables
+            }
+        }
+        else
+        {
+            if (isHoldingRespawn)
+            {
+                Debug.Log($"[Player] {gameObject.name} - Respawn manual cancelado, reseteando cooldown");
+                manualRespawnTimer = 0f;
+                isHoldingRespawn = false;
+                
+                // Detener el temblor y restaurar posición
+                if (isShaking)
+                {
+                    // Reactivar CharacterController si estaba desactivado
+                    if (characterController != null && !characterController.enabled)
+                    {
+                        characterController.enabled = true;
+                    }
+                    
+                    transform.position = originalPosition;
+                    isShaking = false;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Aplica un efecto de temblor al jugador basado en el progreso del respawn manual.
+    /// El temblor se aplica como un offset desde la posición original sin mover al jugador.
+    /// </summary>
+    /// <param name="progress">Progreso de 0 a 1, donde 1 es máximo temblor</param>
+    private void ApplyShake(float progress)
+    {
+        // Calcular intensidad del temblor basado en el progreso
+        float intensity = Mathf.Lerp(0f, shakeIntensityMax, progress);
+
+        // Generar offset aleatorio usando ruido de Perlin para un movimiento más suave
+        float time = Time.time * shakeFrequency;
+        float offsetX = (Mathf.PerlinNoise(time, 0f) - 0.5f) * 2f * intensity;
+        float offsetY = (Mathf.PerlinNoise(0f, time) - 0.5f) * 2f * intensity;
+        float offsetZ = (Mathf.PerlinNoise(time, time + 100f) - 0.5f) * 2f * intensity;
+
+        // Aplicar el temblor como offset desde la posición original
+        Vector3 shakeOffset = new Vector3(offsetX, offsetY, offsetZ);
+        
+        // Aplicar directamente el offset a la posición
+        // UpdateManualRespawn ya desactivó el CharacterController si es necesario
+        transform.position = originalPosition + shakeOffset;
     }
 
     /// <summary>
