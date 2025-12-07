@@ -8,6 +8,7 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
     public static event System.Action<StatueInteractable, GameObject> OnStatuePickedUp;
     
     private bool isCarried = false;
+    private PlayerObjectHolder currentHolder = null; // Referencia al holder que sostiene la estatua
 
     [Header("Lifetime / Despawn")]
     [Tooltip("Tiempo en segundos que la estatua permanece en el mapa antes de desaparecer si no se activó.")]
@@ -69,6 +70,7 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
         {
             holder.PickUpExistingInstance(gameObject);
             isCarried = true;
+            currentHolder = holder; // Guardar referencia al holder
             
             // Notificar que la estatua fue agarrada
             OnStatuePickedUp?.Invoke(this, interactor);
@@ -86,6 +88,7 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
         if (droppedObject == gameObject)
         {
             isCarried = false;
+            currentHolder = null; // Limpiar referencia al holder
             
             // Desuscribirse del evento para evitar memory leaks
             PlayerObjectHolder[] holders = FindObjectsByType<PlayerObjectHolder>(FindObjectsSortMode.None);
@@ -227,5 +230,29 @@ public class StatueInteractable : PowerUpBase, IInteractable, IUIActivatable
                 Destroy(vfx, vfxAutoDestroyAfter);
             }
         }
+    }
+
+    /// <summary>
+    /// Sobrescribir Despawn para soltar la estatua si está siendo sostenida por un player.
+    /// </summary>
+    protected override void Despawn()
+    {
+        // Si la estatua está siendo sostenida por un player, soltarla
+        if (isCarried && currentHolder != null)
+        {
+            currentHolder.DropObject();
+            currentHolder = null;
+            isCarried = false;
+        }
+
+        // Desuscribirse de eventos para evitar memory leaks
+        PlayerObjectHolder[] holders = FindObjectsByType<PlayerObjectHolder>(FindObjectsSortMode.None);
+        foreach (var holder in holders)
+        {
+            holder.OnDropped -= OnStatueDropped;
+        }
+
+        // Llamar al método base para el comportamiento de despawn estándar
+        base.Despawn();
     }
 }

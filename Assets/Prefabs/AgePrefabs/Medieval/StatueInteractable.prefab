@@ -277,7 +277,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1262562607902851120
 Transform:
   m_ObjectHideFlags: 0
@@ -308,8 +308,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22616d3b2171aa845b61a7ae3eeb8e88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 10
-  timeToLive: 15
+  duration: 99999
+  timeToLive: 99999
   spawnSfxIndex: 8
   activateSfxIndex: -1
   lifeDuration: 99999
@@ -320,7 +320,8 @@ MonoBehaviour:
   buildUpToLayer: 1
   activationVfxPrefabs:
   - {fileID: 104829970813648393, guid: 70a697a1a5b23cd4d9bb3e173ffab2ea, type: 3}
-  activationVfxSpawnPoints: []
+  activationVfxSpawnPoints:
+  - {fileID: 0}
   parentVfxToSpawn: 0
   vfxAutoDestroyAfter: 8
   uiIndex: 3

@@ -388,7 +388,9 @@ public class Player : MonoBehaviour, IHitable
 
             currentInRange.Add(candidato);
 
-            if (ignoredInteractables.Contains(candidato)) continue;
+            // Ballista y Catapult nunca deben ser ignorados
+            bool isNeverIgnored = candidato is Ballista || candidato is Catapult;
+            if (!isNeverIgnored && ignoredInteractables.Contains(candidato)) continue;
 
             var torch = col.GetComponentInParent<TorchInteractable>();
             var prioridadEfectiva = candidato.InteractPriority;
@@ -432,7 +434,11 @@ public class Player : MonoBehaviour, IHitable
                 {
                     seleccionado.Interact(this.gameObject);
 
-                    ignoredInteractables.Add(seleccionado);
+                    // Ballista y Catapult nunca deben ser ignorados
+                    if (!(seleccionado is Ballista) && !(seleccionado is Catapult))
+                    {
+                        ignoredInteractables.Add(seleccionado);
+                    }
                     OnPlayerInteracted?.Invoke();
                 }
             }
