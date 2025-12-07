@@ -167,6 +167,10 @@ MonoBehaviour:
   drawGizmos: 1
   fillColor: {r: 0, g: 1, b: 0, a: 0.08}
   wireColor: {r: 0, g: 1, b: 0, a: 0.6}
+  launchAngleDeg: 45
+  launchGravity: 9.81
+  kinematicDuringLaunch: 1
+  minLaunchDistance: 0.05
 --- !u!1 &29620631
 GameObject:
   m_ObjectHideFlags: 0
@@ -729,6 +733,10 @@ MonoBehaviour:
   drawGizmos: 1
   fillColor: {r: 0, g: 1, b: 0, a: 0.08}
   wireColor: {r: 0, g: 1, b: 0, a: 0.6}
+  launchAngleDeg: 45
+  launchGravity: 9.81
+  kinematicDuringLaunch: 1
+  minLaunchDistance: 0.05
 --- !u!1001 &134148837
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3030,6 +3038,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 262329338383758646, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: ec0f4cf05a59d8f428ffbb101bcbaaec, type: 3}
     - target: {fileID: 1645118235592284019, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
       propertyPath: respawnPoint
       value: 
@@ -3125,7 +3137,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 3761028561274965198, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
+    - {fileID: 4278945634370417469, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 5346083422694941886, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
+      insertIndex: 0
+      addedObject: {fileID: 945408383}
     - targetCorrespondingSourceObject: {fileID: 7908193259062417225, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
       insertIndex: 0
       addedObject: {fileID: 1536068528}
@@ -3150,6 +3166,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &664093515 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5346083422694941886, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
+  m_PrefabInstance: {fileID: 664093512}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -4535,6 +4556,68 @@ Transform:
   - {fileID: 885959036}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &945408382
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 664093515}
+    m_Modifications:
+    - target: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.8699951
+      objectReference: {fileID: 0}
+    - target: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5420197338192671991, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+      propertyPath: m_Name
+      value: Character medieval Blue
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+--- !u!4 &945408383 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4644258424975896141, guid: cc2f704a8c107ca46a0fa4c85edc0e4b, type: 3}
+  m_PrefabInstance: {fileID: 945408382}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &963041783
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7056,6 +7139,10 @@ MonoBehaviour:
   drawGizmos: 1
   fillColor: {r: 0, g: 1, b: 0, a: 0.08}
   wireColor: {r: 0, g: 1, b: 0, a: 0.6}
+  launchAngleDeg: 45
+  launchGravity: 9.81
+  kinematicDuringLaunch: 1
+  minLaunchDistance: 0.05
 --- !u!1 &1437374063 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7059573964150791199, guid: 3a5054450548d4440854a00973a4b017, type: 3}
@@ -7705,6 +7792,10 @@ MonoBehaviour:
   drawGizmos: 1
   fillColor: {r: 0, g: 1, b: 0, a: 0.08}
   wireColor: {r: 0, g: 1, b: 0, a: 0.6}
+  launchAngleDeg: 45
+  launchGravity: 9.81
+  kinematicDuringLaunch: 1
+  minLaunchDistance: 0.05
 --- !u!1 &1616396320
 GameObject:
   m_ObjectHideFlags: 0
@@ -10336,6 +10427,10 @@ MonoBehaviour:
   drawGizmos: 1
   fillColor: {r: 0, g: 1, b: 0, a: 0.08}
   wireColor: {r: 0, g: 1, b: 0, a: 0.6}
+  launchAngleDeg: 45
+  launchGravity: 9.81
+  kinematicDuringLaunch: 1
+  minLaunchDistance: 0.05
 --- !u!1 &2083280916
 GameObject:
   m_ObjectHideFlags: 0
@@ -10384,6 +10479,10 @@ MonoBehaviour:
   drawGizmos: 1
   fillColor: {r: 0, g: 1, b: 0, a: 0.08}
   wireColor: {r: 0, g: 1, b: 0, a: 0.6}
+  launchAngleDeg: 45
+  launchGravity: 9.81
+  kinematicDuringLaunch: 1
+  minLaunchDistance: 0.05
 --- !u!1 &2099780515
 GameObject:
   m_ObjectHideFlags: 0
