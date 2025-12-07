@@ -2780,7 +2780,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 111602487057439365, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
       propertyPath: m_DefaultActionMap
-      value: Player1
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 1645118235592284019, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
       propertyPath: buildKeyUI
@@ -6629,6 +6629,10 @@ MonoBehaviour:
   drawGizmos: 1
   fillColor: {r: 0, g: 1, b: 0, a: 0.08}
   wireColor: {r: 0, g: 1, b: 0, a: 0.6}
+  launchAngleDeg: 45
+  launchGravity: 9.81
+  kinematicDuringLaunch: 1
+  minLaunchDistance: 0.05
 --- !u!1 &1137834371 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 74667027998539064, guid: 9772c1baa136c534093b0f903b312e3c, type: 3}
