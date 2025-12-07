@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using BridgeItTogether.Gameplay.Abstractions;
 using BridgeItTogether.Gameplay.SafeZones;
 
 namespace BridgeItTogether.Gameplay.AutoControllers
@@ -19,14 +18,9 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         [SerializeField] private bool asegurarTagVehiculo = true;
         [SerializeField] private string nombreTagVehiculo = "Vehicle";
 
-        // ==== Lanzamiento de IHitable (Parábola Física) ====
-        [Header("Lanzamiento IHitable (Parábola Física)")]
+        // ==== Lanzamiento de IHitable ====
+        [Header("Lanzamiento IHitable")]
         [SerializeField] private string safeZoneTag = "SafeZone";
-        [SerializeField, Range(10f, 80f)] private float launchAngleDeg = 45f;
-        [SerializeField, Min(0.1f)] private float launchSpeed = 12f;
-        [SerializeField, Min(0.1f)] private float launchGravity = 9.81f;
-        [SerializeField] private bool kinematicDuringLaunch = true;
-        [SerializeField] private float minLaunchDistance = 0.05f;
         [SerializeField] private float ignoreCollisionDuration = 0.5f; // Tiempo para re-habilitar colisiones después del impacto con IHitable
 
         // Estado
@@ -34,7 +28,6 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         private bool isInitialized;
         private bool isPaused;
         private Vector3 direccionMovimiento;
-        private readonly Dictionary<Transform, Coroutine> activeLaunches = new();
         private readonly HashSet<Collider> currentlyIgnoredColliders = new HashSet<Collider>();
 
         private void Awake()
@@ -223,14 +216,40 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             if (targetT != transform && targetT.IsChildOf(transform))
                 targetT.SetParent(null, true);
 
-            if (activeLaunches.ContainsKey(targetT)) return;
+            // Buscar la SafeZone más cercana
+            var safeZone = FindNearestSafeZone(targetT.position);
+            if (safeZone == null) return;
 
-            if (!TryGetRandomPointInNearestSafeZone(targetT.position, out var destino)) return;
+            // Desactivar componentes de física antes del lanzamiento
+            PrepareHitableForLaunch(targetT);
 
-            hitable.OnLaunched(destino);
+            // Delegar el lanzamiento a la SafeZone
+            safeZone.LaunchHitableToZone(targetT, hitable);
+        }
 
-            var routine = StartCoroutine(LaunchRoutine(targetT, destino));
-            activeLaunches[targetT] = routine;
+        private void PrepareHitableForLaunch(Transform target)
+        {
+            if (target == null) return;
+
+            // Deshabilitar CharacterController durante lanzamiento (Players)
+            CharacterController charController = target.GetComponent<CharacterController>();
+            if (charController != null)
+            {
+                charController.enabled = false;
+            }
+
+            // Hacer kinematic el Rigidbody durante lanzamiento (Materiales/objetos con física)
+            Rigidbody trb = target.GetComponent<Rigidbody>();
+            if (trb != null)
+            {
+#if UNITY_6000_0_OR_NEWER
+                trb.linearVelocity = Vector3.zero;
+#else
+                trb.velocity = Vector3.zero;
+#endif
+                trb.angularVelocity = Vector3.zero;
+                trb.isKinematic = true;
+            }
         }
 
         private bool IsObjectBeingHeld(Transform obj)
@@ -255,150 +274,12 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             return null;
         }
 
-        private IEnumerator LaunchRoutine(Transform target, Vector3 destino)
+        private SafeZoneArea FindNearestSafeZone(Vector3 from)
         {
-            if (target == null) yield break;
-            if (target.IsChildOf(transform))
-                target.SetParent(null, true);
-
-            Vector3 start = target.position;
-            Vector3 end = destino;
-            
-            // Calcular distancia horizontal y diferencia de altura
-            Vector3 horizontalDisplacement = new Vector3(end.x - start.x, 0f, end.z - start.z);
-            float horizontalDistance = horizontalDisplacement.magnitude;
-            
-            if (horizontalDistance < minLaunchDistance)
-            {
-                activeLaunches.Remove(target);
-                yield break;
-            }
-
-            Vector3 horizontalDir = horizontalDisplacement / horizontalDistance;
-            float heightDifference = end.y - start.y;
-            
-            // Calcular velocidad inicial necesaria para llegar EXACTAMENTE al destino
-            // Fórmula balística: v = sqrt(g * d^2 / (2 * cos^2(θ) * (d * tan(θ) - h)))
-            float g = Mathf.Max(0.01f, launchGravity);
-            float angleRad = launchAngleDeg * Mathf.Deg2Rad;
-            float tanAngle = Mathf.Tan(angleRad);
-            float cosAngle = Mathf.Cos(angleRad);
-            
-            float denominator = 2f * cosAngle * cosAngle * (horizontalDistance * tanAngle - heightDifference);
-            
-            if (denominator <= 0f)
-            {
-                // No hay solución física con este ángulo, usar velocidad fija como fallback
-                Debug.LogWarning($"[AutoController] No se puede calcular trayectoria exacta con ángulo {launchAngleDeg}°. Usando fallback.");
-                activeLaunches.Remove(target);
-                yield break;
-            }
-            
-            float velocitySquared = (g * horizontalDistance * horizontalDistance) / denominator;
-            float velocity = Mathf.Sqrt(velocitySquared);
-            
-            // Calcular tiempo de vuelo
-            float totalTime = horizontalDistance / (velocity * cosAngle);
-            
-            // Detectar si tiene CharacterController (Players) o Rigidbody (Materiales, objetos)
-            CharacterController charController = target.GetComponent<CharacterController>();
-            Rigidbody trb = target.GetComponent<Rigidbody>();
-            
-            bool hasCharController = charController != null;
-            bool hasRigidbody = trb != null;
-            
-            bool prevCharControllerEnabled = false;
-            bool prevRigidbodyKinematic = false;
-            
-            // Deshabilitar CharacterController durante lanzamiento (Players)
-            if (hasCharController)
-            {
-                prevCharControllerEnabled = charController.enabled;
-                charController.enabled = false;
-            }
-            
-            // Hacer kinematic el Rigidbody durante lanzamiento (Materiales/objetos con física)
-            if (hasRigidbody && kinematicDuringLaunch)
-            {
-                prevRigidbodyKinematic = trb.isKinematic;
-#if UNITY_6000_0_OR_NEWER
-                trb.linearVelocity = Vector3.zero;
-#else
-                trb.velocity = Vector3.zero;
-#endif
-                trb.angularVelocity = Vector3.zero;
-                trb.isKinematic = true;
-            }
-
-            // Ejecutar parábola balística exacta
-            float t = 0f;
-            Vector3 lastPosition = start;
-            
-            while (t < totalTime && target != null)
-            {
-                t += Time.deltaTime;
-                float ct = Mathf.Clamp(t, 0f, totalTime);
-                
-                // Posición horizontal (movimiento uniforme)
-                float horizontalProgress = velocity * cosAngle * ct;
-                
-                // Posición vertical (movimiento parabólico)
-                float verticalProgress = velocity * Mathf.Sin(angleRad) * ct - 0.5f * g * ct * ct;
-                
-                lastPosition = target.position;
-                Vector3 newPosition = start + horizontalDir * horizontalProgress;
-                newPosition.y = start.y + verticalProgress;
-                
-                target.position = newPosition;
-
-                yield return null;
-            }
-
-            // Calcular velocidad final de la trayectoria para que continúe cayendo naturalmente
-            Vector3 finalVelocity = Vector3.zero;
-            if (target != null && Time.deltaTime > 0f)
-            {
-                finalVelocity = (target.position - lastPosition) / Time.deltaTime;
-            }
-
-            // Restaurar CharacterController (caerá por gravedad natural)
-            if (hasCharController && charController != null)
-            {
-                charController.enabled = prevCharControllerEnabled;
-            }
-
-            // Restaurar Rigidbody y aplicar velocidad final para continuar la trayectoria
-            if (hasRigidbody && trb != null)
-            {
-                if (kinematicDuringLaunch)
-                {
-                    trb.isKinematic = prevRigidbodyKinematic;
-                }
-                
-                // Aplicar velocidad solo si no es kinematic
-                if (!trb.isKinematic)
-                {
-#if UNITY_6000_0_OR_NEWER
-                    trb.linearVelocity = finalVelocity;
-#else
-                    trb.velocity = finalVelocity;
-#endif
-                }
-            }
-
-
-            if (target != null)
-                activeLaunches.Remove(target);
-        }
-
-        private bool TryGetRandomPointInNearestSafeZone(Vector3 from, out Vector3 point)
-        {
-            point = default;
             GameObject[] zones = GameObject.FindGameObjectsWithTag(safeZoneTag);
-            if (zones == null || zones.Length == 0) return false;
+            if (zones == null || zones.Length == 0) return null;
 
-            SafeZoneArea bestArea = null;
-            Transform fallback = null;
+            SafeZoneArea nearest = null;
             float bestDist = float.MaxValue;
 
             for (int i = 0; i < zones.Length; i++)
@@ -407,41 +288,17 @@ namespace BridgeItTogether.Gameplay.AutoControllers
                 if (go == null) continue;
 
                 var area = go.GetComponent<SafeZoneArea>();
-                var t = go.transform;
-                float d = (t.position - from).sqrMagnitude;
+                if (area == null) continue;
 
-                if (area != null)
+                float d = (go.transform.position - from).sqrMagnitude;
+                if (d < bestDist)
                 {
-                    if (d < bestDist)
-                    {
-                        bestDist = d;
-                        bestArea = area;
-                        fallback = t;
-                    }
-                }
-                else
-                {
-                    if (d < bestDist)
-                    {
-                        bestDist = d;
-                        fallback = t;
-                    }
+                    bestDist = d;
+                    nearest = area;
                 }
             }
 
-            if (bestArea != null)
-            {
-                point = bestArea.GetRandomPointInside();
-                return true;
-            }
-
-            if (fallback != null)
-            {
-                point = fallback.position;
-                return true;
-            }
-
-            return false;
+            return nearest;
         }
 
         /// <summary>
