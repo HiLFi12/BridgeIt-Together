@@ -8,6 +8,9 @@ public class AudioManager : MonoBehaviour
     public AudioSource music;
     public List<AudioClip> bgTracks;
 
+    [Tooltip("Índice del track de BGM a reproducir automáticamente al iniciar (-1 para ninguno)")]
+    [SerializeField] private int initialBgmIndex = -1;
+
     [Header("SFX")]
     public AudioSource sfx;
     public List<AudioClip> soundEffects;
@@ -17,6 +20,14 @@ public class AudioManager : MonoBehaviour
         if (music == null) music = GetComponent<AudioSource>();
         if (sfx == null) sfx = gameObject.AddComponent<AudioSource>();
         ServiceLocator.Instance.SetService(this);
+    }
+
+    private void Start()
+    {
+        if (initialBgmIndex >= 0)
+        {
+            PlayBGM(initialBgmIndex);
+        }
     }
 
     public void PlayBGM(int bgmIndex)
