@@ -7,9 +7,6 @@ public class Campfire : MonoBehaviour, IInteractable
     public InteractPriority InteractPriority => InteractPriority.Medium;
     
     [SerializeField] private GameObject shadow;
-    
-    [Header("Audio")]
-    [SerializeField] private int igniteSfxIndex = -1;
 
     private void Start()
     {
@@ -25,16 +22,6 @@ public class Campfire : MonoBehaviour, IInteractable
             if (palo != null && !palo.EstaEncendido())
             {
                 palo.SetEncendido(true);
-
-                // Reproducir SFX de encendido si está configurado
-                if (igniteSfxIndex >= 0)
-                {
-                    var audio = FindFirstObjectByType<AudioManager>();
-                    if (audio != null)
-                    {
-                        audio.PlaySFX(igniteSfxIndex);
-                    }
-                }
             }
         }
     }
