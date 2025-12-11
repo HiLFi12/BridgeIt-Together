@@ -18,6 +18,10 @@ public class VehicleReturnTrigger : MonoBehaviour
     [SerializeField] private GameObject efectoDestruccionVehiculoPrefab = null;
     [SerializeField] private bool spawnearEfectoVehiculo = true;
 
+    [Header("Audio SFX")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir al destruir vehículos en este trigger. -1 desactiva.")]
+    [SerializeField] private int vehicleReturnSfxIndex = -1;
+
     [Header("Tags protegidos (no se destruyen)")]
     [SerializeField] private string[] protectedTags = new string[]
     {
@@ -35,6 +39,7 @@ public class VehicleReturnTrigger : MonoBehaviour
 
     private Collider triggerCollider;
     private bool isActive = true;
+    private AudioManager audioManager;
 
     private void Awake()
     {
@@ -42,6 +47,11 @@ public class VehicleReturnTrigger : MonoBehaviour
         if (triggerCollider != null)
         {
             triggerCollider.isTrigger = true;
+        }
+
+        if (audioManager == null)
+        {
+            audioManager = FindFirstObjectByType<AudioManager>();
         }
     }
 
@@ -136,14 +146,22 @@ public class VehicleReturnTrigger : MonoBehaviour
             return;
         }
 
+        bool esVehiculo = obj.CompareTag("Vehicle");
+
         // Elegir efecto según si es vehículo o no
-        if (obj.CompareTag("Vehicle") && spawnearEfectoVehiculo && efectoDestruccionVehiculoPrefab != null)
+        if (esVehiculo && spawnearEfectoVehiculo && efectoDestruccionVehiculoPrefab != null)
         {
             SpawnearEfectoDestruccionEspecifico(obj.transform.position, efectoDestruccionVehiculoPrefab, true);
         }
         else
         {
             SpawnearEfectoDestruccion(obj.transform.position);
+        }
+
+        // Reproducir SFX solo para vehículos si hay índice configurado
+        if (esVehiculo)
+        {
+            PlayVehicleReturnSfx();
         }
 
         if (showDebugMessages)
@@ -204,6 +222,21 @@ public class VehicleReturnTrigger : MonoBehaviour
         else
         {
             Destroy(efecto, 5f);
+        }
+    }
+
+    private void PlayVehicleReturnSfx()
+    {
+        if (vehicleReturnSfxIndex < 0) return;
+
+        if (audioManager == null)
+        {
+            audioManager = FindFirstObjectByType<AudioManager>();
+        }
+
+        if (audioManager != null)
+        {
+            audioManager.PlaySFX(vehicleReturnSfxIndex);
         }
     }
 

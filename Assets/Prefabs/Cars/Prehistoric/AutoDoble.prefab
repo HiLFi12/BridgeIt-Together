@@ -46,12 +46,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionPoint: {fileID: 3048006963490823857}
   detectionRadius: 1.5
+  bridgeQuadrantTag: BridgeQuadrant
   bridgeLayer:
     serializedVersion: 2
     m_Bits: 320
-  bridgeQuadrantTag: BridgeQuadrant
   vehicleTag: Vehicle
-  debugMode: 1
+  damageAmount: 1
 --- !u!1 &2948579226618137670
 GameObject:
   m_ObjectHideFlags: 0
@@ -154,11 +154,8 @@ MonoBehaviour:
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
   safeZoneTag: SafeZone
-  launchAngleDeg: 45
-  launchSpeed: 12
-  launchGravity: 9.81
-  kinematicDuringLaunch: 1
-  minLaunchDistance: 0.05
+  ignoreCollisionDuration: 0.5
+  returnToPoolSfxIndex: 21
 --- !u!114 &1939103582763151452
 MonoBehaviour:
   m_ObjectHideFlags: 0

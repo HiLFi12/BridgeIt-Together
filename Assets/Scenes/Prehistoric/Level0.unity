@@ -6387,77 +6387,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 570119925}
   m_CullTransparentMesh: 1
---- !u!1 &580002471
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 580002474}
-  - component: {fileID: 580002472}
-  - component: {fileID: 580002473}
-  m_Layer: 0
-  m_Name: GameObject (1)
-  m_TagString: PassTrigger
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!65 &580002472
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 580002471}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &580002473
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 580002471}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b73d8d984e892444ad3d256ca7297c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tipoTrigger: 0
-  tagVehiculoRequerido: Vehicle
-  mostrarDebugInfo: 1
-  activarGizmosVisuales: 1
-  triggerActivo: 1
---- !u!4 &580002474
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 580002471}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -211.5, y: 236.01, z: 237.58035}
-  m_LocalScale: {x: 5.770589, y: 15.748145, z: 18.702177}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1398344872}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &580470372 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5752125055088218753, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
@@ -9150,7 +9079,7 @@ PrefabInstance:
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'returnTriggers.Array.data[2]'
       value: 
-      objectReference: {fileID: 580002472}
+      objectReference: {fileID: 0}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'returnTriggers.Array.data[3]'
       value: 
@@ -9158,7 +9087,7 @@ PrefabInstance:
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'returnTriggers.Array.data[4]'
       value: 
-      objectReference: {fileID: 580002472}
+      objectReference: {fileID: 0}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'returnTriggers.Array.data[5]'
       value: 
@@ -13708,7 +13637,7 @@ MonoBehaviour:
   vehiculosParaDerrota: 3
   triggersVictoriaPersonalizados:
   - {fileID: 451844934}
-  - {fileID: 580002472}
+  - {fileID: 0}
   triggersDerrotaPersonalizados:
   - {fileID: 658206065}
 --- !u!1 &1356151616
@@ -14233,7 +14162,6 @@ Transform:
   m_Children:
   - {fileID: 1239765918}
   - {fileID: 451844931}
-  - {fileID: 580002474}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1400166762
@@ -21424,6 +21352,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1398344872}
     m_Modifications:
+    - target: {fileID: 300766207920275094, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
+      propertyPath: efectoDestruccionPrefab
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 300766207920275094, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
+      propertyPath: efectoDestruccionVehiculoPrefab
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3173107929012228056, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -224.8
