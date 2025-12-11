@@ -60,12 +60,22 @@ public class Catapult : MonoBehaviour, IInteractable
         loadedObject = objectInHand;
         var objTransform = objectInHand.transform;
 
-        ClearPlayerHolder(playerHolder);
+        // Llamar a DropObject para que se limpie correctamente la UI del puente
+        playerHolder.DropObject();
 
+        // Inmediatamente tomar el objeto y parentearlo al socket de la catapulta
         Transform parentSocket = launchSocket ? launchSocket : rotatingArm;
         objTransform.SetParent(parentSocket, true);
         objTransform.localPosition = Vector3.zero;
         objTransform.localRotation = Quaternion.identity;
+        
+        // Preparar el objeto para el lanzamiento (deshabilitar física temporalmente)
+        var rb = objectInHand.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = false;
+        }
 
         isReady = false;
         if (currentOperation != null)
@@ -117,29 +127,7 @@ public class Catapult : MonoBehaviour, IInteractable
         currentOperation = null;
     }
 
-    private void ClearPlayerHolder(PlayerObjectHolder holder)
-    {
-        var heldObjectField = typeof(PlayerObjectHolder).GetField("heldObject",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
-        if (heldObjectField != null)
-            heldObjectField.SetValue(holder, null);
-
-        var disabledCollidersField = typeof(PlayerObjectHolder).GetField("heldDisabledColliders",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        if (disabledCollidersField != null)
-        {
-            var list = disabledCollidersField.GetValue(holder) as System.Collections.IList;
-            list?.Clear();
-        }
-
-        var rigidbodyField = typeof(PlayerObjectHolder).GetField("heldRigidbody",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        if (rigidbodyField != null)
-            rigidbodyField.SetValue(holder, null);
-    }
 
     private bool IsValidHandObject(GameObject obj)
     {
