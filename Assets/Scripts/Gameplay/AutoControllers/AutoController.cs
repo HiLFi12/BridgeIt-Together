@@ -23,16 +23,26 @@ namespace BridgeItTogether.Gameplay.AutoControllers
         [SerializeField] private string safeZoneTag = "SafeZone";
         [SerializeField] private float ignoreCollisionDuration = 0.5f; // Tiempo para re-habilitar colisiones después del impacto con IHitable
 
+        // ==== Audio SFX ====
+        [Header("Audio SFX")]
+        [Tooltip("Índice en AudioManager.soundEffects para reproducir al spawnear. -1 desactiva.")]
+        [SerializeField] private int spawnSfxIndex = -1;
+        [Tooltip("Índice en AudioManager.soundEffects para reproducir al volver a la pool (caer al vacío). -1 desactiva.")]
+        [SerializeField] private int returnToPoolSfxIndex = -1;
+
         // Estado
         private Rigidbody rb;
         private bool isInitialized;
         private bool isPaused;
         private Vector3 direccionMovimiento;
         private readonly HashSet<Collider> currentlyIgnoredColliders = new HashSet<Collider>();
+        private AudioManager audioManager;
 
         private void Awake()
         {
             direccionMovimiento = direccionInicial.sqrMagnitude > 0.0001f ? direccionInicial.normalized : Vector3.right;
+            if (audioManager == null)
+                audioManager = FindFirstObjectByType<AudioManager>();
         }
 
         public void Initialize(Vector3 direction)
@@ -63,6 +73,8 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             AlinearRotacionConDireccion();
             isInitialized = true;
             isPaused = false;
+
+            PlaySpawnSfx();
         }
 
         protected virtual void FixedUpdate()
@@ -111,6 +123,15 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             Vector3 look = new Vector3(direccionMovimiento.x, 0f, direccionMovimiento.z);
             if (look.sqrMagnitude > 0.0001f)
                 transform.rotation = Quaternion.LookRotation(look, Vector3.up);
+        }
+
+        private void OnDisable()
+        {
+            // Asumimos que el retorno a pool desactiva el GameObject
+            if (isInitialized)
+            {
+                PlayReturnToPoolSfx();
+            }
         }
 
         // ===================== IHitable: colisión y lanzamiento =====================
@@ -327,6 +348,28 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             {
                 Physics.IgnoreCollision(otherCollider, myCollider, false);
                 currentlyIgnoredColliders.Remove(otherCollider);
+            }
+        }
+
+        private void PlaySpawnSfx()
+        {
+            if (spawnSfxIndex < 0) return;
+            if (audioManager == null)
+                audioManager = FindFirstObjectByType<AudioManager>();
+            if (audioManager != null)
+            {
+                audioManager.PlaySFX(spawnSfxIndex);
+            }
+        }
+
+        private void PlayReturnToPoolSfx()
+        {
+            if (returnToPoolSfxIndex < 0) return;
+            if (audioManager == null)
+                audioManager = FindFirstObjectByType<AudioManager>();
+            if (audioManager != null)
+            {
+                audioManager.PlaySFX(returnToPoolSfxIndex);
             }
         }
     }
