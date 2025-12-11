@@ -73,6 +73,10 @@ public class PlayerObjectHolder : MonoBehaviour
         }
 
         heldObject = objectInstance;
+        
+        // Detener cualquier corutina de lanzamiento activa de catapultas
+        StopCatapultLaunchIfActive(heldObject.transform);
+        
         // Mantener posición/rotación/escala en mundo al parentear para no deformar el objeto
         heldObject.transform.SetParent(Anchor, true);
 
@@ -228,6 +232,22 @@ public class PlayerObjectHolder : MonoBehaviour
     }
 
     public GameObject GetHeldObjectLegacy() => heldObject;
+    
+    /// <summary>
+    /// Detiene cualquier corutina de lanzamiento activa de catapultas para el objeto dado.
+    /// Esto previene conflictos de posición cuando se recoge un objeto en pleno vuelo.
+    /// </summary>
+    private void StopCatapultLaunchIfActive(Transform objectTransform)
+    {
+        if (objectTransform == null) return;
+        
+        // Buscar todas las catapultas en la escena y pedirles que detengan el lanzamiento
+        var catapults = FindObjectsByType<Catapult>(FindObjectsSortMode.None);
+        foreach (var catapult in catapults)
+        {
+            catapult.StopLaunchForObject(objectTransform);
+        }
+    }
 
     private void PlayPickUpSfx()
     {

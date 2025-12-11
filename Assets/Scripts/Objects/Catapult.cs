@@ -300,6 +300,22 @@ public class Catapult : MonoBehaviour, IInteractable
         float t = 0f;
         while (t < totalTime && target != null)
         {
+            // Si el objeto fue recogido por un jugador (tiene parent), detener el lanzamiento
+            if (target.parent != null)
+            {
+                Debug.Log($"[Catapult] Objeto {target.name} fue recogido durante el lanzamiento, deteniendo corutina.");
+                
+                // Restaurar estado del Rigidbody si fue modificado (aunque PlayerObjectHolder ya lo maneja)
+                if (hadRB && kinematicDuringLaunch && trb != null)
+                {
+                    // No restaurar aquí porque PlayerObjectHolder ya configuró el RB como kinematic
+                    // trb.isKinematic = prevKinematic;
+                }
+                
+                activeLaunches.Remove(target);
+                yield break;
+            }
+            
             t += Time.deltaTime;
             float progress = Mathf.Min(t / totalTime, 1f);
 
@@ -323,6 +339,25 @@ public class Catapult : MonoBehaviour, IInteractable
 
     public bool IsReady() => isReady;
     public bool HasLoadedObject() => loadedObject != null;
+    
+    /// <summary>
+    /// Detiene el lanzamiento activo de un objeto específico si existe.
+    /// Útil cuando el objeto es recogido por un jugador durante el vuelo.
+    /// </summary>
+    public void StopLaunchForObject(Transform target)
+    {
+        if (target == null) return;
+        
+        if (activeLaunches.TryGetValue(target, out Coroutine routine))
+        {
+            if (routine != null)
+            {
+                StopCoroutine(routine);
+            }
+            activeLaunches.Remove(target);
+            Debug.Log($"[Catapult] Lanzamiento detenido manualmente para {target.name}");
+        }
+    }
 
     // Calcula la duración de una rotación dado el ángulo inicial, final y velocidad
     private float CalculateRotationDuration(float startAngle, float targetAngle, float rotationSpeed)
