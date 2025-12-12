@@ -213,6 +213,7 @@ namespace BridgeItTogether.Gameplay.AutoControllers
             var targetT = (hitable as Component)?.transform;
             if (targetT == null) return;
 
+            // CASO 1: El objeto que fue golpeado está siendo sostenido por un player
             if (IsObjectBeingHeld(targetT))
             {
                 var holder = FindPlayerHoldingObject(targetT);
@@ -223,6 +224,49 @@ namespace BridgeItTogether.Gameplay.AutoControllers
                 return;
             }
 
+            // CASO 2: Un player fue golpeado y tiene un objeto en mano
+            var playerHolder = targetT.GetComponent<PlayerObjectHolder>();
+            if (playerHolder != null && playerHolder.HasObjectInHand())
+            {
+                // Obtener el objeto antes de soltarlo
+                GameObject heldObject = playerHolder.GetHeldObject();
+                
+                // Soltar el objeto
+                playerHolder.DropObject();
+                
+                Debug.Log($"[AutoController] Player '{targetT.name}' fue golpeado con objeto en mano. Soltando objeto '{heldObject.name}'");
+                
+                // Lanzar al player
+                if (targetT != transform && targetT.IsChildOf(transform))
+                    targetT.SetParent(null, true);
+
+                var safeZonePlayer = FindNearestSafeZone(targetT.position);
+                if (safeZonePlayer != null)
+                {
+                    PrepareHitableForLaunch(targetT);
+                    safeZonePlayer.LaunchHitableToZone(targetT, hitable);
+                }
+                
+                // Lanzar también el objeto suelto
+                if (heldObject != null)
+                {
+                    var objectHitable = heldObject.GetComponent<IHitable>();
+                    if (objectHitable != null)
+                    {
+                        var safeZoneObject = FindNearestSafeZone(heldObject.transform.position);
+                        if (safeZoneObject != null)
+                        {
+                            PrepareHitableForLaunch(heldObject.transform);
+                            safeZoneObject.LaunchHitableToZone(heldObject.transform, objectHitable);
+                            Debug.Log($"[AutoController] Objeto '{heldObject.name}' también lanzado a safe zone");
+                        }
+                    }
+                }
+                
+                return;
+            }
+
+            // CASO 3: Lanzamiento normal (ni es objeto sostenido, ni player con objeto)
             if (targetT != transform && targetT.IsChildOf(transform))
                 targetT.SetParent(null, true);
 
