@@ -13,9 +13,9 @@ public class PaloIgnifugoGenerator : MonoBehaviour, IInteractable
     [SerializeField] private InteractPriority interactPriority = InteractPriority.Medium;
     [SerializeField] private float tiempoRecarga = 0.5f; // Tiempo antes de poder generar otro palo
     [SerializeField] private GameObject shadow;
-    
+
     private bool enRecarga = false;
-    
+
     // Propiedad requerida por la interfaz IInteractable
     public InteractPriority InteractPriority => interactPriority;
 
@@ -23,7 +23,7 @@ public class PaloIgnifugoGenerator : MonoBehaviour, IInteractable
     {
         shadow.SetActive(false);
     }
-    
+
     // Método llamado cuando un jugador interactúa con este objeto
     public void Interact(GameObject interactor)
     {
@@ -59,15 +59,15 @@ public class PaloIgnifugoGenerator : MonoBehaviour, IInteractable
             Debug.Log("El interactor no tiene el componente PlayerObjectHolder.");
         }
     }
-    
+
     private IEnumerator Recargar()
     {
         enRecarga = true;
-        
+
         // Aquí podrías añadir algún efecto visual o sonido de recarga
-        
+
         yield return new WaitForSeconds(tiempoRecarga);
-        
+
         enRecarga = false;
     }
 }
