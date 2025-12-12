@@ -48,4 +48,13 @@ public class LifeStarsUI : MonoBehaviour
             stars[i].SetActive(true);
         }
     }
+    
+    /// <summary>
+    /// Obtiene la cantidad actual de vidas restantes
+    /// </summary>
+    /// <returns>Número de vidas actuales</returns>
+    public int GetCurrentLives()
+    {
+        return currentLives;
+    }
 }

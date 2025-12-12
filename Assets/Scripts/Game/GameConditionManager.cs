@@ -422,6 +422,9 @@ public class GameConditionManager : MonoBehaviour
             Debug.Log("🎉 ¡VICTORIA! ¡Has logrado que pasen suficientes vehículos por el puente!");
         }
         
+        // Guardar progreso del nivel como completado
+        GuardarProgresoNivel();
+        
         // Desactivar controles y sistemas de juego
         DesactivarSistemasDeJuego();
         
@@ -448,6 +451,9 @@ public class GameConditionManager : MonoBehaviour
         {
             Debug.Log("🎉 ¡VICTORIA POR RONDAS! ¡Has completado todas las rondas configuradas!");
         }
+        
+        // Guardar progreso del nivel como completado
+        GuardarProgresoNivel();
         
         // Desactivar controles y sistemas de juego
         DesactivarSistemasDeJuego();
@@ -486,6 +492,42 @@ public class GameConditionManager : MonoBehaviour
         ActivarAnimacionesDerrota();
         
         OnDerrota?.Invoke();
+    }
+    
+    /// <summary>
+    /// Guarda el progreso del nivel actual como completado usando PlayerPrefs
+    /// </summary>
+    private void GuardarProgresoNivel()
+    {
+        // Verificar que contamos con al menos una estrella (vida)
+        if (lifeStarsUI != null && lifeStarsUI.GetCurrentLives() <= 0)
+        {
+            if (mostrarDebugInfo)
+            {
+                Debug.Log("⚠️ No se guardará el progreso: el jugador no tiene estrellas restantes");
+            }
+            return;
+        }
+        
+        // Buscar el LevelProgressManager en la escena con FindFirstObjectByType
+        LevelProgressManager manager = FindFirstObjectByType<LevelProgressManager>();
+        
+        if (manager == null)
+        {
+            if (mostrarDebugInfo)
+            {
+                Debug.LogWarning("⚠️ No se encontró LevelProgressManager - el progreso no se guardará");
+            }
+            return;
+        }
+        
+        // Guardar el nivel actual como completado
+        manager.MarkCurrentLevelAsCompleted();
+        
+        if (mostrarDebugInfo)
+        {
+            Debug.Log("💾 Progreso del nivel guardado en PlayerPrefs");
+        }
     }
     
     #endregion
