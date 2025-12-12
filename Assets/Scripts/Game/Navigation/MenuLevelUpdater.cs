@@ -17,8 +17,20 @@ public class MenuLevelUpdater : MonoBehaviour
         public Image completionStar; // Imagen de estrella
     }
     
+    [System.Serializable]
+    public class EraButton
+    {
+        public string eraName; // Nombre de la era (ej: "Prehistoric", "Medieval")
+        public Button button; // Referencia al botón de la era
+        public Image completionStar; // Imagen de estrella de la era
+        public List<int> levelButtonIndices; // Índices de los LevelButton en la lista levelButtons
+    }
+    
     [Header("Referencias de Botones")]
     [SerializeField] private List<LevelButton> levelButtons = new List<LevelButton>();
+    
+    [Header("Referencias de Eras")]
+    [SerializeField] private List<EraButton> eraButtons = new List<EraButton>();
     
     [Header("Debug")]
     [SerializeField] private bool showDebugLogs = true;
@@ -99,6 +111,122 @@ public class MenuLevelUpdater : MonoBehaviour
         {
             Debug.Log($"✅ {updated} estrellas actualizadas, {completed} niveles completados, {skipped} saltados");
         }
+        
+        // Actualizar estrellas de eras
+        UpdateEraStars(manager);
+    }
+    
+    /// <summary>
+    /// Actualiza las estrellas de las eras.
+    /// Una era se marca como completada si TODOS sus niveles están completados.
+    /// </summary>
+    private void UpdateEraStars(LevelProgressManager manager)
+    {
+        if (manager == null)
+        {
+            return;
+        }
+        
+        if (eraButtons.Count == 0)
+        {
+            return; // No hay eras configuradas
+        }
+        
+        if (showDebugLogs)
+        {
+            Debug.Log($"🔄 Actualizando {eraButtons.Count} estrellas de eras...");
+        }
+        
+        int eraUpdated = 0;
+        int eraCompleted = 0;
+        int eraSkipped = 0;
+        
+        foreach (var eraButton in eraButtons)
+        {
+            // Verificar referencias
+            if (eraButton.button == null || eraButton.completionStar == null)
+            {
+                eraSkipped++;
+                continue;
+            }
+            
+            // Verificar si la era tiene niveles
+            if (eraButton.levelButtonIndices == null || eraButton.levelButtonIndices.Count == 0)
+            {
+                if (showDebugLogs)
+                {
+                    Debug.LogWarning($"⚠️ Era '{eraButton.eraName}' no tiene niveles configurados");
+                }
+                eraSkipped++;
+                continue;
+            }
+            
+            // Verificar si TODOS los niveles de la era están completados
+            bool allLevelsCompleted = true;
+            int completedLevels = 0;
+            int totalLevels = 0;
+            
+            foreach (int levelIndex in eraButton.levelButtonIndices)
+            {
+                // Verificar que el índice sea válido
+                if (levelIndex < 0 || levelIndex >= levelButtons.Count)
+                {
+                    if (showDebugLogs)
+                    {
+                        Debug.LogWarning($"⚠️ Índice {levelIndex} fuera de rango en era '{eraButton.eraName}'");
+                    }
+                    continue;
+                }
+                
+                // Obtener el LevelButton desde la lista usando el índice
+                LevelButton levelButton = levelButtons[levelIndex];
+                
+                if (string.IsNullOrEmpty(levelButton.levelSceneName))
+                {
+                    continue; // Saltar niveles sin nombre configurado
+                }
+                
+                totalLevels++;
+                
+                // Preguntar al manager si el nivel está completado
+                bool isLevelCompleted = manager.IsLevelCompleted(levelButton.levelSceneName);
+                
+                if (isLevelCompleted)
+                {
+                    completedLevels++;
+                }
+                else
+                {
+                    allLevelsCompleted = false;
+                }
+            }
+            
+            // Activar/desactivar la estrella de la era
+            eraButton.completionStar.gameObject.SetActive(allLevelsCompleted && totalLevels > 0);
+            
+            eraUpdated++;
+            if (allLevelsCompleted && totalLevels > 0)
+            {
+                eraCompleted++;
+                
+                if (showDebugLogs)
+                {
+                    Debug.Log($"⭐ Era '{eraButton.eraName}' - COMPLETADA ({completedLevels}/{totalLevels} niveles)");
+                }
+            }
+            else
+            {
+                if (showDebugLogs)
+                {
+                    Debug.Log($"📊 Era '{eraButton.eraName}' - {completedLevels}/{totalLevels} niveles completados");
+                }
+            }
+        }
+        
+        if (showDebugLogs)
+        {
+            Debug.Log($"✅ Eras: {eraUpdated} actualizadas, {eraCompleted} completadas, {eraSkipped} saltadas");
+        }
     }
     
     /// <summary>
@@ -107,6 +235,14 @@ public class MenuLevelUpdater : MonoBehaviour
     public List<LevelButton> GetLevelButtons()
     {
         return levelButtons;
+    }
+    
+    /// <summary>
+    /// Obtiene la lista de botones de eras.
+    /// </summary>
+    public List<EraButton> GetEraButtons()
+    {
+        return eraButtons;
     }
 }
 
