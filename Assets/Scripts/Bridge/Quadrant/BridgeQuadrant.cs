@@ -66,14 +66,14 @@ public class BridgeQuadrant : MonoBehaviour
         return currentLayer;
     }
 
-    private int GetX()
+    public int GetX()
     {
         string[] parts = gameObject.name.Split('_');
         if (parts.Length >= 3 && int.TryParse(parts[1], out int x)) return x;
         return -1;
     }
 
-    private int GetZ()
+    public int GetZ()
     {
         string[] parts = gameObject.name.Split('_');
         if (parts.Length >= 3 && int.TryParse(parts[2], out int z)) return z;

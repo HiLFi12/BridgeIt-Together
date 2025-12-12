@@ -433,7 +433,23 @@ public class PlayerUIManager : MonoBehaviour
             BridgeConstructionGrid grid = kvp.Key;
             List<BridgeQuadrant> quadrants = kvp.Value;
             
-            // Determinar de qué lado está el jugador
+            // Cache de cuadrantes completos para este grid (para optimizar búsquedas)
+            Dictionary<(int x, int z), bool> completionCache = new Dictionary<(int, int), bool>();
+            foreach (BridgeQuadrant q in quadrants)
+            {
+                if (q != null)
+                {
+                    int qx = q.GetX();
+                    int qz = q.GetZ();
+                    if (qx != -1 && qz != -1)
+                    {
+                        completionCache[(qx, qz)] = q.GetCurrentLayer() >= 2;
+                    }
+                }
+            }
+            
+            List<BridgeQuadrant> allQuadrantsInGrid = quadrants;
+            
             int leftEdgeX = 0;
             int rightEdgeX = grid.gridWidth - 1;
             
@@ -452,8 +468,11 @@ public class PlayerUIManager : MonoBehaviour
             int direction = playerNearLeftEdge ? 1 : -1; // 1 = hacia derecha, -1 = hacia izquierda
             int activatedCount = 0;
             
-            // CAMBIO: Recorrer por FILAS Z primero, y para cada fila, buscar la primera columna X disponible
-            // Esto asegura que se active solo UN cuadrante por fila Z (el más cercano al jugador en X)
+            // HashSet para evitar activar el mismo cuadrante múltiples veces
+            HashSet<(int x, int z)> alreadyActivated = new HashSet<(int, int)>();
+            
+            // PASO 1: Recorrer por FILAS Z primero, y para cada fila, buscar la primera columna X disponible
+            // Esto asegura que se active AL MENOS UN cuadrante por fila Z (el más cercano al jugador en X)
             for (int z = 0; z < grid.gridLength; z++)
             {
                 bool foundInThisRow = false;
@@ -461,35 +480,21 @@ public class PlayerUIManager : MonoBehaviour
                 // Para cada columna X desde el borde del jugador
                 for (int x = startX; x >= 0 && x < grid.gridWidth; x += direction)
                 {
-                    BridgeQuadrant quadrant = FindQuadrantAt(quadrants, x, z);
+                    BridgeQuadrant quadrant = FindQuadrantAt(allQuadrantsInGrid, x, z);
                     
                     if (quadrant != null && quadrant.CanBuildLayer(group.bridgeLayer))
                     {
-                        Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
-                        if (layerUI != null)
+                        if (!IsQuadrantReachableFromPlayerSide(grid, x, z, playerNearLeftEdge, completionCache))
                         {
-                            // Incrementar el contador compartido para este cuadrante
-                            var key = (index, quadrant);
-                            if (!_sharedQuadrantCount.ContainsKey(key))
-                            {
-                                _sharedQuadrantCount[key] = 0;
-                            }
-                            _sharedQuadrantCount[key]++;
-                            
-                            // Solo activar la UI si es la primera vez que se activa (contador == 1)
-                            // O si ya estaba activada, mantenerla activada
-                            if (!layerUI.gameObject.activeInHierarchy)
-                            {
-                                layerUI.gameObject.SetActive(true);
-                            }
-                            
+                            Debug.Log($"  ✗ Cuadrante [{x},{z}] no es alcanzable desde el lado del jugador");
+                            continue;
+                        }
+                        
+                        if (ActivateQuadrantUI(quadrant, group, index, myQuadrants, x, z, alreadyActivated))
+                        {
                             foundInThisRow = true;
                             activatedCount++;
-
-                            // Registrar este cuadrante como activado por ESTE jugador
-                            myQuadrants.Add(quadrant);
-
-                            Debug.Log($"  ✓ Activado cuadrante [{x},{z}] (primer disponible en fila Z={z}), contador compartido: {_sharedQuadrantCount[key]}");
+                            Debug.Log($"  ✓ Activado cuadrante [{x},{z}] (primer disponible en fila Z={z})");
                             
                             // IMPORTANTE: Detener la búsqueda en esta fila una vez encontrado el primero
                             break;
@@ -503,8 +508,268 @@ public class PlayerUIManager : MonoBehaviour
                 }
             }
             
+            Debug.Log($"Paso 1 completado: {activatedCount} cuadrantes activados desde borde X={startX}");
+            
+            // PASO 2: Activar cuadrantes adyacentes a todos los cuadrantes COMPLETOS
+            int adjacentActivatedCount = ActivateAdjacentQuadrants(grid, allQuadrantsInGrid, completionCache, group, index, myQuadrants, alreadyActivated, playerNearLeftEdge);
+            activatedCount += adjacentActivatedCount;
+            
+            Debug.Log($"Paso 2 completado: {adjacentActivatedCount} cuadrantes adyacentes activados");
             Debug.Log($"Total activados: {activatedCount} cuadrantes desde borde X={startX}");
         }
+    }
+    
+    /// <summary>
+    /// Activa la UI de un cuadrante específico.
+    /// </summary>
+    /// <returns>True si se activó exitosamente, false si ya estaba activado o no se pudo activar</returns>
+    private bool ActivateQuadrantUI(BridgeQuadrant quadrant, UIGroup group, int index, HashSet<BridgeQuadrant> myQuadrants, int x, int z, HashSet<(int, int)> alreadyActivated)
+    {
+        // Verificar si ya fue activado
+        if (alreadyActivated.Contains((x, z)))
+        {
+            return false;
+        }
+        
+        Image layerUI = quadrant.GetLayerUI(group.bridgeLayer);
+        if (layerUI == null)
+        {
+            return false;
+        }
+        
+        // Incrementar el contador compartido para este cuadrante
+        var key = (index, quadrant);
+        if (!_sharedQuadrantCount.ContainsKey(key))
+        {
+            _sharedQuadrantCount[key] = 0;
+        }
+        _sharedQuadrantCount[key]++;
+        
+        // Solo activar la UI si no está activa
+        if (!layerUI.gameObject.activeInHierarchy)
+        {
+            layerUI.gameObject.SetActive(true);
+        }
+        
+        // Registrar este cuadrante como activado por ESTE jugador
+        myQuadrants.Add(quadrant);
+        alreadyActivated.Add((x, z));
+        
+        Debug.Log($"      UI activada para [{x},{z}], contador compartido: {_sharedQuadrantCount[key]}");
+        return true;
+    }
+    
+    /// <summary>
+    /// Activa los cuadrantes adyacentes a todos los cuadrantes completos.
+    /// Solo activa los que sean alcanzables desde el lado específico del jugador.
+    /// VALIDACIÓN CRÍTICA: Solo procesa cuadrantes completos que el jugador pueda alcanzar.
+    /// </summary>
+    private int ActivateAdjacentQuadrants(BridgeConstructionGrid grid, List<BridgeQuadrant> allQuadrantsInGrid, 
+        Dictionary<(int, int), bool> completionCache, UIGroup group, int index, 
+        HashSet<BridgeQuadrant> myQuadrants, HashSet<(int, int)> alreadyActivated, bool playerNearLeftEdge)
+    {
+        int activatedCount = 0;
+        
+        Debug.Log($"Buscando cuadrantes adyacentes a cuadrantes completos (desde lado {(playerNearLeftEdge ? "IZQUIERDO" : "DERECHO")})...");
+        
+        // Recorrer todos los cuadrantes completos
+        foreach (var kvp in completionCache)
+        {
+            if (!kvp.Value) continue; // Solo procesar cuadrantes completos
+            
+            int completeX = kvp.Key.Item1;
+            int completeZ = kvp.Key.Item2;
+            
+            // VALIDACIÓN PRIMERA: Verificar que el cuadrante completo sea alcanzable por el jugador
+            // Si el jugador no puede llegar caminando hasta este cuadrante completo, no mostrar sus adyacentes
+            if (!IsCompleteQuadrantReachableByPlayer(grid, completeX, completeZ, playerNearLeftEdge, completionCache))
+            {
+                Debug.Log($"  ✗ Cuadrante completo [{completeX},{completeZ}] NO es alcanzable por el jugador, ignorando sus adyacentes");
+                continue;
+            }
+            
+            Debug.Log($"  ✓ Cuadrante completo [{completeX},{completeZ}] es alcanzable por el jugador, verificando sus adyacentes");
+            
+            // Verificar los 4 cuadrantes adyacentes (arriba, abajo, izquierda, derecha)
+            int[] adjacentX = { completeX - 1, completeX + 1, completeX, completeX };
+            int[] adjacentZ = { completeZ, completeZ, completeZ - 1, completeZ + 1 };
+            
+            for (int i = 0; i < 4; i++)
+            {
+                int adjX = adjacentX[i];
+                int adjZ = adjacentZ[i];
+                
+                // Validar que esté dentro de los límites del grid
+                if (adjX < 0 || adjX >= grid.gridWidth || adjZ < 0 || adjZ >= grid.gridLength)
+                {
+                    continue;
+                }
+                
+                // Saltar si ya fue activado
+                if (alreadyActivated.Contains((adjX, adjZ)))
+                {
+                    continue;
+                }
+                
+                BridgeQuadrant adjacentQuadrant = FindQuadrantAt(allQuadrantsInGrid, adjX, adjZ);
+                
+                if (adjacentQuadrant != null && adjacentQuadrant.CanBuildLayer(group.bridgeLayer))
+                {
+                    // VALIDACIÓN CRÍTICA: Verificar que el cuadrante adyacente sea alcanzable desde el lado del jugador
+                    if (!IsQuadrantReachableFromPlayerSide(grid, adjX, adjZ, playerNearLeftEdge, completionCache))
+                    {
+                        Debug.Log($"    ✗ Cuadrante adyacente [{adjX},{adjZ}] NO es alcanzable desde el lado del jugador (vecino de [{completeX},{completeZ}])");
+                        continue;
+                    }
+                    
+                    if (ActivateQuadrantUI(adjacentQuadrant, group, index, myQuadrants, adjX, adjZ, alreadyActivated))
+                    {
+                        activatedCount++;
+                        Debug.Log($"    ✓ Activado cuadrante adyacente [{adjX},{adjZ}] (vecino de [{completeX},{completeZ}])");
+                    }
+                }
+            }
+        }
+        
+        return activatedCount;
+    }
+    
+    /// <summary>
+    /// Verifica si un cuadrante es alcanzable desde el lado específico del jugador.
+    /// </summary>
+    private bool IsQuadrantReachableFromPlayerSide(BridgeConstructionGrid grid, int x, int z, bool fromLeftSide, Dictionary<(int, int), bool> completionCache)
+    {
+        // Si es el borde del jugador, siempre es alcanzable
+        if ((fromLeftSide && x == 0) || (!fromLeftSide && x == grid.gridWidth - 1))
+        {
+            Debug.Log($"  → Cuadrante [{x},{z}] es el borde del jugador, ALCANZABLE");
+            return true;
+        }
+        
+        // Para cuadrantes internos, verificar si tienen un vecino completo EN LA DIRECCIÓN del jugador
+        int previousX = fromLeftSide ? x - 1 : x + 1;
+        
+        // Verificar vecino en la dirección del jugador (el que ya debería estar construido)
+        if (IsQuadrantCompleteAt(previousX, z, completionCache))
+        {
+            Debug.Log($"  → Cuadrante [{x},{z}] es ALCANZABLE porque el vecino [{previousX},{z}] está completo");
+            return true;
+        }
+        
+        // También verificar vecinos en Z (arriba/abajo)
+        if (IsQuadrantCompleteAt(x, z - 1, completionCache))
+        {
+            Debug.Log($"  → Cuadrante [{x},{z}] es ALCANZABLE porque el vecino [{x},{z - 1}] está completo");
+            return true;
+        }
+        
+        if (IsQuadrantCompleteAt(x, z + 1, completionCache))
+        {
+            Debug.Log($"  → Cuadrante [{x},{z}] es ALCANZABLE porque el vecino [{x},{z + 1}] está completo");
+            return true;
+        }
+        
+        Debug.Log($"  → Cuadrante [{x},{z}] NO es alcanzable (ningún vecino completo en dirección correcta)");
+        return false;
+    }
+    
+    /// <summary>
+    /// Verifica si un cuadrante en las coordenadas dadas está completo usando el cache.
+    /// </summary>
+    private bool IsQuadrantCompleteAt(int x, int z, Dictionary<(int, int), bool> completionCache)
+    {
+        if (completionCache.TryGetValue((x, z), out bool isComplete))
+        {
+            return isComplete;
+        }
+        
+        return false;
+    }
+    
+    /// <summary>
+    /// Verifica si un cuadrante completo es alcanzable por el jugador caminando desde su borde.
+    /// Usa un algoritmo de búsqueda para determinar si existe un camino de cuadrantes completos
+    /// desde el borde del jugador hasta el cuadrante objetivo.
+    /// </summary>
+    private bool IsCompleteQuadrantReachableByPlayer(BridgeConstructionGrid grid, int targetX, int targetZ, 
+        bool fromLeftSide, Dictionary<(int, int), bool> completionCache)
+    {
+        // Si es el borde del jugador, siempre es alcanzable
+        int playerEdgeX = fromLeftSide ? 0 : grid.gridWidth - 1;
+        if (targetX == playerEdgeX)
+        {
+            return true;
+        }
+        
+        // BFS (Breadth-First Search) para encontrar un camino de cuadrantes completos
+        // desde el borde del jugador hasta el cuadrante objetivo
+        Queue<(int x, int z)> queue = new Queue<(int, int)>();
+        HashSet<(int x, int z)> visited = new HashSet<(int, int)>();
+        
+        // Iniciar búsqueda desde todos los cuadrantes completos en el borde del jugador
+        for (int z = 0; z < grid.gridLength; z++)
+        {
+            if (IsQuadrantCompleteAt(playerEdgeX, z, completionCache))
+            {
+                queue.Enqueue((playerEdgeX, z));
+                visited.Add((playerEdgeX, z));
+            }
+        }
+        
+        // Si no hay cuadrantes completos en el borde, el target no es alcanzable
+        if (queue.Count == 0)
+        {
+            Debug.Log($"    → No hay cuadrantes completos en el borde X={playerEdgeX}");
+            return false;
+        }
+        
+        // Búsqueda BFS
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            int currentX = current.x;
+            int currentZ = current.z;
+            
+            // Si llegamos al objetivo, es alcanzable
+            if (currentX == targetX && currentZ == targetZ)
+            {
+                Debug.Log($"    → Camino encontrado desde borde X={playerEdgeX} hasta [{targetX},{targetZ}]");
+                return true;
+            }
+            
+            // Explorar vecinos completos (4 direcciones)
+            int[] neighborX = { currentX - 1, currentX + 1, currentX, currentX };
+            int[] neighborZ = { currentZ, currentZ, currentZ - 1, currentZ + 1 };
+            
+            for (int i = 0; i < 4; i++)
+            {
+                int nx = neighborX[i];
+                int nz = neighborZ[i];
+                
+                // Validar límites
+                if (nx < 0 || nx >= grid.gridWidth || nz < 0 || nz >= grid.gridLength)
+                {
+                    continue;
+                }
+                
+                // Si ya fue visitado, saltar
+                if (visited.Contains((nx, nz)))
+                {
+                    continue;
+                }
+                
+                // Solo considerar cuadrantes completos como caminables
+                if (IsQuadrantCompleteAt(nx, nz, completionCache))
+                {
+                    queue.Enqueue((nx, nz));
+                    visited.Add((nx, nz));
+                }
+            }
+        }
+        
+        // No se encontró camino
+        Debug.Log($"    → NO existe camino desde borde X={playerEdgeX} hasta [{targetX},{targetZ}]");
+        return false;
     }
     
     /// <summary>
