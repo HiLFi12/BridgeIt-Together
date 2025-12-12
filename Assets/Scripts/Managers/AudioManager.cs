@@ -15,10 +15,13 @@ public class AudioManager : MonoBehaviour
     public AudioSource sfx;
     public List<AudioClip> soundEffects;
 
+    private SFXVolumeSettings sfxVolumeSettings;
+
     private void Awake()
     {
         if (music == null) music = GetComponent<AudioSource>();
         if (sfx == null) sfx = gameObject.AddComponent<AudioSource>();
+        sfxVolumeSettings = GetComponent<SFXVolumeSettings>();
         ServiceLocator.Instance.SetService(this);
     }
 
@@ -47,7 +50,12 @@ public class AudioManager : MonoBehaviour
         if (sfxIndex < 0 || sfxIndex >= soundEffects.Count) return;
         var clip = soundEffects[sfxIndex];
         if (clip == null) return;
-        sfx.PlayOneShot(clip);
+        float volume = 1f;
+        if (sfxVolumeSettings != null)
+        {
+            volume = sfxVolumeSettings.GetVolumeForIndex(sfxIndex);
+        }
+        sfx.PlayOneShot(clip, volume);
     }
 
     public void PauseMusic()
