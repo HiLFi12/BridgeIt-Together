@@ -14,8 +14,15 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
     [SerializeField] private int turnedOffIndex = 3;
     [SerializeField] private int turnedOnIndex = 4;
 
+    [Header("Audio")]
+    [Tooltip("Índice en AudioManager.soundEffects para el loop de la antorcha (-1 = sin sonido).")]
+    [SerializeField] private int loopSfxIndex = -1;
+
     private bool estaEncendido = false;
     private float tiempoRestante = 0f;
+
+    private AudioSource loopSfxSource;
+    private AudioManager audioManager;
 
     public int UIIndex { get; private set; }
 
@@ -23,6 +30,21 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
     {
         // Inicializar UIIndex ANTES de que cualquier sistema lo lea
         UIIndex = turnedOffIndex;
+
+        // Configurar audio de la antorcha si hay índice válido
+        audioManager = FindFirstObjectByType<AudioManager>();
+        if (loopSfxIndex >= 0 && audioManager != null &&
+            loopSfxIndex < audioManager.soundEffects.Count)
+        {
+            var clip = audioManager.soundEffects[loopSfxIndex];
+            if (clip != null)
+            {
+                loopSfxSource = gameObject.AddComponent<AudioSource>();
+                loopSfxSource.playOnAwake = false;
+                loopSfxSource.loop = true;
+                loopSfxSource.clip = clip;
+            }
+        }
     }
 
     private void Start()
@@ -49,6 +71,26 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
         {
             efectoFuego.SetActive(encendido);
         }
+
+        // Controlar el loop de audio asociado a la antorcha
+        if (loopSfxSource != null)
+        {
+            if (encendido)
+            {
+                if (!loopSfxSource.isPlaying)
+                {
+                    loopSfxSource.Play();
+                }
+            }
+            else
+            {
+                if (loopSfxSource.isPlaying)
+                {
+                    loopSfxSource.Stop();
+                }
+            }
+        }
+
         tiempoRestante = encendido ? tiempoEncendido : 0f;
         int index = encendido ? turnedOnIndex : turnedOffIndex;
         SetUIIndex(index);
@@ -98,5 +140,14 @@ public class PaloIgnifugo : MonoBehaviour, IHitable, IUIActivatable
 
     public void OnLaunched(Vector3 targetPosition)
     {
+    }
+
+    private void OnDestroy()
+    {
+        // Asegurar que el sonido se detiene cuando la antorcha es destruida
+        if (loopSfxSource != null && loopSfxSource.isPlaying)
+        {
+            loopSfxSource.Stop();
+        }
     }
 }

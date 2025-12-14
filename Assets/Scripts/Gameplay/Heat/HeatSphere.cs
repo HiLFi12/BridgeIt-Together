@@ -177,12 +177,25 @@ public class HeatSphere : MonoBehaviour
         if (audioManager == null || audioManager.soundEffects == null) return;
         if (loopSfxIndex < 0 || loopSfxIndex >= audioManager.soundEffects.Count) return;
 
+        // Intentar usar la misma configuración de volumen que el resto de SFX
+        var sfxVolumeSettings = audioManager.GetComponent<SFXVolumeSettings>();
+
         // Crear un AudioSource local que haga loop del clip elegido
         loopAudioSource = gameObject.AddComponent<AudioSource>();
         loopAudioSource.clip = audioManager.soundEffects[loopSfxIndex];
         loopAudioSource.loop = true;
         loopAudioSource.playOnAwake = false;
-        loopAudioSource.spatialBlend = 1f; // 3D
+        // Lo ponemos en 2D para que no dependa tanto de la distancia cámara–heat sphere
+        loopAudioSource.spatialBlend = 0f;
+
+        if (sfxVolumeSettings != null)
+        {
+            loopAudioSource.volume = sfxVolumeSettings.GetVolumeForIndex(loopSfxIndex);
+        }
+        else
+        {
+            loopAudioSource.volume = 1f;
+        }
         loopAudioSource.Play();
     }
 }

@@ -324,17 +324,31 @@ public class Wagon : MonoBehaviour, IInteractable, ITurnable
         if (audioManager == null || audioManager.soundEffects == null) return;
         if (moveLoopSfxIndex < 0 || moveLoopSfxIndex >= audioManager.soundEffects.Count) return;
 
+        // Opcional: usar la misma configuración de volumen que el resto de SFX
+        var sfxVolumeSettings = audioManager.GetComponent<SFXVolumeSettings>();
+
         if (moveLoopSource == null)
         {
             moveLoopSource = gameObject.AddComponent<AudioSource>();
             moveLoopSource.loop = true;
             moveLoopSource.playOnAwake = false;
-            moveLoopSource.spatialBlend = 1f; // 3D
+            // Lo pasamos a 2D para evitar que el volumen dependa tanto de la distancia cámara-vagón
+            moveLoopSource.spatialBlend = 0f; // 0 = 2D, 1 = 3D
         }
 
         moveLoopSource.clip = audioManager.soundEffects[moveLoopSfxIndex];
         if (moveLoopSource.clip != null)
         {
+            // Ajustar volumen según SFXVolumeSettings si está disponible
+            if (sfxVolumeSettings != null)
+            {
+                moveLoopSource.volume = sfxVolumeSettings.GetVolumeForIndex(moveLoopSfxIndex);
+            }
+            else
+            {
+                moveLoopSource.volume = 1f;
+            }
+
             moveLoopSource.Play();
         }
     }
