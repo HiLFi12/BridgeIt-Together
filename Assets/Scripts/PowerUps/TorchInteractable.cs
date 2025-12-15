@@ -15,6 +15,9 @@ public class TorchInteractable : MonoBehaviour, IInteractable
     
     public InteractPriority InteractPriority => InteractPriority.High;
 
+    // Evento que se dispara cuando la antorcha se enciende exitosamente
+    public static event System.Action OnSuccessfulTorchLit;
+
     /// <summary>
     /// Configura la antorcha con su lado y referencia al power up
     /// </summary>
@@ -79,6 +82,9 @@ public class TorchInteractable : MonoBehaviour, IInteractable
             ritualPowerUp.LightRightTorch();
             Debug.Log("¡Antorcha derecha del tótem encendida!");
         }
+
+        // Disparar evento para tutoriales
+        OnSuccessfulTorchLit?.Invoke();
 
         // Aquí se pueden añadir efectos visuales y sonoros adicionales
         // TODO: Añadir feedback audiovisual
