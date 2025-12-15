@@ -2941,6 +2941,10 @@ MonoBehaviour:
   drawGizmos: 1
   fillColor: {r: 0, g: 1, b: 0, a: 0.08}
   wireColor: {r: 0, g: 1, b: 0, a: 0.6}
+  launchAngleDeg: 45
+  launchGravity: 9.81
+  kinematicDuringLaunch: 1
+  minLaunchDistance: 0.05
 --- !u!1 &441491505
 GameObject:
   m_ObjectHideFlags: 0
@@ -4234,7 +4238,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2322183861910670454, guid: 214b2883cf94ace44b99f9bd85ee2d84, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2542805390273581327, guid: 214b2883cf94ace44b99f9bd85ee2d84, type: 3}
       propertyPath: m_IsActive
@@ -7229,6 +7233,11 @@ MonoBehaviour:
   - {x: 130, y: 50, z: 130}
   - {x: 3, y: 0.2, z: 3}
   layerScaleMode: 1
+  layerEulerRotations:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  layerRotationMode: 0
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
   incompleteColor: {r: 1, g: 0, b: 0, a: 1}
@@ -12265,12 +12274,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  efectoDesaparicionPrefab: {fileID: 0}
-  spawnearEfectoAlDesaparecer: 1
-  additionalProtectedTags:
-  - InvisibleWall
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!114 &1722577575
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13666,11 +13686,19 @@ PrefabInstance:
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: constructAllQuadrants
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 4
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[2]'
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[3]'
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16309,11 +16337,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  efectoDesaparicionPrefab: {fileID: 0}
-  spawnearEfectoAlDesaparecer: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!114 &2081650197
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16754,11 +16794,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  efectoDesaparicionPrefab: {fileID: 0}
-  spawnearEfectoAlDesaparecer: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!114 &2122694956
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -5477,6 +5477,11 @@ MonoBehaviour:
   - {x: 130, y: 50, z: 130}
   - {x: 3, y: 0.2, z: 3}
   layerScaleMode: 1
+  layerEulerRotations:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  layerRotationMode: 0
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
   incompleteColor: {r: 1, g: 0, b: 0, a: 1}
@@ -10372,10 +10377,18 @@ PrefabInstance:
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: constructAllQuadrants
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[2]'
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[3]'
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -13996,6 +14009,12 @@ MonoBehaviour:
   buildPadUI: {fileID: 0}
   dashKeyUI: {fileID: 0}
   dashPadUI: {fileID: 0}
+  respawnPoint: {fileID: 0}
+  respawnEffectPrefab: {fileID: 0}
+  manualRespawnCooldown: 3
+  shakeIntensityMax: 0.5
+  shakeFrequency: 20
+  manualRespawnKey: 102
   enableFillBridgeHotkey: 0
   fillBridgeKey: 103
   bridgeGrid: {fileID: 0}

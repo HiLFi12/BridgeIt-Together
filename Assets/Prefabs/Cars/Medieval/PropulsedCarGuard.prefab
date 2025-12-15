@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4180638346515143030}
   - component: {fileID: 9130637375304943818}
   - component: {fileID: 1834046654946767549}
+  - component: {fileID: -442140443172286710}
   m_Layer: 11
   m_Name: PropulsedCarGuard
   m_TagString: Vehicle
@@ -65,7 +66,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!136 &5266726970569190894
 CapsuleCollider:
@@ -107,12 +108,8 @@ MonoBehaviour:
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
   safeZoneTag: SafeZone
-  launchAngleDeg: 45
-  launchSpeed: 12
-  launchGravity: 9.81
-  kinematicDuringLaunch: 1
-  minLaunchDistance: 0.05
   ignoreCollisionDuration: 0.1
+  spawnSfxIndex: -1
 --- !u!114 &9130637375304943818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,7 +138,7 @@ MonoBehaviour:
   referenceObject: {fileID: 8819827193253672425}
   projectilePrefab: {fileID: 3153354572346523118, guid: a9e0a90ec23c7834998ceb857f5aac2e, type: 3}
   launchAngleDeg: 45
-  launchSpeed: 5
+  launchSpeed: 15
   launchGravity: 9.81
   kinematicDuringLaunch: 1
   minLaunchDistance: 0.05
@@ -169,6 +166,26 @@ MonoBehaviour:
   - {fileID: 953713837338644269}
   velocidadRotacion: 360
   ejeRotacion: {x: -1, y: 0, z: 0}
+--- !u!114 &-442140443172286710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248325544060308125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c759499648444d0a8b0930f361e0d35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRadius: 0.3
+  detectionOffset: {x: 2.5, y: -1, z: 0}
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 33217
+  rotationDegrees: 90
+  rotationSpeed: 150
+  showDebugGizmos: 1
 --- !u!1 &4766199055566141447
 GameObject:
   m_ObjectHideFlags: 0
