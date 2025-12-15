@@ -165,6 +165,7 @@ GameObject:
   - component: {fileID: 8551482216539278869}
   - component: {fileID: 5010841045342427424}
   - component: {fileID: 3376972816013855151}
+  - component: {fileID: 5995021736564979790}
   m_Layer: 13
   m_Name: IndustrialBasicCar
   m_TagString: Vehicle
@@ -216,7 +217,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!136 &8551482216539278869
 CapsuleCollider:
@@ -237,10 +238,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1.7491215
+  m_Radius: 1.36
   m_Height: 5.1663895
   m_Direction: 2
-  m_Center: {x: -0.00088363886, y: 1.6369592, z: 0.13449383}
+  m_Center: {x: 0, y: 1.36, z: 0.13449383}
 --- !u!114 &5010841045342427424
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,12 +259,8 @@ MonoBehaviour:
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
   safeZoneTag: SafeZone
-  launchAngleDeg: 45
-  launchSpeed: 12
-  launchGravity: 9.81
-  kinematicDuringLaunch: 1
-  minLaunchDistance: 0.05
   ignoreCollisionDuration: 0.1
+  spawnSfxIndex: -1
 --- !u!114 &3376972816013855151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -281,6 +278,26 @@ MonoBehaviour:
   - {fileID: 7947285052314996379}
   velocidadRotacion: 360
   ejeRotacion: {x: 1, y: 0, z: 0}
+--- !u!114 &5995021736564979790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2948579226618137670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c759499648444d0a8b0930f361e0d35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRadius: 0.3
+  detectionOffset: {x: 1, y: 0, z: 0}
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 448
+  rotationDegrees: 90
+  rotationSpeed: 150
+  showDebugGizmos: 1
 --- !u!1 &3387467430337041859
 GameObject:
   m_ObjectHideFlags: 0
