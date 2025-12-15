@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Componente que maneja la interacción con las antorchas del tótem ritual.
@@ -12,6 +13,8 @@ public class TorchInteractable : MonoBehaviour, IInteractable
     [SerializeField] private TorchSide torchSide;
     [SerializeField] private PowerUpRitualGranFuego ritualPowerUp;
     [SerializeField] private GameObject shadow;
+    [SerializeField] private Image NotReadyUI;
+    [SerializeField] private Image ReadyUI;
     
     public InteractPriority InteractPriority => InteractPriority.High;
 
@@ -32,6 +35,13 @@ public class TorchInteractable : MonoBehaviour, IInteractable
     private void Start()
     {
         shadow.SetActive(false);
+        
+        // Configurar UI inicial
+        if (NotReadyUI != null)
+            NotReadyUI.gameObject.SetActive(true);
+        
+        if (ReadyUI != null)
+            ReadyUI.gameObject.SetActive(false);
     }
 
 
@@ -82,6 +92,13 @@ public class TorchInteractable : MonoBehaviour, IInteractable
             ritualPowerUp.LightRightTorch();
             Debug.Log("¡Antorcha derecha del tótem encendida!");
         }
+
+        // Cambiar UI para indicar que la antorcha está encendida
+        if (NotReadyUI != null)
+            NotReadyUI.gameObject.SetActive(false);
+        
+        if (ReadyUI != null)
+            ReadyUI.gameObject.SetActive(true);
 
         // Disparar evento para tutoriales
         OnSuccessfulTorchLit?.Invoke();
