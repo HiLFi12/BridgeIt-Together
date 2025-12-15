@@ -65,6 +65,7 @@ GameObject:
   - component: {fileID: 8551482216539278869}
   - component: {fileID: 5010841045342427424}
   - component: {fileID: 6348376215983084815}
+  - component: {fileID: 7556566595164487520}
   m_Layer: 13
   m_Name: Auto
   m_TagString: Vehicle
@@ -135,10 +136,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.9475294
-  m_Height: 5.8722286
+  m_Radius: 0.5563674
+  m_Height: 5.2207317
   m_Direction: 2
-  m_Center: {x: 0, y: 6.9394517, z: -0.06846128}
+  m_Center: {x: 0, y: 4.1274767, z: -0.39420715}
 --- !u!114 &5010841045342427424
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,6 +176,26 @@ MonoBehaviour:
   - {fileID: 6547718076325998802}
   velocidadRotacion: 360
   ejeRotacion: {x: 1, y: 0, z: 0}
+--- !u!114 &7556566595164487520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2948579226618137670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c759499648444d0a8b0930f361e0d35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRadius: 0.3
+  detectionOffset: {x: 1.2, y: 0, z: 0}
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 192
+  rotationDegrees: 90
+  rotationSpeed: 150
+  showDebugGizmos: 1
 --- !u!1001 &8952901406696738499
 PrefabInstance:
   m_ObjectHideFlags: 0
