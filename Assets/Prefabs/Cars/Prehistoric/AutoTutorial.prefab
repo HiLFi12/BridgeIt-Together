@@ -65,6 +65,7 @@ GameObject:
   - component: {fileID: 8551482216539278869}
   - component: {fileID: 5010841045342427424}
   - component: {fileID: 3754000993711322329}
+  - component: {fileID: 6500537870426016378}
   m_Layer: 13
   m_Name: AutoTutorial
   m_TagString: Vehicle
@@ -175,6 +176,26 @@ MonoBehaviour:
   - {fileID: 6547718076325998802}
   velocidadRotacion: 360
   ejeRotacion: {x: 1, y: 0, z: 0}
+--- !u!114 &6500537870426016378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2948579226618137670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c759499648444d0a8b0930f361e0d35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRadius: 0.3
+  detectionOffset: {x: 2, y: 0, z: 0}
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 192
+  rotationDegrees: 90
+  rotationSpeed: 150
+  showDebugGizmos: 1
 --- !u!1001 &8952901406696738499
 PrefabInstance:
   m_ObjectHideFlags: 0

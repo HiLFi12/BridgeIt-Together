@@ -22,6 +22,10 @@ namespace Gameplay.AutoControllers
         
         [Tooltip("Velocidad de rotación (grados por segundo)")]
         [SerializeField] private float rotationSpeed = 180f;
+
+        [Header("Cooldown de Caída")]
+        [Tooltip("Tiempo en segundos sin detectar suelo antes de comenzar la rotación.")]
+        [SerializeField] private float rotationCooldown = 0.5f;
         
         [Header("Debug")]
         [SerializeField] private bool showDebugGizmos = true;
@@ -31,11 +35,15 @@ namespace Gameplay.AutoControllers
         private bool isRotating;
         private float targetRotation;
         private float currentXRotation;
+        private float currentCooldown;
+        private bool hasRotatedThisFall;
         private Collider[] detectionBuffer = new Collider[5];
 
         private void Awake()
         {
             currentXRotation = transform.rotation.eulerAngles.x;
+            currentCooldown = rotationCooldown;
+            hasRotatedThisFall = false;
         }
 
         private void FixedUpdate()
@@ -51,10 +59,31 @@ namespace Gameplay.AutoControllers
             bool wasGrounded = isGrounded;
             isGrounded = hits > 0;
 
-            // Si estaba en el suelo y dejó de estarlo, iniciar rotación
-            if (wasGrounded && !isGrounded && !isRotating)
+            // Gestión de cooldown: se resetea al tocar suelo y se consume al estar en el aire.
+            if (isGrounded)
             {
-                StartRotation();
+                currentCooldown = rotationCooldown;
+                hasRotatedThisFall = false;
+            }
+            else
+            {
+                // Acaba de dejar el suelo: reiniciar cooldown para este "salto/caída".
+                if (wasGrounded)
+                {
+                    currentCooldown = rotationCooldown;
+                    hasRotatedThisFall = false;
+                }
+
+                if (currentCooldown > 0f)
+                {
+                    currentCooldown -= Time.fixedDeltaTime;
+                }
+
+                if (currentCooldown <= 0f && !isRotating && !hasRotatedThisFall)
+                {
+                    hasRotatedThisFall = true;
+                    StartRotation();
+                }
             }
         }
 
