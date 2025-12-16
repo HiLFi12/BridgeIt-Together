@@ -3949,9 +3949,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!1001 &922705537
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5378,9 +5392,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!1 &1266223971 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 74667027998539064, guid: 9772c1baa136c534093b0f903b312e3c, type: 3}
@@ -5945,9 +5973,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!1 &1392263751 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 74667027998539064, guid: 9772c1baa136c534093b0f903b312e3c, type: 3}
@@ -7997,9 +8039,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!114 &1842064692 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 111602487057439365, guid: 8f9354d9ca0aea4478bffeaa6d4d5575, type: 3}
@@ -8891,9 +8947,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!114 &2047612260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9162,9 +9232,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!1001 &2116029763
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9453,15 +9537,15 @@ PrefabInstance:
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: constructAllQuadrants
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: specificQuadrants.Array.size
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: 'specificQuadrants.Array.data[0]'
@@ -9473,11 +9557,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: 'specificQuadrants.Array.data[2]'
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: 'specificQuadrants.Array.data[3]'
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: 'specificQuadrants.Array.data[4]'
@@ -9861,11 +9945,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 201285140784237310, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 7.6535645
+      value: 7.89
       objectReference: {fileID: 0}
     - target: {fileID: 201285140784237310, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.6013794
+      value: -4.77
       objectReference: {fileID: 0}
     - target: {fileID: 201285140784237310, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9915,6 +9999,22 @@ PrefabInstance:
       propertyPath: quadrantPrefab
       value: 
       objectReference: {fileID: 1437374063}
+    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+      propertyPath: layerScales.Array.data[1].x
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+      propertyPath: layerScales.Array.data[1].z
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+      propertyPath: layerScales.Array.data[2].x
+      value: 1.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103696424932745856, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
+      propertyPath: layerScales.Array.data[2].z
+      value: 1.6
+      objectReference: {fileID: 0}
     - target: {fileID: 7962460780614538347, guid: a3140b6cc4bdfe741b25210693ca60bf, type: 3}
       propertyPath: m_Name
       value: BridgeGrid
