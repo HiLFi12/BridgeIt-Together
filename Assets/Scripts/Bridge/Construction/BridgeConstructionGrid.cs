@@ -29,15 +29,30 @@ public class BridgeConstructionGrid : MonoBehaviour
     public float[] layerHeights = new float[] { 0.0f, 0.5f, 1.5f };
     
     [Tooltip("Escalas individuales para cada capa del puente (Base, Soporte, Superficie)")]
-    public Vector3[] layerScales = new Vector3[] { 
-        Vector3.one,        // Capa 0: Base - escala normal
-        Vector3.one,        // Capa 1: Soporte - escala normal  
-        Vector3.one         // Capa 2: Superficie - escala normal
+    public Vector3[] layerScales = new Vector3[] {
+        Vector3.one,
+        Vector3.one,
+        Vector3.one
     };
 
     // Nuevo: modo de escala
     public enum LayerScaleMode { RelativeToQuadrantSize, AbsoluteWorldScale }
     public LayerScaleMode layerScaleMode = LayerScaleMode.RelativeToQuadrantSize;
+
+    // NUEVO: Rotación por capa
+    public enum LayerRotationMode { AdditiveToPrefab, AbsoluteLocalEuler }
+
+    [Header("Rotación de Capas")]
+    [Tooltip("Rotación por capa en grados (X/Y/Z). Se aplica en LOCAL al objeto de capa.")]
+    public Vector3[] layerEulerRotations = new Vector3[]
+    {
+        Vector3.zero, // Capa 0
+        Vector3.zero, // Capa 1
+        Vector3.zero  // Capa 2
+    };
+
+    [Tooltip("AdditiveToPrefab: rota sobre la rotación del prefab. AbsoluteLocalEuler: ignora la rotación del prefab.")]
+    public LayerRotationMode layerRotationMode = LayerRotationMode.AdditiveToPrefab;
 
     [Header("Visualización de Depuración")]
     public bool showDebugGrid = true;
@@ -249,6 +264,13 @@ public class BridgeConstructionGrid : MonoBehaviour
             Debug.LogWarning("Array de escalas de capas resetado a valores por defecto. Ajústalo según tus necesidades.", this);
         }
 
+        // Validar que el array de rotaciones tenga el tamaño correcto (3 capas)
+        if (layerEulerRotations == null || layerEulerRotations.Length != 3)
+        {
+            layerEulerRotations = new Vector3[] { Vector3.zero, Vector3.zero, Vector3.zero };
+            Debug.LogWarning("Array de rotaciones de capas resetado a valores por defecto (Vector3.zero).", this);
+        }
+
         if (quadrantParent == null)
         {
             // Intentar crear automáticamente el padre para los cuadrantes
@@ -396,6 +418,23 @@ public class BridgeConstructionGrid : MonoBehaviour
         ApplyConfiguredScalesAfterInit();
     }
 
+    private Quaternion GetLayerLocalRotation(int layerIndex, Quaternion prefabLocalRotation)
+    {
+        Vector3 euler = (layerEulerRotations != null && layerIndex >= 0 && layerIndex < layerEulerRotations.Length)
+            ? layerEulerRotations[layerIndex]
+            : Vector3.zero;
+
+        switch (layerRotationMode)
+        {
+            case LayerRotationMode.AbsoluteLocalEuler:
+                return Quaternion.Euler(euler);
+
+            case LayerRotationMode.AdditiveToPrefab:
+            default:
+                return prefabLocalRotation * Quaternion.Euler(euler);
+        }
+    }
+
     /// <summary>
     /// Aplica las escalas configuradas a todas las capas existentes después de la inicialización
     /// </summary>
@@ -434,7 +473,11 @@ public class BridgeConstructionGrid : MonoBehaviour
                                     cx / 2, layerHeight, cz / 2
                                 );
                                 layerTransform.position = posicionCorrecta;
-                                // Nota: aquí ya no tocamos la rotación para respetar la del prefab
+
+                                // NUEVO: aplicar rotación configurada por capa
+                                var prefab = constructionGrid[x, z].quadrantSO.requiredLayers[i].visualPrefab;
+                                Quaternion baseRot = prefab != null ? prefab.transform.localRotation : layerTransform.localRotation;
+                                layerTransform.localRotation = GetLayerLocalRotation(i, baseRot);
                             }
                         }
                     }
@@ -887,7 +930,12 @@ public class BridgeConstructionGrid : MonoBehaviour
                     GameObject layerObj = Instantiate(prefab, info.quadrantObject.transform);
                     layerObj.name = nombreCapa;
                     layerObj.transform.position = posicionCorrecta;
-                    layerObj.transform.localRotation = prefab.transform.localRotation;
+
+                    // Antes: respetaba solo la rotación del prefab
+                    // layerObj.transform.localRotation = prefab.transform.localRotation;
+
+                    // NUEVO: respetar prefab + aplicar override por capa según modo
+                    layerObj.transform.localRotation = GetLayerLocalRotation(i, prefab.transform.localRotation);
 
                     // Calcular escala final según el modo
                     Vector3 finalScale;
@@ -1298,7 +1346,7 @@ public class BridgeConstructionGrid : MonoBehaviour
         var layers = info.quadrantSO.requiredLayers;
         if (layers == null || layers.Length == 0) return false;
 
-        // Consider quadrant complete if its last required layer is completed
+        // Considerar cuadrante completo si su última capa requerida está completada
         return layers[layers.Length - 1].isCompleted;
     }
 
@@ -1454,6 +1502,7 @@ public class BridgeConstructionGrid : MonoBehaviour
                             constructionGrid[x, z].layerRenderers[i].gameObject != null)
                         {
                             GameObject layerObj = constructionGrid[x, z].layerRenderers[i].gameObject;
+
                             // Reposicionar la capa usando las alturas configurables
                             float layerHeight = (i < layerHeights.Length) ? layerHeights[i] : (0.5f * i);
                             Vector3 newLayerPosition = newPosition + new Vector3(
@@ -1472,9 +1521,18 @@ public class BridgeConstructionGrid : MonoBehaviour
                                 : layerScale;
                             layerObj.transform.localScale = finalScale;
 
+                            var quadrantSo = constructionGrid[x, z].quadrantSO;
+
+                            // NUEVO: re-aplicar rotación configurada por capa también al reescalar
+                            if (quadrantSo != null && i >= 0 && i < quadrantSo.requiredLayers.Length)
+                            {
+                                var prefab = quadrantSo.requiredLayers[i].visualPrefab;
+                                Quaternion baseRot = prefab != null ? prefab.transform.localRotation : layerObj.transform.localRotation;
+                                layerObj.transform.localRotation = GetLayerLocalRotation(i, baseRot);
+                            }
+
                             // Ajustar collider de última capa proporcional al tamaño visual
-                            var so = constructionGrid[x, z].quadrantSO;
-                            if (so != null && i == so.requiredLayers.Length - 1)
+                            if (quadrantSo != null && i == quadrantSo.requiredLayers.Length - 1)
                             {
                                 FitBoxColliderToRenderers(layerObj);
                             }
@@ -1642,6 +1700,8 @@ public class BridgeConstructionGrid : MonoBehaviour
             targets = new Transform[renderers.Length];
             for (int i = 0; i < renderers.Length; i++) targets[i] = renderers[i].transform;
         }
+
+
 
         var type = System.Type.GetType("QuadrantLastLayerShaker") ?? System.Type.GetType("QuadrantLastLayerShaker, Assembly-CSharp");
         if (type == null) return;

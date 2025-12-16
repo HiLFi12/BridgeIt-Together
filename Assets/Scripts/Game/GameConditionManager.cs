@@ -331,7 +331,6 @@ public class GameConditionManager : MonoBehaviour
 
         // Nuevo comportamiento: decrementamos los vehículos restantes INMEDIATAMENTE
         vehiculosPasados++;
-        if (vehiculosRestantes > 0) vehiculosRestantes--;
 
         if (mostrarDebugInfo)
         {
@@ -348,11 +347,6 @@ public class GameConditionManager : MonoBehaviour
         // Disparar evento de progreso con la cantidad restante (para mostrar en UI)
         OnVictoriaProgreso?.Invoke(vehiculosRestantes);
 
-        // Verificar condición de victoria: cuando quedan 0 vehículos disponibles y pasa el último
-        if (vehiculosRestantes <= 0)
-        {
-            Victoria();
-        }
     }
     
     /// <summary>
@@ -618,6 +612,21 @@ public class GameConditionManager : MonoBehaviour
     /// Obtiene si el juego ha terminado
     /// </summary>
     public bool IsJuegoTerminado() => juegoTerminado;
+
+    /// <summary>
+    /// Evalúa y dispara la victoria si no quedan vehículos restantes.
+    /// Útil para sistemas externos (ej: retorno a pool) donde el conteo ya ocurrió.
+    /// </summary>
+    public void EvaluarVictoriaSiNoQuedanVehiculos()
+    {
+        if (!juegoActivo || juegoTerminado || juegoEnPausa) return;
+        if (vehiculosRestantes > 0) vehiculosRestantes--;
+        if (vehiculosRestantes <= 0)
+        {
+            Victoria();
+        }
+        
+    }
     
     /// <summary>
     /// Obtiene la meta de vehículos para victoria

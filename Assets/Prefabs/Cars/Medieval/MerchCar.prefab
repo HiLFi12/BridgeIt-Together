@@ -100,6 +100,7 @@ GameObject:
   - component: {fileID: 7534566590204756760}
   - component: {fileID: 7236148492619856147}
   - component: {fileID: 6699154543574898434}
+  - component: {fileID: 3074071214754154990}
   m_Layer: 13
   m_Name: MerchCar
   m_TagString: Vehicle
@@ -151,7 +152,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!136 &5786666951659194499
 CapsuleCollider:
@@ -193,12 +194,8 @@ MonoBehaviour:
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
   safeZoneTag: SafeZone
-  launchAngleDeg: 45
-  launchSpeed: 12
-  launchGravity: 9.81
-  kinematicDuringLaunch: 1
-  minLaunchDistance: 0.05
   ignoreCollisionDuration: 0.1
+  spawnSfxIndex: -1
 --- !u!114 &7236148492619856147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,6 +239,27 @@ MonoBehaviour:
   - {fileID: 8303759340139808805}
   velocidadRotacion: 360
   ejeRotacion: {x: 0, y: 0, z: -1}
+--- !u!114 &3074071214754154990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248325544060308125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c759499648444d0a8b0930f361e0d35c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRadius: 0.3
+  detectionOffset: {x: 6.5, y: 0, z: 0}
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 33217
+  rotationDegrees: 90
+  rotationSpeed: 150
+  rotationCooldown: 0.3
+  showDebugGizmos: 1
 --- !u!1 &1301683650741692815
 GameObject:
   m_ObjectHideFlags: 0

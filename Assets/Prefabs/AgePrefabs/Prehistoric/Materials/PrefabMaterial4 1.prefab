@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6592562587722298924}
-  - component: {fileID: 6013370778659644987}
-  - component: {fileID: 5975200323588487600}
-  - component: {fileID: 8960096820510945736}
-  - component: {fileID: 213839523144129910}
+  - component: {fileID: 5545313815788000504}
+  - component: {fileID: 7820275136246263713}
+  - component: {fileID: 5097007624021785543}
+  - component: {fileID: 7467930496145786564}
   m_Layer: 8
   m_Name: PrefabMaterial4 1
   m_TagString: BridgeQuadrant
@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 403930078715100155}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.43051103, z: 0, w: 0.9025853}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 4.2, y: 1, z: 4.1}
   m_ConstrainProportionsScale: 0
@@ -37,16 +37,16 @@ Transform:
   - {fileID: 6042078294554641981}
   - {fileID: 3588999812056662333}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 51, z: 0}
---- !u!33 &6013370778659644987
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &5545313815788000504
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 403930078715100155}
-  m_Mesh: {fileID: 7164540556213919397, guid: 5d754d478f6a25d47bc7dc6e9cab2be8, type: 3}
---- !u!23 &5975200323588487600
+  m_Mesh: {fileID: 7164540556213919397, guid: 5ce039b554b512c47b723366b50233bf, type: 3}
+--- !u!23 &7820275136246263713
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -69,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 7549781418554286500, guid: 5d754d478f6a25d47bc7dc6e9cab2be8, type: 3}
+  - {fileID: 7549781418554286500, guid: 5ce039b554b512c47b723366b50233bf, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -91,7 +91,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8960096820510945736
+--- !u!65 &5097007624021785543
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -110,9 +110,9 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.5216792, y: 0.32452258, z: 0.5755701}
-  m_Center: {x: 0.008266029, y: 0.028114751, z: -0.02203856}
---- !u!114 &213839523144129910
+  m_Size: {x: 0.45268995, y: 0.32452258, z: 0.515676}
+  m_Center: {x: -0.0082332995, y: 0.028114751, z: -0.016850553}
+--- !u!114 &7467930496145786564
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eae21c2f68f26074587ad27681eaadd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetMeshFilter: {fileID: 6013370778659644987}
+  targetMeshFilter: {fileID: 5545313815788000504}
   updateOnScaleChange: 1
   updateEveryFrame: 1
 --- !u!1001 &3281763313187828449

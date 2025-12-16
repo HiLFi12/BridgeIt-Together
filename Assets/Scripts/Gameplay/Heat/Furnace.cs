@@ -35,6 +35,10 @@ public class Furnace : MonoBehaviour, IInteractable
     [SerializeField] private bool autoAcceptCoalOnTrigger = false;
     [SerializeField] private GameObject shadow;
 
+    [Header("Audio")]
+    [Tooltip("Índice en AudioManager.soundEffects para reproducir cuando el horno recibe carbón (-1 = sin sonido).")]
+    [SerializeField] private int addCoalSfxIndex = -1;
+
     public InteractPriority InteractPriority => interactPriority;
 
     private void OnValidate()
@@ -128,6 +132,8 @@ public class Furnace : MonoBehaviour, IInteractable
         {
             currentCoal++;
             holder.UseHeldObject();
+
+            PlayAddCoalSfx();
             
             bool justTurnedOn = false;
             if (currentCoal >= maxCoal)
@@ -153,6 +159,7 @@ public class Furnace : MonoBehaviour, IInteractable
         {
             holder.UseHeldObject();
             heatSphere.ResetCooldown();
+            PlayAddCoalSfx();
             Debug.Log("[Furnace] Coal added while active, cooldown reset.");
             
             // Notificar que el jugador agregó carbón exitosamente
@@ -164,6 +171,16 @@ public class Furnace : MonoBehaviour, IInteractable
             Debug.Log("[Furnace] Coal storage is full and heat is not active.");
             return false;
         }
+    }
+
+    private void PlayAddCoalSfx()
+    {
+        if (addCoalSfxIndex < 0) return;
+
+        var audioManager = FindFirstObjectByType<AudioManager>();
+        if (audioManager == null) return;
+
+        audioManager.PlaySFX(addCoalSfxIndex);
     }
 
     private void TurnOn()

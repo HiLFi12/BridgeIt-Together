@@ -26,6 +26,25 @@ namespace BridgeItTogether.Gameplay.SafeZones
             set => size = new Vector2(Mathf.Max(0f, value.x), Mathf.Max(0f, value.y));
         }
 
+        /// <summary>
+        /// Detiene el lanzamiento activo para el transform dado si existe.
+        /// Usado cuando un objeto es recogido durante el vuelo.
+        /// </summary>
+        public void StopLaunchForObject(Transform target)
+        {
+            if (target == null) return;
+            
+            if (activeLaunches.TryGetValue(target, out Coroutine routine))
+            {
+                if (routine != null)
+                {
+                    StopCoroutine(routine);
+                }
+                activeLaunches.Remove(target);
+                RestorePhysicsComponents(target);
+            }
+        }
+
         public Vector3 GetRandomPointInside()
         {
             Vector2 half = size * 0.5f;

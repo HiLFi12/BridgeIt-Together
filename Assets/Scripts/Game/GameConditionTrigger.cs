@@ -187,6 +187,14 @@ public class GameConditionTrigger : MonoBehaviour
         switch (tipoTrigger)
         {
             case TipoTrigger.Victoria:
+                // Si este collider también es un trigger de retorno al pool, NO debe contar victoria.
+                // (Este caso existe en escenas donde el mismo collider se usa para retorno + conteo)
+                if (GetComponent<VehicleReturnTrigger>() != null)
+                {
+                    if (mostrarDebugInfo)
+                        Debug.Log($"ℹ️ GameConditionTrigger: Ignorando conteo de victoria porque '{gameObject.name}' es VehicleReturnTrigger.");
+                    return;
+                }
                 gameManager.OnVehiculoPasaPuente(vehiculo);
                 break;
                 

@@ -213,11 +213,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  efectoDesaparicionPrefab: {fileID: 0}
-  spawnearEfectoAlDesaparecer: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!114 &130080004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,12 +380,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  efectoDesaparicionPrefab: {fileID: 104829970813648393, guid: a6a6ee34c2d1aa64eb05240d7aa85da8, type: 3}
-  spawnearEfectoAlDesaparecer: 1
-  additionalProtectedTags:
-  - InvisibleWall
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!114 &149768883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4320,7 +4343,7 @@ GameObject:
   m_Component:
   - component: {fileID: 985317587}
   - component: {fileID: 985317586}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BridgeGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4346,7 +4369,7 @@ MonoBehaviour:
   quadrantSizeX: 3.39
   quadrantSizeY: 1
   quadrantSizeZ: 3.5
-  defaultQuadrantSO: {fileID: 11400000, guid: dc289388ff952494da534bf59c75595b, type: 2}
+  defaultQuadrantSO: {fileID: 11400000, guid: e848efcdade68e94aa427ce371155c0f, type: 2}
   quadrantPrefab: {fileID: 1437374063}
   quadrantParent: {fileID: 873773387}
   layerHeights:
@@ -4358,6 +4381,11 @@ MonoBehaviour:
   - {x: 110, y: 100, z: 20}
   - {x: 2.9, y: 0.2, z: 3}
   layerScaleMode: 1
+  layerEulerRotations:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  layerRotationMode: 0
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
   incompleteColor: {r: 1, g: 0, b: 0, a: 1}
@@ -4784,7 +4812,7 @@ PrefabInstance:
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'autoPrefabs.Array.data[0]'
       value: 
-      objectReference: {fileID: 248325544060308125, guid: 181dd2111d415bf4d8114322b03ae22c, type: 3}
+      objectReference: {fileID: 248325544060308125, guid: 6447c1d329fbc774aa69beec85cb6ac6, type: 3}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'autoPrefabs.Array.data[1]'
       value: 
@@ -6604,7 +6632,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2322183861910670454, guid: 214b2883cf94ace44b99f9bd85ee2d84, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2542805390273581327, guid: 214b2883cf94ace44b99f9bd85ee2d84, type: 3}
       propertyPath: m_IsActive
@@ -7199,11 +7227,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678901234abcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyNonVehicles: 1
   showDebugMessages: 1
-  efectoDesaparicionPrefab: {fileID: 0}
-  spawnearEfectoAlDesaparecer: 1
-  additionalProtectedTags: []
+  efectoDestruccionPrefab: {fileID: 0}
+  spawnearEfectoAlDestruir: 1
+  efectoDestruccionVehiculoPrefab: {fileID: 0}
+  spawnearEfectoVehiculo: 1
+  vehicleReturnSfxIndex: -1
+  protectedTags:
+  - Player
+  - MainCamera
+  - GameController
+  - UI
+  - BridgeQuadrant
+  - Ground
+  - Platform
+  - Respawn
+  - Finish
+  - EditorOnly
 --- !u!114 &1557463134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7927,11 +7967,27 @@ PrefabInstance:
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: constructAllQuadrants
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[2]'
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[3]'
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[4]'
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[5]'
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8025,7 +8081,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[0].tiempoEntreAutos
-      value: 50
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2362986081783338978, guid: 7804bb8f088c4674d936eb46cfb83af2, type: 3}
       propertyPath: configuracionRondas.Array.data[1].tiempoEntreAutos
@@ -9242,9 +9298,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5588104189865236928, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6189082352308714957, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6436639965930558152, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7229149903105642913, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
+      propertyPath: m_Layer
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 9213080468329332838, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
       propertyPath: m_Name
       value: PropulsedCarGuardDropZone
+      objectReference: {fileID: 0}
+    - target: {fileID: 9213080468329332838, guid: 62ea2b5e12fe0824a92dc86f4da6a325, type: 3}
+      propertyPath: m_Layer
+      value: 15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
