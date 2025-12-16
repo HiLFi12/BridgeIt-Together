@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8982840b44f663240a2ed9271433f8cc, type: 3}
+  m_Name: MedievalTEST
+  m_EditorClassIdentifier: 
+  era: 1
+  requiredLayers:
+  - layerName: 0
+    visualPrefab: {fileID: 187256071978650319, guid: 98affd2f1cb09fc4da3685f27bb98530, type: 3}
+    material: {fileID: 2100000, guid: f2ba779d124f85948bd1a58524537299, type: 2}
+    isCompleted: 0
+  - layerName: 1
+    visualPrefab: {fileID: 6669498875483708022, guid: d9f0dd36a03c5464cae7e9bd246c4779, type: 3}
+    material: {fileID: 2100000, guid: 93b654a98506dee46a60ea196e6bcf66, type: 2}
+    isCompleted: 0
+  - layerName: 2
+    visualPrefab: {fileID: 8709062679644081020, guid: e8148da00c1055542a5462a5b04d4968, type: 3}
+    material: {fileID: 2100000, guid: 31dbee322b0836041bfbc0ce2ba40409, type: 2}
+    isCompleted: 0
+  hasCollision: 1
+  lastLayerState: 0
+  maxUsesBeforeDamage: 5
+  currentUses: 0
+  maxTemperature: 100
+  currentTemperature: 100
+  temperatureDecayRate: 5
+  damageChance: 0.3
+  batteryLife: 100
+  batteryDrainRate: 5
+  heatActive: 0
+  isWet: 0
+  wetHeatDamagePerSecond: 1
+  wetDurationAfterWater: 3
+  debugLife: 0
+  debugLifeInterval: 0.5
+  damagedMaterial: {fileID: 2100000, guid: 25a76c028a5fca048800dd297963835a, type: 2}
+  destroyedMaterial: {fileID: 2100000, guid: 31746a195f76e364f801898c80305451, type: 2}
+  destructionEffectPrefab: {fileID: 0}
+  damageMaterial_30to40: {fileID: 0}
+  damageMaterial_20to30: {fileID: 0}
+  damageMaterial_0to10: {fileID: 0}
+  buildLayer0SfxIndex: 9
+  buildLayer1SfxIndex: 3
+  buildLayer2SfxIndex: 1
+  repairSfxIndex: 1
+  destroySfxIndex: -1
+  damageSfxIndex: -1
+  maxLife: 3
+  currentLife: 3
+  damagedThreshold01: 0.1
+  damagePerImpact: 0
