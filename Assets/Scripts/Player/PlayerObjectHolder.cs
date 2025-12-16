@@ -74,8 +74,9 @@ public class PlayerObjectHolder : MonoBehaviour
 
         heldObject = objectInstance;
         
-        // Detener cualquier corutina de lanzamiento activa de catapultas
+        // Detener cualquier corutina de lanzamiento activa (catapultas y SafeZones)
         StopCatapultLaunchIfActive(heldObject.transform);
+        StopSafeZoneLaunchIfActive(heldObject.transform);
         
         // Mantener posición/rotación/escala en mundo al parentear para no deformar el objeto
         heldObject.transform.SetParent(Anchor, true);
@@ -246,6 +247,22 @@ public class PlayerObjectHolder : MonoBehaviour
         foreach (var catapult in catapults)
         {
             catapult.StopLaunchForObject(objectTransform);
+        }
+    }
+
+    /// <summary>
+    /// Detiene cualquier corutina de lanzamiento activa de SafeZones para el objeto dado.
+    /// Esto previene conflictos de posición cuando se recoge un objeto que está siendo lanzado por un AutoController.
+    /// </summary>
+    private void StopSafeZoneLaunchIfActive(Transform objectTransform)
+    {
+        if (objectTransform == null) return;
+        
+        // Buscar todas las SafeZones en la escena y pedirles que detengan el lanzamiento
+        var safeZones = FindObjectsByType<BridgeItTogether.Gameplay.SafeZones.SafeZoneArea>(FindObjectsSortMode.None);
+        foreach (var safeZone in safeZones)
+        {
+            safeZone.StopLaunchForObject(objectTransform);
         }
     }
 

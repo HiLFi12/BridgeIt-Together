@@ -40,6 +40,7 @@ public class VehicleReturnTrigger : MonoBehaviour
     private Collider triggerCollider;
     private bool isActive = true;
     private AudioManager audioManager;
+    private VehicleReturnTriggerManager triggerManager;
 
     private void Awake()
     {
@@ -63,6 +64,7 @@ public class VehicleReturnTrigger : MonoBehaviour
     {
         // El manager ya no es necesario para la destrucción,
         // pero mantenemos este método para no romper referencias existentes.
+        this.triggerManager = triggerManager;
         triggerCollider = GetComponent<Collider>();
         if (triggerCollider != null)
         {
@@ -163,6 +165,31 @@ public class VehicleReturnTrigger : MonoBehaviour
         {
             PlayVehicleReturnSfx();
         }
+
+        if (esVehiculo)
+        {
+            // IMPORTANTE: el retorno al pool NO debe contabilizar victoria.
+            // Si este collider también tiene GameConditionTrigger por tag/configuración,
+            // ese componente debe ignorar el conteo (ver GameConditionTrigger).
+
+            if (triggerManager != null)
+            {
+                if (showDebugMessages)
+                    Debug.Log($"↩️ Retornando vehículo al pool: {obj.name}", obj);
+
+                triggerManager.OnVehicleTriggered(obj, triggerCollider);
+                GameConditionManager.Instance.EvaluarVictoriaSiNoQuedanVehiculos();
+            }
+            else
+            {
+                // Fallback seguro: si no hay manager, no destruimos el vehículo.
+                if (showDebugMessages)
+                    Debug.LogWarning($"⚠️ VehicleReturnTrigger sin manager, no se puede retornar al pool: {obj.name}", obj);
+            }
+
+            return;
+        }
+
 
         if (showDebugMessages)
             Debug.Log($"🗑️ Destruyendo objeto: {obj.name} (Tag: {obj.tag})", obj);

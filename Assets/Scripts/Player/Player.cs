@@ -338,6 +338,10 @@ public class Player : MonoBehaviour, IHitable
 
     private void TryInteract()
     {
+        if(characterController == null){
+            return;
+        }
+        
         int elements = Physics.OverlapSphereNonAlloc(interactionPoint.position, interactionRadius, interactables, interactionLayer, QueryTriggerInteraction.Collide);
 
         if (elements == 0) 

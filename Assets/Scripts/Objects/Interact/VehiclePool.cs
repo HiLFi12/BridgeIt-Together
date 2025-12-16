@@ -249,6 +249,16 @@ public class VehiclePool : MonoBehaviour
                 trigger.RemoverVehiculoContado(vehicle);
             }
         }
+
+        // También limpiar triggers de conteo dedicado (si existen)
+        VictoryCountOnlyTrigger[] victoryCountTriggers = FindObjectsByType<VictoryCountOnlyTrigger>(FindObjectsSortMode.None);
+        foreach (VictoryCountOnlyTrigger trigger in victoryCountTriggers)
+        {
+            if (trigger != null)
+            {
+                trigger.RemoverVehiculoContado(vehicle);
+            }
+        }
     }
 
     /// <summary>
