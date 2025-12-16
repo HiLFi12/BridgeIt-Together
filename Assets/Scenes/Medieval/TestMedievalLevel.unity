@@ -2336,14 +2336,23 @@ MonoBehaviour:
   - {x: 65, y: 60, z: 20}
   - {x: 1.5, y: 0.2, z: 1.7}
   layerScaleMode: 1
+  layerEulerRotations:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  layerRotationMode: 0
   showDebugGrid: 1
   completeColor: {r: 0, g: 1, b: 0, a: 1}
   incompleteColor: {r: 1, g: 0, b: 0, a: 1}
   damagedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   showLifeInScene: 1
   lifeTextColor: {r: 1, g: 0.95, b: 0.6, a: 1}
+  shakerLifeThreshold: 1
   powerUpEffectMultiplier: 1.5
   isPowerUpActive: 0
+  usarUmbralesAbsolutosGrietas: 1
+  valorGrieta1: 43
+  valorGrieta2: 3
 --- !u!4 &985317587
 Transform:
   m_ObjectHideFlags: 0
@@ -2524,14 +2533,14 @@ PrefabInstance:
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'autoPrefabs.Array.data[0]'
       value: 
-      objectReference: {fileID: 248325544060308125, guid: 7343e7e8ac960bf44a616c51b049fc4a, type: 3}
+      objectReference: {fileID: 248325544060308125, guid: 6447c1d329fbc774aa69beec85cb6ac6, type: 3}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'autoPrefabs.Array.data[1]'
       value: 
-      objectReference: {fileID: 248325544060308125, guid: 7343e7e8ac960bf44a616c51b049fc4a, type: 3}
+      objectReference: {fileID: 248325544060308125, guid: 6447c1d329fbc774aa69beec85cb6ac6, type: 3}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: returnTriggers.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'returnTriggers.Array.data[1]'
@@ -2552,7 +2561,7 @@ PrefabInstance:
     - target: {fileID: 1456342313909371167, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: 'returnTriggers.Array.data[5]'
       value: 
-      objectReference: {fileID: 6644201429299394500, guid: 699dbe08343102a4b914f48e1a73a5f2, type: 3}
+      objectReference: {fileID: 2111161555}
     - target: {fileID: 2970604831044255281, guid: 3a5037f6e75eedc43b0e1415a54bca9e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -61.881927
@@ -3991,7 +4000,23 @@ PrefabInstance:
       objectReference: {fileID: 985317586}
     - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
       propertyPath: initialConstructedLayers
-      value: 4
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[1]'
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[2]'
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[3]'
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7876199422304386391, guid: 4aff8cd213dc5ee4a8f56f8163183ff9, type: 3}
+      propertyPath: 'specificQuadrants.Array.data[5]'
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5296,9 +5321,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   holdAnchor: {fileID: 2109101784}
+  objectLocalPosition: {x: 0, y: 0, z: 0}
   objectLocalRotation: {x: 0, y: 0, z: 0}
-  paloIgnifugoRotation: {x: 0, y: 0, z: -45}
-  material1Rotation: {x: 0, y: 0, z: -90}
+  overrides: []
   playerUIManager: {fileID: 0}
   pickUpSfxIndex: -1
   dropSfxIndex: -1
@@ -5324,6 +5349,10 @@ MonoBehaviour:
   spherecastRadius: 0.22
   spherecastUpOffset: 0.3
   spherecastExtraDistance: 1
+  previewMaterial: {fileID: 0}
+  previewAlpha: 0.45
+  previewTint: {r: 0.1, g: 0.8, b: 1, a: 0.45}
+  showPreview: 1
 --- !u!114 &4116812497726793947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5342,6 +5371,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   interactKey: 112
+  dropKey: 113
   dashKey: 304
   dashDistance: 5
   dashDuration: 0.2
@@ -5374,12 +5404,19 @@ MonoBehaviour:
   dashOnlyWhenGrounded: 1
   dashEffectPrefab: {fileID: 0}
   dashSpawn: {fileID: 0}
+  dashSfxIndex: -1
   interactionKeyUI: {fileID: 0}
   interactionPadUI: {fileID: 0}
   buildKeyUI: {fileID: 0}
   buildPadUI: {fileID: 0}
   dashKeyUI: {fileID: 0}
   dashPadUI: {fileID: 0}
+  respawnPoint: {fileID: 0}
+  respawnEffectPrefab: {fileID: 0}
+  manualRespawnCooldown: 3
+  shakeIntensityMax: 0.5
+  shakeFrequency: 20
+  manualRespawnKey: 102
   enableFillBridgeHotkey: 0
   fillBridgeKey: 103
   bridgeGrid: {fileID: 0}
