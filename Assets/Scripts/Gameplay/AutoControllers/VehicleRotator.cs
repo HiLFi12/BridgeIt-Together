@@ -37,6 +37,7 @@ namespace Gameplay.AutoControllers
         private float currentXRotation;
         private float currentCooldown;
         private bool hasRotatedThisFall;
+        private bool hasRotatedEver; // Nueva bandera para desactivar el sistema tras la primera rotación
         private Collider[] detectionBuffer = new Collider[5];
 
         private void Awake()
@@ -44,10 +45,14 @@ namespace Gameplay.AutoControllers
             currentXRotation = transform.rotation.eulerAngles.x;
             currentCooldown = rotationCooldown;
             hasRotatedThisFall = false;
+            hasRotatedEver = false;
         }
 
         private void FixedUpdate()
         {
+            // Si ya rotó alguna vez, desactivar el sistema permanentemente
+            if (hasRotatedEver) return;
+            
             CheckGroundStatus();
         }
 
@@ -91,6 +96,7 @@ namespace Gameplay.AutoControllers
         {
             targetRotation = currentXRotation + rotationDegrees;
             isRotating = true;
+            hasRotatedEver = true; // Marcar que ya se ejecutó una rotación, desactivando el sistema permanentemente
             StartCoroutine(RotateCoroutine());
         }
 
@@ -135,4 +141,3 @@ namespace Gameplay.AutoControllers
         }
     }
 }
-
