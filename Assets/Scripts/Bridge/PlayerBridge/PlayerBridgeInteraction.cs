@@ -614,6 +614,71 @@ public class PlayerBridgeInteraction : MonoBehaviour
         return FindTargetQuadrantAllGrids(buildPoint.position, out _, out _, out _);
     }
 
+    /// <summary>
+    /// Verifica si hay posibilidad real de construir o reparar en el cuadrante objetivo con el material en mano.
+    /// Retorna true solo si:
+    /// 1. Hay un cuadrante en rango
+    /// 2. El cuadrante tiene capas incompletas O necesita reparación
+    /// 3. El material en mano es compatible con la acción requerida
+    /// </summary>
+    public bool CanBuildOrRepairInRange()
+    {
+        if (objectHolder == null || !objectHolder.HasObjectInHand()) return false;
+        
+        GameObject inHand = objectHolder.GetHeldObject();
+        if (inHand == null || !EsMaterialDeConstruccionValido(inHand)) return false;
+
+        if (!FindTargetQuadrantAllGrids(buildPoint != null ? buildPoint.position : transform.position, 
+            out BridgeConstructionGrid grid, out int x, out int z))
+        {
+            return false;
+        }
+
+        BridgeQuadrantSO so = GetQuadrantSO(grid, x, z);
+        if (so == null || so.requiredLayers == null || so.requiredLayers.Length == 0) return false;
+
+        // Obtener info del material
+        BridgeMaterialInfo matInfo = inHand.GetComponent<BridgeMaterialInfo>();
+        int matLayerIndex = 0;
+        if (matInfo != null)
+        {
+            matLayerIndex = matInfo.layerIndex;
+        }
+        else if (inHand.tag.StartsWith("BridgeLayer"))
+        {
+            string layerStr = inHand.tag.Substring(11);
+            if (int.TryParse(layerStr, out int li)) matLayerIndex = li;
+        }
+
+        // Verificar construcción normal
+        int nextLayer = GetNextCorrectLayerIndex(grid, x, z);
+        if (nextLayer >= 0 && nextLayer == matLayerIndex)
+        {
+            return true; // Puede construir la siguiente capa
+        }
+
+        // Verificar reparación
+        if (nextLayer == -1 && so.NeedsRepair())
+        {
+            int lastIdx = Mathf.Max(0, so.requiredLayers.Length - 1);
+            bool canRepair = false;
+            
+            if (matInfo != null)
+            {
+                canRepair = matInfo.materialType == BridgeQuadrantSO.MaterialType.Adoquin || 
+                           matInfo.layerIndex == lastIdx;
+            }
+            else if (inHand.tag == $"BridgeLayer{lastIdx}")
+            {
+                canRepair = true;
+            }
+            
+            return canRepair;
+        }
+
+        return false;
+    }
+
     // Selección de cuadrante entre TODOS los grids disponibles
     private bool FindTargetQuadrantAllGrids(Vector3 position, out BridgeConstructionGrid grid, out int xSel, out int zSel)
     {
