@@ -372,7 +372,7 @@ public class GameConditionManager : MonoBehaviour
             lifeStarsUI.LoseLife();
         }
 
-        if (vehiculosRestantes > 0) vehiculosRestantes--;
+        ////if (vehiculosRestantes > 0);
         
         if (mostrarDebugInfo)
         {

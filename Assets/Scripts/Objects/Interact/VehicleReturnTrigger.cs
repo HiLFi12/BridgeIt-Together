@@ -178,6 +178,7 @@ public class VehicleReturnTrigger : MonoBehaviour
                     Debug.Log($"↩️ Retornando vehículo al pool: {obj.name}", obj);
 
                 triggerManager.OnVehicleTriggered(obj, triggerCollider);
+                GameConditionManager.Instance.EvaluarVictoriaSiNoQuedanVehiculos();
             }
             else
             {
