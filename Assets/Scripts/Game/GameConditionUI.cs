@@ -228,7 +228,10 @@ public class GameConditionUI : MonoBehaviour
         
         if (totalRondas > 0)
         {
-            string texto = string.Format(formatoRondas, rondaActual, totalRondas);
+            // Asegurar que la ronda actual nunca exceda el total en la UI
+            int rondaMostrar = Mathf.Min(rondaActual, totalRondas);
+            
+            string texto = string.Format(formatoRondas, rondaMostrar, totalRondas);
             textoRondas.text = texto;
             textoRondas.color = colorNormal;
         }

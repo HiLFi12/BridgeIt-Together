@@ -592,7 +592,7 @@ public class Player : MonoBehaviour, IHitable
     // Mostrar/ocultar BuildUI (similar a InteractionUI)
     private void UpdateBuildUI()
     {
-        if (bridgeInteraction == null || objectHolder == null)
+        if (CurrentBuildUI == null || bridgeInteraction == null || objectHolder == null)
         {
             HideBuildUI();
             return;
@@ -602,9 +602,10 @@ public class Player : MonoBehaviour, IHitable
                                  objectHolder.GetHeldObject() != null &&
                                  objectHolder.GetHeldObject().GetComponent<BridgeMaterialInfo>() != null;
 
-        bool targetInRange = hasMaterialInHand && bridgeInteraction.HasTargetQuadrantInRange();
+        // Solo mostrar UI si hay posibilidad real de construir o reparar
+        bool canBuildOrRepair = hasMaterialInHand && bridgeInteraction.CanBuildOrRepairInRange();
 
-        if (targetInRange) ShowBuildUI();
+        if (canBuildOrRepair) ShowBuildUI();
         else HideBuildUI();
     }
 
