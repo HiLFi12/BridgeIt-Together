@@ -10705,9 +10705,9 @@ MonoBehaviour:
   yellowLifeAbsolute: 30
   greenLifeThreshold: 0.51
   yellowLifeThreshold: 0.26
-  highLifeColor: {r: 0, g: 1, b: 0, a: 1}
-  mediumLifeColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  lowLifeColor: {r: 1, g: 0, b: 0, a: 1}
+  highLifeColor: {r: 0, g: 1, b: 0, a: 0.5019608}
+  mediumLifeColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 0.5019608}
+  lowLifeColor: {r: 1, g: 0, b: 0, a: 0.5019608}
   validateHeatByProbing: 1
   heatCheckRadius: 12.16
   heatLayerMask:
@@ -19683,6 +19683,10 @@ PrefabInstance:
     - target: {fileID: 743470466611498014, guid: 3a5054450548d4440854a00973a4b017, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 773390949318633742, guid: 3a5054450548d4440854a00973a4b017, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 1041225843213052244, guid: 3a5054450548d4440854a00973a4b017, type: 3}
       propertyPath: m_LocalScale.x
