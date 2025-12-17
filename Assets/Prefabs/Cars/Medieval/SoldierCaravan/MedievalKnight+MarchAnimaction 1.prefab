@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1820670478023695698}
-  - component: {fileID: 3770068302732353088}
   m_Layer: 0
   m_Name: FeetPoint
   m_TagString: Untagged
@@ -32,27 +31,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2344448967621814100}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &3770068302732353088
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2129011680841826676}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.16967583
-  m_Center: {x: 0, y: 0, z: -0.33032417}
 --- !u!1 &7827258134071200852
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,12 +294,8 @@ MonoBehaviour:
   asegurarTagVehiculo: 1
   nombreTagVehiculo: Vehicle
   safeZoneTag: SafeZone
-  launchAngleDeg: 45
-  launchSpeed: 12
-  launchGravity: 9.81
-  kinematicDuringLaunch: 1
-  minLaunchDistance: 0.05
   ignoreCollisionDuration: 0.1
+  spawnSfxIndex: -1
   feetPoint: {fileID: 1820670478023695698}
   feetRadius: 0.5
   groundLayer:
