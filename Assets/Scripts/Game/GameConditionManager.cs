@@ -416,6 +416,9 @@ public class GameConditionManager : MonoBehaviour
             Debug.Log("🎉 ¡VICTORIA! ¡Has logrado que pasen suficientes vehículos por el puente!");
         }
         
+        // Hacer que todos los jugadores suelten objetos
+        DropAllPlayersObjects();
+        
         // Guardar progreso del nivel como completado
         GuardarProgresoNivel();
         
@@ -446,6 +449,9 @@ public class GameConditionManager : MonoBehaviour
             Debug.Log("🎉 ¡VICTORIA POR RONDAS! ¡Has completado todas las rondas configuradas!");
         }
         
+        // Hacer que todos los jugadores suelten objetos
+        DropAllPlayersObjects();
+        
         // Guardar progreso del nivel como completado
         GuardarProgresoNivel();
         
@@ -475,6 +481,9 @@ public class GameConditionManager : MonoBehaviour
         {
             Debug.Log("💀 ¡DERROTA! Demasiados vehículos han caído del puente.");
         }
+        
+        // Hacer que todos los jugadores suelten objetos
+        DropAllPlayersObjects();
         
         // Desactivar controles y sistemas de juego
         DesactivarSistemasDeJuego();
@@ -521,6 +530,50 @@ public class GameConditionManager : MonoBehaviour
         if (mostrarDebugInfo)
         {
             Debug.Log("💾 Progreso del nivel guardado en PlayerPrefs");
+        }
+    }
+    
+    /// <summary>
+    /// Hace que todos los jugadores en la escena suelten los objetos que tienen en las manos
+    /// y deshabilita su capacidad de interactuar con nuevos objetos
+    /// </summary>
+    private void DropAllPlayersObjects()
+    {
+        // Buscar todos los Player en la escena
+        Player[] players = FindObjectsByType<Player>(FindObjectsSortMode.None);
+        
+        if (players == null || players.Length == 0)
+        {
+            if (mostrarDebugInfo)
+            {
+                Debug.Log("⚠️ No se encontraron jugadores en la escena para soltar objetos");
+            }
+            return;
+        }
+        
+        int playersWithObjects = 0;
+        
+        // Hacer que cada jugador suelte su objeto y deshabilitar su interacción
+        foreach (Player player in players)
+        {
+            if (player != null)
+            {
+                // Deshabilitar la capacidad de interacción del jugador
+                player.SetInteractionEnabled(false);
+                
+                // Soltar el objeto si tiene uno
+                PlayerObjectHolder objectHolder = player.GetComponent<PlayerObjectHolder>();
+                if (objectHolder != null && objectHolder.HasObjectInHand())
+                {
+                    objectHolder.DropObject();
+                    playersWithObjects++;
+                }
+            }
+        }
+        
+        if (mostrarDebugInfo)
+        {
+            Debug.Log($"🎒 {players.Length} jugador(es) tuvieron su interacción deshabilitada. {playersWithObjects} soltaron objetos al terminar el juego");
         }
     }
     
@@ -592,6 +645,35 @@ public class GameConditionManager : MonoBehaviour
         vehiculosPasados = 0;
         OnVictoriaProgreso?.Invoke(vehiculosRestantes);
         OnDerrotaProgreso?.Invoke(0);
+        
+        // Reactivar interacciones de los jugadores
+        ReactivarInteraccionesJugadores();
+    }
+    
+    /// <summary>
+    /// Reactiva la capacidad de interacción de todos los jugadores en la escena
+    /// </summary>
+    private void ReactivarInteraccionesJugadores()
+    {
+        Player[] players = FindObjectsByType<Player>(FindObjectsSortMode.None);
+        
+        if (players == null || players.Length == 0)
+        {
+            return;
+        }
+        
+        foreach (Player player in players)
+        {
+            if (player != null)
+            {
+                player.SetInteractionEnabled(true);
+            }
+        }
+        
+        if (mostrarDebugInfo)
+        {
+            Debug.Log($"🔓 Interacciones reactivadas para {players.Length} jugador(es)");
+        }
     }
     
     /// <summary>

@@ -98,6 +98,8 @@ public class Player : MonoBehaviour, IHitable
 
     private HashSet<IInteractable> ignoredInteractables = new HashSet<IInteractable>();
     private HashSet<IInteractable> activeShadows = new HashSet<IInteractable>(); // Rastrea qué sombras están activas
+    
+    private bool interactionEnabled = true; // Controla si el jugador puede interactuar con objetos
 
     [Header("Debug Bridge Hotkey")]
     [SerializeField] private bool enableFillBridgeHotkey = false;
@@ -338,6 +340,12 @@ public class Player : MonoBehaviour, IHitable
 
     private void TryInteract()
     {
+        // Si la interacción está deshabilitada, no hacer nada
+        if (!interactionEnabled)
+        {
+            return;
+        }
+        
         if(characterController == null){
             return;
         }
@@ -906,5 +914,36 @@ public class Player : MonoBehaviour, IHitable
         }
         
         return false;
+    }
+
+    /// <summary>
+    /// Habilita o deshabilita la capacidad del jugador para interactuar con objetos.
+    /// Cuando se deshabilita, el jugador no puede recoger ni interactuar con objetos.
+    /// </summary>
+    /// <param name="enable">True para habilitar interacciones, False para deshabilitarlas</param>
+    public void SetInteractionEnabled(bool enable)
+    {
+        interactionEnabled = enable;
+        
+        // Si se deshabilita, ocultar todos los UI de interacción
+        if (!enable)
+        {
+            HideInteractionUI();
+            HideBuildUI();
+            
+            // Desactivar todas las sombras activas
+            foreach (var shadowActive in new List<IInteractable>(activeShadows))
+            {
+                ActivarSombra(shadowActive, false);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Obtiene si la interacción está habilitada para este jugador.
+    /// </summary>
+    public bool IsInteractionEnabled()
+    {
+        return interactionEnabled;
     }
 }
